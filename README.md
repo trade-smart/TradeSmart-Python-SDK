@@ -1,4 +1,4 @@
-# TradeSmart SDKs
+# TradeSmart Python SDK
 
 Official open-source SDKs for the [TradeSmart API V2](https://apidocs.tradesmartonline.in/v2/)
 (REST + WebSocket) from TradeSmart Fintech Securities Limited. Log in, read your account, find
