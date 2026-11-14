@@ -54,7 +54,7 @@ dev = [
     "pytest-xdist>=3.6",
     "respx>=0.21",
     "ruff>=0.6",
-    "mypy>=1.10,<2",
+    "mypy>=1.10,<3",
     "build>=1.2",
     "twine>=5",
 ]
