@@ -1,0 +1,363 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"exch\":\"NSE\",\"token\":\"22\"}",
+        "utf8_hex": "6a446174613d7b22756964223a2254455354313233222c2265786368223a224e5345222c22746f6b656e223a223232227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "uid",
+            "TEST123"
+          ],
+          [
+            "exch",
+            "NSE"
+          ],
+          [
+            "token",
+            "22"
+          ]
+        ]
+      },
+      "name": "plain_values"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\"}",
+        "utf8_hex": "6a446174613d7b22756964223a2254455354313233222c226163746964223a2254455354313233227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "uid",
+            "TEST123"
+          ],
+          [
+            "actid",
+            "TEST123"
+          ]
+        ]
+      },
+      "name": "key_order_is_kept_not_sorted"
+    },
+    {
+      "expected": {
+        "body": "jData={}",
+        "utf8_hex": "6a446174613d7b7d"
+      },
+      "input": {
+        "payload": []
+      },
+      "name": "empty_payload"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"remarks\":\"\"}",
+        "utf8_hex": "6a446174613d7b22756964223a2254455354313233222c2272656d61726b73223a22227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "uid",
+            "TEST123"
+          ],
+          [
+            "remarks",
+            ""
+          ]
+        ]
+      },
+      "name": "empty_value"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"a%26b\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a226125323662227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "a&b"
+          ]
+        ]
+      },
+      "name": "ampersand_is_percent_encoded"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"a%2Bb\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a226125324262227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "a+b"
+          ]
+        ]
+      },
+      "name": "plus_is_percent_encoded"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"100%25\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a22313030253235227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "100%"
+          ]
+        ]
+      },
+      "name": "percent_is_encoded_first"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"%2526\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a222532353236227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "%26"
+          ]
+        ]
+      },
+      "name": "literal_percent_escape_is_encoded_again"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"a=b\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a22613d62227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "a=b"
+          ]
+        ]
+      },
+      "name": "equals_is_sent_as_is"
+    },
+    {
+      "expected": {
+        "body": "jData={\"tsym\":\"M%26M FIN/X\"}",
+        "utf8_hex": "6a446174613d7b227473796d223a224d2532364d2046494e2f58227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "tsym",
+            "M&M FIN/X"
+          ]
+        ]
+      },
+      "name": "space_and_slash_are_sent_as_is"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"say \\\"hi\\\"\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a22736179205c2268695c22227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "say \"hi\""
+          ]
+        ]
+      },
+      "name": "double_quote_is_json_escaped"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"a\\\\b\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a22615c5c62227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "a\\b"
+          ]
+        ]
+      },
+      "name": "backslash_is_json_escaped"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"a\\nb\\tc\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a22615c6e625c7463227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "a\nb\tc"
+          ]
+        ]
+      },
+      "name": "newline_and_tab_are_json_escaped"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"a\\rb\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a22615c7262227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "a\rb"
+          ]
+        ]
+      },
+      "name": "carriage_return_is_short_escaped"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"a\\bb\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a22615c6262227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "a\bb"
+          ]
+        ]
+      },
+      "name": "backspace_is_short_escaped"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"a\\fb\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a22615c6662227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "a\fb"
+          ]
+        ]
+      },
+      "name": "form_feed_is_short_escaped"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"a\\u001fb\\u0001c\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a22615c7530303166625c753030303163227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "a\u001fb\u0001c"
+          ]
+        ]
+      },
+      "name": "other_control_character_is_lowercase_u_escape"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"ab\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a22617f62227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "ab"
+          ]
+        ]
+      },
+      "name": "delete_character_is_sent_raw"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"a b c\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a2261e280a862e280a963227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "a b c"
+          ]
+        ]
+      },
+      "name": "line_separator_u2028_is_sent_raw"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"<b>%26'x'</b>\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a223c623e2532362778273c2f623e227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "<b>&'x'</b>"
+          ]
+        ]
+      },
+      "name": "html_characters_are_not_escaped"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"₹ नमस्ते\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a22e282b920e0a4a8e0a4aee0a4b8e0a58de0a4a4e0a587227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "₹ नमस्ते"
+          ]
+        ]
+      },
+      "name": "non_ascii_is_sent_as_utf8_not_escaped"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"😀\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a22f09f9880227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "😀"
+          ]
+        ]
+      },
+      "name": "astral_character_is_sent_as_utf8"
+    },
+    {
+      "expected": {
+        "body": "jData={\"remarks\":\"%25%26%2B=?#\"}",
+        "utf8_hex": "6a446174613d7b2272656d61726b73223a222532352532362532423d3f23227d"
+      },
+      "input": {
+        "payload": [
+          [
+            "remarks",
+            "%&+=?#"
+          ]
+        ]
+      },
+      "name": "all_specials_together"
+    }
+  ],
+  "description": "REST request body. input.payload is the ordered list of [key, value] string pairs (the wire key order is kept, never sorted). The body is jData= followed by compact JSON (separators \",\" and \":\", no spaces), non-ASCII characters written as UTF-8 (no \\u escapes), no HTML escaping of < > & or ', then only % & + percent-encoded, in that order (% first). Everything else, including = space / ? #, is sent as is. JSON string escapes: \" and \\ as \\\" and \\\\; the control characters U+0008, U+0009, U+000A, U+000C, U+000D as \\b \\t \\n \\f \\r; every other character below U+0020 as \\u00XX with lower-case hex; DEL (U+007F), U+2028 and U+2029 are sent raw as UTF-8. expected.utf8_hex is the exact body bytes.",
+  "source": "tradesmart._transport.codec.encode_jdata",
+  "tolerance": {}
+}

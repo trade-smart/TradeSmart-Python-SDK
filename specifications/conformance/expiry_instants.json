@@ -1,0 +1,421 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "instant": "2026-11-26T15:30:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "expiry_instant"
+      },
+      "name": "nfo_default_close"
+    },
+    {
+      "expected": {
+        "instant": "2026-11-26T15:30:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "BFO",
+        "expiry_time": null,
+        "function": "expiry_instant"
+      },
+      "name": "bfo_default_close"
+    },
+    {
+      "expected": {
+        "instant": "2026-11-26T12:30:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "CDS",
+        "expiry_time": null,
+        "function": "expiry_instant"
+      },
+      "name": "cds_default_close"
+    },
+    {
+      "expected": {
+        "instant": "2026-11-26T12:30:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "BCD",
+        "expiry_time": null,
+        "function": "expiry_instant"
+      },
+      "name": "bcd_default_close"
+    },
+    {
+      "expected": {
+        "instant": "2026-11-26T23:30:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "MCX",
+        "expiry_time": null,
+        "function": "expiry_instant"
+      },
+      "name": "mcx_default_close"
+    },
+    {
+      "expected": {
+        "instant": "2026-11-26T15:00:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NFO",
+        "expiry_time": "15:00",
+        "function": "expiry_instant"
+      },
+      "name": "nfo_with_expiry_time_override"
+    },
+    {
+      "expected": {
+        "instant": "2026-11-26T10:15:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "BFO",
+        "expiry_time": "10:15",
+        "function": "expiry_instant"
+      },
+      "name": "bfo_with_expiry_time_override"
+    },
+    {
+      "expected": {
+        "instant": "2026-11-26T17:00:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "CDS",
+        "expiry_time": "17:00",
+        "function": "expiry_instant"
+      },
+      "name": "cds_with_expiry_time_override"
+    },
+    {
+      "expected": {
+        "instant": "2026-11-26T09:00:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "BCD",
+        "expiry_time": "09:00",
+        "function": "expiry_instant"
+      },
+      "name": "bcd_with_expiry_time_override"
+    },
+    {
+      "expected": {
+        "instant": "2026-11-26T17:00:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "MCX",
+        "expiry_time": "17:00",
+        "function": "expiry_instant"
+      },
+      "name": "mcx_with_expiry_time_override"
+    },
+    {
+      "expected": {
+        "instant": "2026-11-26T00:00:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "MCX",
+        "expiry_time": "00:00",
+        "function": "expiry_instant"
+      },
+      "name": "mcx_override_to_midnight"
+    },
+    {
+      "expected": {
+        "instant": "2026-11-26T15:30:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "  nfo ",
+        "expiry_time": null,
+        "function": "expiry_instant"
+      },
+      "name": "exchange_is_case_and_space_insensitive"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NSE",
+        "expiry_time": null,
+        "function": "expiry_instant"
+      },
+      "name": "unknown_exchange_without_override_is_an_error"
+    },
+    {
+      "expected": {
+        "instant": "2026-11-26T15:30:00+05:30"
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NSE",
+        "expiry_time": "15:30",
+        "function": "expiry_instant"
+      },
+      "name": "unknown_exchange_with_override_is_accepted"
+    },
+    {
+      "expected": {
+        "instant": "2028-02-29T15:30:00+05:30"
+      },
+      "input": {
+        "date": "2028-02-29",
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "expiry_instant"
+      },
+      "name": "leap_day"
+    },
+    {
+      "expected": {
+        "expired": false
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T15:29:00+05:30"
+      },
+      "name": "nfo_one_minute_before_close"
+    },
+    {
+      "expected": {
+        "expired": true
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T15:30:00+05:30"
+      },
+      "name": "nfo_exactly_at_close_is_expired"
+    },
+    {
+      "expected": {
+        "expired": true
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T15:31:00+05:30"
+      },
+      "name": "nfo_one_minute_after_close"
+    },
+    {
+      "expected": {
+        "expired": false
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T09:15:00+05:30"
+      },
+      "name": "nfo_morning_of_expiry"
+    },
+    {
+      "expected": {
+        "expired": false
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-25T23:59:00+05:30"
+      },
+      "name": "nfo_day_before"
+    },
+    {
+      "expected": {
+        "expired": true
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-27T09:00:00+05:30"
+      },
+      "name": "nfo_day_after"
+    },
+    {
+      "expected": {
+        "expired": false
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "BFO",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T15:29:00+05:30"
+      },
+      "name": "bfo_one_minute_before_close"
+    },
+    {
+      "expected": {
+        "expired": true
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "BFO",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T15:31:00+05:30"
+      },
+      "name": "bfo_one_minute_after_close"
+    },
+    {
+      "expected": {
+        "expired": false
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "CDS",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T12:29:00+05:30"
+      },
+      "name": "cds_one_minute_before_close"
+    },
+    {
+      "expected": {
+        "expired": true
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "CDS",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T12:31:00+05:30"
+      },
+      "name": "cds_one_minute_after_close"
+    },
+    {
+      "expected": {
+        "expired": true
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "BCD",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T12:31:00+05:30"
+      },
+      "name": "bcd_one_minute_after_close"
+    },
+    {
+      "expected": {
+        "expired": false
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "MCX",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T23:29:00+05:30"
+      },
+      "name": "mcx_one_minute_before_close"
+    },
+    {
+      "expected": {
+        "expired": true
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "MCX",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T23:30:00+05:30"
+      },
+      "name": "mcx_exactly_at_close_is_expired"
+    },
+    {
+      "expected": {
+        "expired": true
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "MCX",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T23:31:00+05:30"
+      },
+      "name": "mcx_one_minute_after_close"
+    },
+    {
+      "expected": {
+        "expired": false
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "MCX",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T16:00:00+05:30"
+      },
+      "name": "mcx_afternoon_is_not_expired"
+    },
+    {
+      "expected": {
+        "expired": false
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NFO",
+        "expiry_time": "15:00",
+        "function": "option_has_expired",
+        "now": "2026-11-26T14:59:00+05:30"
+      },
+      "name": "override_before"
+    },
+    {
+      "expected": {
+        "expired": true
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NFO",
+        "expiry_time": "15:00",
+        "function": "option_has_expired",
+        "now": "2026-11-26T15:01:00+05:30"
+      },
+      "name": "override_after"
+    },
+    {
+      "expected": {
+        "expired": true
+      },
+      "input": {
+        "date": "2026-11-26",
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_has_expired",
+        "now": "2026-11-26T10:01:00+00:00"
+      },
+      "name": "now_given_in_utc_is_compared_as_an_instant"
+    }
+  ],
+  "description": "input.function is expiry_instant (expected {\"instant\": ISO 8601 with +05:30}) or option_has_expired (expected {\"expired\": bool}; true when the expiry instant is at or before now). expiry_time is null or HH:MM in IST and overrides the exchange close (NFO/BFO 15:30, CDS/BCD 12:30, MCX 23:30). An unknown exchange without an override is {\"error\": \"ValueError\"}.",
+  "source": "tradesmart._option_contracts.expiry_instant / option_has_expired",
+  "tolerance": {}
+}

@@ -1,0 +1,23 @@
+{
+  "USERID": "TEST123",
+  "access_token": "test-access-token",
+  "expires_in": "1789723906",
+  "refresh_token": "test-refresh-token",
+  "scope": "0",
+  "actid": "TEST123",
+  "uname": "Test User",
+  "prarr": [],
+  "exch_prd": [],
+  "stat": "Ok",
+  "susertoken": "test-access-token",
+  "uid": "TEST123",
+  "brnchid": "HO",
+  "totp_set": "1",
+  "orarr": [],
+  "exarr": ["NSE", "NFO", "CDS", "MCX", "BSE", "BFO", "BCD"],
+  "values": [],
+  "mws": {},
+  "brkname": "VNS",
+  "lastaccesstime": "1781947511",
+  "lastpwdtime": "0"
+}

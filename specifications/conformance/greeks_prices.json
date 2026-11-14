@@ -1,0 +1,1615 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "delta": 0.779131290942669,
+        "gamma": 0.04996267040591185,
+        "iv": 0.2,
+        "price": 4.759422392871535,
+        "rho": 0.1398204591336028,
+        "status": "ok",
+        "theta": -0.012490663546829112,
+        "vega": 0.08813415059602854,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.1,
+        "strike": 40,
+        "underlying": 42,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "bsm_textbook_hull_call"
+    },
+    {
+      "expected": {
+        "delta": -0.22086870905733103,
+        "gamma": 0.04996267040591185,
+        "iv": 0.2,
+        "price": 0.8085993729000958,
+        "rho": -0.050425425766539994,
+        "status": "ok",
+        "theta": -0.0020662314975062207,
+        "vega": 0.08813415059602854,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.1,
+        "strike": 40,
+        "underlying": 42,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "bsm_textbook_hull_put"
+    },
+    {
+      "expected": {
+        "delta": 0.5131388031882277,
+        "gamma": 0.13376450266134562,
+        "iv": 0.25,
+        "price": 1.116641456558943,
+        "rho": -0.00372213818852981,
+        "status": "ok",
+        "theta": -0.004305639868976754,
+        "vega": 0.044588167553781866,
+        "years_to_expiry": 0.3333333333333333
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.09,
+        "strike": 20,
+        "underlying": 20,
+        "volatility": 0.25,
+        "years": 0.3333333333333333
+      },
+      "name": "black76_textbook_hull_call"
+    },
+    {
+      "expected": {
+        "delta": -0.4573067303602805,
+        "gamma": 0.13376450266134562,
+        "iv": 0.25,
+        "price": 1.116641456558943,
+        "rho": -0.00372213818852981,
+        "status": "ok",
+        "theta": -0.004305639868976754,
+        "vega": 0.044588167553781866,
+        "years_to_expiry": 0.3333333333333333
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.09,
+        "strike": 20,
+        "underlying": 20,
+        "volatility": 0.25,
+        "years": 0.3333333333333333
+      },
+      "name": "black76_textbook_hull_put"
+    },
+    {
+      "expected": {
+        "delta": 0.6987394144421953,
+        "gamma": 0.0095418781570453,
+        "iv": 0.35,
+        "price": 19.890442787012965,
+        "rho": 0.49983498657206576,
+        "status": "ok",
+        "theta": -0.019030401301825164,
+        "vega": 0.33396573549658554,
+        "years_to_expiry": 1.0
+      },
+      "input": {
+        "dividend_yield": 0.02,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.05,
+        "strike": 90,
+        "underlying": 100,
+        "volatility": 0.35,
+        "years": 1.0
+      },
+      "name": "bsm_with_dividend_yield_call"
+    },
+    {
+      "expected": {
+        "delta": -0.28145925886455986,
+        "gamma": 0.0095418781570453,
+        "iv": 0.35,
+        "price": 7.481223661401703,
+        "rho": -0.3562714954785769,
+        "status": "ok",
+        "theta": -0.01267386688089447,
+        "vega": 0.33396573549658554,
+        "years_to_expiry": 1.0
+      },
+      "input": {
+        "dividend_yield": 0.02,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.05,
+        "strike": 90,
+        "underlying": 100,
+        "volatility": 0.35,
+        "years": 1.0
+      },
+      "name": "bsm_with_dividend_yield_put"
+    },
+    {
+      "expected": {
+        "delta": 0.07327596686077346,
+        "gamma": 0.0004291150712607169,
+        "iv": 0.12,
+        "price": 10.521211776622522,
+        "rho": 0.27201427380984167,
+        "status": "ok",
+        "theta": -3.432152980247369,
+        "vega": 3.755168353736591,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 20000,
+        "underlying": 19500,
+        "volatility": 0.12,
+        "years": 0.019178082191780823
+      },
+      "name": "bsm_index_scale_with_yield"
+    },
+    {
+      "expected": {
+        "delta": 0.6289147501001685,
+        "gamma": 0.0008056045017097195,
+        "iv": 0.14,
+        "price": 270.40453556502143,
+        "rho": -0.05185840408096302,
+        "status": "ok",
+        "theta": -12.566907084582368,
+        "vega": 12.615061316943258,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 24000,
+        "underlying": 24150,
+        "volatility": 0.14,
+        "years": 0.019178082191780823
+      },
+      "name": "black76_index_future_call"
+    },
+    {
+      "expected": {
+        "delta": -0.36983945120965583,
+        "gamma": 0.0008056045017097195,
+        "iv": 0.14,
+        "price": 120.59140536854648,
+        "rho": -0.023127118837803433,
+        "status": "ok",
+        "theta": -12.593586135165301,
+        "vega": 12.615061316943258,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 24000,
+        "underlying": 24150,
+        "volatility": 0.14,
+        "years": 0.019178082191780823
+      },
+      "name": "black76_index_future_put"
+    },
+    {
+      "expected": {
+        "delta": 0.34408561975603585,
+        "gamma": 0.4156958040576524,
+        "iv": 0.8,
+        "price": 0.17848870487924584,
+        "rho": -0.00017848870487924585,
+        "status": "ok",
+        "theta": -0.004464459046317802,
+        "vega": 0.004073818879764994,
+        "years_to_expiry": 0.1
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.0,
+        "strike": 4.0,
+        "underlying": 3.5,
+        "volatility": 0.8,
+        "years": 0.1
+      },
+      "name": "black76_zero_rate_low_price"
+    },
+    {
+      "expected": {
+        "delta": 0.5115580780754218,
+        "gamma": 0.03920215237377904,
+        "iv": 0.2,
+        "price": 3.9234837174155928,
+        "rho": -0.009808709293538982,
+        "status": "ok",
+        "theta": -0.020781928857873406,
+        "vega": 0.19601076186889518,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CALL",
+        "rate": 0.065,
+        "strike": 100,
+        "underlying": 100,
+        "volatility": 0.2,
+        "years": 0.25
+      },
+      "name": "black76_option_type_call_alias"
+    },
+    {
+      "expected": {
+        "delta": -0.4723232409012657,
+        "gamma": 0.03920215237377904,
+        "iv": 0.2,
+        "price": 3.9234837174155928,
+        "rho": -0.009808709293538982,
+        "status": "ok",
+        "theta": -0.02078192885787341,
+        "vega": 0.19601076186889518,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "put",
+        "rate": 0.065,
+        "strike": 100,
+        "underlying": 100,
+        "volatility": 0.2,
+        "years": 0.25
+      },
+      "name": "black76_option_type_put_alias_lowercase"
+    },
+    {
+      "expected": {
+        "delta": 0.500122736720299,
+        "gamma": 6.467291808814343,
+        "iv": 0.2,
+        "price": 0.02460917813505148,
+        "rho": -2.3410557586616705e-09,
+        "status": "near_expiry",
+        "theta": -3.5437171566199726,
+        "vega": 0.0012304588677348447,
+        "years_to_expiry": 9.512937595129377e-06
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100,
+        "underlying": 100,
+        "volatility": 0.2,
+        "years": 9.512937595129377e-06
+      },
+      "name": "black76_five_minutes_left_is_near_expiry"
+    },
+    {
+      "expected": {
+        "delta": -0.4994770547827411,
+        "gamma": 6.467290559129676,
+        "iv": 0.2,
+        "price": 0.024578281069558727,
+        "rho": -4.753832168887336e-06,
+        "status": "near_expiry",
+        "theta": -3.5348216804974744,
+        "vega": 0.0012304586299714,
+        "years_to_expiry": 9.512937595129377e-06
+      },
+      "input": {
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100,
+        "underlying": 100,
+        "volatility": 0.2,
+        "years": 9.512937595129377e-06
+      },
+      "name": "bsm_five_minutes_left_is_near_expiry"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 5.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.0
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100,
+        "underlying": 105,
+        "volatility": 0.2,
+        "years": 0.0
+      },
+      "name": "black76_years_zero_is_expired_itm_call"
+    },
+    {
+      "expected": {
+        "delta": 0.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 0.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": -0.01
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100,
+        "underlying": 105,
+        "volatility": 0.2,
+        "years": -0.01
+      },
+      "name": "black76_negative_years_is_expired_otm_put"
+    },
+    {
+      "expected": {
+        "delta": 0.5,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 0.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.0
+      },
+      "input": {
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100,
+        "underlying": 100,
+        "volatility": 0.2,
+        "years": 0.0
+      },
+      "name": "bsm_years_zero_is_expired_atm_call"
+    },
+    {
+      "expected": {
+        "delta": 0.5000549659890086,
+        "gamma": 14.461311818729579,
+        "iv": 0.2,
+        "price": 0.01100556461982194,
+        "rho": -2.0939049885505973e-10,
+        "status": "near_expiry",
+        "theta": -7.924004516121139,
+        "vega": 0.0005502782275011255,
+        "years_to_expiry": 1e-06
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100,
+        "underlying": 100,
+        "volatility": 0.2,
+        "years": 1e-06
+      },
+      "name": "black76_sub_minute_years_uses_the_one_minute_floor"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "XX",
+        "rate": 0.065,
+        "strike": 100,
+        "underlying": 100,
+        "volatility": 0.2,
+        "years": 0.25
+      },
+      "name": "black76_option_type_invalid_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100,
+        "underlying": 100,
+        "volatility": 0.0,
+        "years": 0.25
+      },
+      "name": "black76_zero_volatility_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 0,
+        "underlying": 100,
+        "volatility": 0.2,
+        "years": 0.25
+      },
+      "name": "black76_zero_strike_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100,
+        "underlying": -1,
+        "volatility": 0.2,
+        "years": 0.25
+      },
+      "name": "bsm_negative_underlying_is_an_error"
+    },
+    {
+      "expected": {
+        "delta": 0.9986869863322352,
+        "gamma": 9.834117749533336e-05,
+        "iv": 0.2,
+        "price": 9.987585925016347,
+        "rho": -0.001915427437674368,
+        "status": "ok",
+        "theta": 0.0017247256154164258,
+        "vega": 3.7719903696840195e-05,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_black76_ce_otm_or_itm_90_7d_vol20"
+    },
+    {
+      "expected": {
+        "delta": 0.9719667201528526,
+        "gamma": 0.011176110962504126,
+        "iv": 0.4,
+        "price": 10.045240673191415,
+        "rho": -0.0019264845126668467,
+        "status": "ok",
+        "theta": -0.02270670719519413,
+        "vega": 0.008573454984934671,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_black76_ce_otm_or_itm_90_7d_vol40"
+    },
+    {
+      "expected": {
+        "delta": 0.7673227731294,
+        "gamma": 0.019578985999205427,
+        "iv": 0.2,
+        "price": 11.395996954795052,
+        "rho": -0.05697998477397526,
+        "status": "ok",
+        "theta": -0.00869878739117646,
+        "vega": 0.19578985999205434,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "grid_black76_ce_otm_or_itm_90_half_year_vol20"
+    },
+    {
+      "expected": {
+        "delta": 0.6740809773017885,
+        "gamma": 0.011964577207817701,
+        "iv": 0.4,
+        "price": 15.886282238913353,
+        "rho": -0.07943141119456676,
+        "status": "ok",
+        "theta": -0.023394666906095322,
+        "vega": 0.23929154415635406,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.5
+      },
+      "name": "grid_black76_ce_otm_or_itm_90_half_year_vol40"
+    },
+    {
+      "expected": {
+        "delta": 0.5048947918559702,
+        "gamma": 0.143844896110732,
+        "iv": 0.2,
+        "price": 1.1035382402115985,
+        "rho": -0.00021163747072551204,
+        "status": "ok",
+        "theta": -0.07862260064803464,
+        "vega": 0.05517338480959583,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_black76_ce_atm_7d_vol20"
+    },
+    {
+      "expected": {
+        "delta": 0.5104114249880464,
+        "gamma": 0.07190176101173873,
+        "iv": 0.4,
+        "price": 2.2068648666268444,
+        "rho": -0.0004232343579832305,
+        "status": "ok",
+        "theta": -0.15719989751523356,
+        "vega": 0.055157515296676285,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_black76_ce_atm_7d_vol40"
+    },
+    {
+      "expected": {
+        "delta": 0.5112958949401051,
+        "gamma": 0.027239225883490713,
+        "iv": 0.2,
+        "price": 5.4569340048904,
+        "rho": -0.027284670024452,
+        "status": "ok",
+        "theta": -0.013953820455836352,
+        "vega": 0.2723922588349072,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "grid_black76_ce_atm_half_year_vol20"
+    },
+    {
+      "expected": {
+        "delta": 0.5384445386552493,
+        "gamma": 0.013517847940460083,
+        "iv": 0.4,
+        "price": 10.886662747919253,
+        "rho": -0.05443331373959626,
+        "status": "ok",
+        "theta": -0.027689439106173462,
+        "vega": 0.2703569588092017,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.5
+      },
+      "name": "grid_black76_ce_atm_half_year_vol40"
+    },
+    {
+      "expected": {
+        "delta": 0.00030439862269272187,
+        "gamma": 0.00040476423082813314,
+        "iv": 0.2,
+        "price": 0.00021404891112234217,
+        "rho": -4.105047610565467e-08,
+        "status": "ok",
+        "theta": -0.00022175050133261284,
+        "vega": 0.00015525203374229765,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_black76_ce_itm_or_otm_110_7d_vol20"
+    },
+    {
+      "expected": {
+        "delta": 0.045181817667154345,
+        "gamma": 0.017162822129709605,
+        "iv": 0.4,
+        "price": 0.10087691719169811,
+        "rho": -1.9346258091558542e-05,
+        "status": "ok",
+        "theta": -0.03759918001137048,
+        "vega": 0.013166000537859424,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_black76_ce_itm_or_otm_110_7d_vol40"
+    },
+    {
+      "expected": {
+        "delta": 0.2644409789800539,
+        "gamma": 0.02276472965039658,
+        "iv": 0.2,
+        "price": 2.1405361898081523,
+        "rho": -0.010702680949040762,
+        "status": "ok",
+        "theta": -0.012092633089703526,
+        "vega": 0.22764729650396592,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "grid_black76_ce_itm_or_otm_110_half_year_vol20"
+    },
+    {
+      "expected": {
+        "delta": 0.4089709006961956,
+        "gamma": 0.013395124292909061,
+        "iv": 0.4,
+        "price": 7.2289306435893295,
+        "rho": -0.036144653217946646,
+        "status": "ok",
+        "theta": -0.02807183271916149,
+        "vega": 0.26790248585818127,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.5
+      },
+      "name": "grid_black76_ce_itm_or_otm_110_half_year_vol40"
+    },
+    {
+      "expected": {
+        "delta": -6.72149775892307e-05,
+        "gamma": 9.834117749533336e-05,
+        "iv": 0.2,
+        "price": 4.3911918107946216e-05,
+        "rho": -8.421463746729412e-09,
+        "status": "ok",
+        "theta": -5.387775677914975e-05,
+        "vega": 3.7719903696840195e-05,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_black76_pe_otm_or_itm_90_7d_vol20"
+    },
+    {
+      "expected": {
+        "delta": -0.026787481156971778,
+        "gamma": 0.011176110962504126,
+        "iv": 0.4,
+        "price": 0.057698660093192355,
+        "rho": -1.1065496456228671e-05,
+        "status": "ok",
+        "theta": -0.024485310567389708,
+        "vega": 0.008573454984934671,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_black76_pe_otm_or_itm_90_7d_vol40"
+    },
+    {
+      "expected": {
+        "delta": -0.20069967670190597,
+        "gamma": 0.019578985999205427,
+        "iv": 0.2,
+        "price": 1.7157724564820036,
+        "rho": -0.008578862282410019,
+        "status": "ok",
+        "theta": -0.010422662986766456,
+        "vega": 0.19578985999205434,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "grid_black76_pe_otm_or_itm_90_half_year_vol20"
+    },
+    {
+      "expected": {
+        "delta": -0.2939414725295176,
+        "gamma": 0.011964577207817701,
+        "iv": 0.4,
+        "price": 6.206057740600272,
+        "rho": -0.03103028870300136,
+        "status": "ok",
+        "theta": -0.025118542501685326,
+        "vega": 0.23929154415635406,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.5
+      },
+      "name": "grid_black76_pe_otm_or_itm_90_half_year_vol40"
+    },
+    {
+      "expected": {
+        "delta": -0.4938594094538542,
+        "gamma": 0.143844896110732,
+        "iv": 0.2,
+        "price": 1.1035382402115985,
+        "rho": -0.00021163747072551204,
+        "status": "ok",
+        "theta": -0.07862260064803464,
+        "vega": 0.05517338480959583,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_black76_pe_atm_7d_vol20"
+    },
+    {
+      "expected": {
+        "delta": -0.48834277632177797,
+        "gamma": 0.07190176101173873,
+        "iv": 0.4,
+        "price": 2.2068648666268444,
+        "rho": -0.0004232343579832305,
+        "status": "ok",
+        "theta": -0.15719989751523356,
+        "vega": 0.055157515296676285,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_black76_pe_atm_7d_vol40"
+    },
+    {
+      "expected": {
+        "delta": -0.456726554891201,
+        "gamma": 0.027239225883490713,
+        "iv": 0.2,
+        "price": 5.4569340048904,
+        "rho": -0.027284670024452,
+        "status": "ok",
+        "theta": -0.013953820455836348,
+        "vega": 0.2723922588349072,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "grid_black76_pe_atm_half_year_vol20"
+    },
+    {
+      "expected": {
+        "delta": -0.42957791117605676,
+        "gamma": 0.013517847940460083,
+        "iv": 0.4,
+        "price": 10.886662747919246,
+        "rho": -0.05443331373959623,
+        "status": "ok",
+        "theta": -0.027689439106173466,
+        "vega": 0.2703569588092017,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.5
+      },
+      "name": "grid_black76_pe_atm_half_year_vol40"
+    },
+    {
+      "expected": {
+        "delta": -0.9984498026871317,
+        "gamma": 0.00040476423082813314,
+        "iv": 0.2,
+        "price": 9.987756062009367,
+        "rho": -0.001915460066686728,
+        "status": "ok",
+        "theta": 0.0015568528708629682,
+        "vega": 0.00015525203374229765,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_black76_pe_itm_or_otm_110_7d_vol20"
+    },
+    {
+      "expected": {
+        "delta": -0.95357238364267,
+        "gamma": 0.017162822129709605,
+        "iv": 0.4,
+        "price": 10.088418930289976,
+        "rho": -0.0019347652743021873,
+        "status": "ok",
+        "theta": -0.0358205766391749,
+        "vega": 0.013166000537859424,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_black76_pe_itm_or_otm_110_7d_vol40"
+    },
+    {
+      "expected": {
+        "delta": -0.7035814708512521,
+        "gamma": 0.02276472965039658,
+        "iv": 0.2,
+        "price": 11.820760688121226,
+        "rho": -0.05910380344060613,
+        "status": "ok",
+        "theta": -0.01036875749411353,
+        "vega": 0.22764729650396592,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "grid_black76_pe_itm_or_otm_110_half_year_vol20"
+    },
+    {
+      "expected": {
+        "delta": -0.5590515491351105,
+        "gamma": 0.013395124292909061,
+        "iv": 0.4,
+        "price": 16.90915514190239,
+        "rho": -0.08454577570951194,
+        "status": "ok",
+        "theta": -0.026347957123571488,
+        "vega": 0.26790248585818127,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.5
+      },
+      "name": "grid_black76_pe_itm_or_otm_110_half_year_vol40"
+    },
+    {
+      "expected": {
+        "delta": 0.999750613717076,
+        "gamma": 8.506148539886885e-05,
+        "iv": 0.2,
+        "price": 10.092982978973282,
+        "rho": 0.01723765886983946,
+        "status": "ok",
+        "theta": -0.013313963777781995,
+        "vega": 3.2626323166689415e-05,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_bsm_ce_otm_or_itm_90_7d_vol20"
+    },
+    {
+      "expected": {
+        "delta": 0.9741510928168564,
+        "gamma": 0.01078231161198693,
+        "iv": 0.4,
+        "price": 10.147878738325645,
+        "rho": 0.01673618120009644,
+        "status": "ok",
+        "theta": -0.03650429638929065,
+        "vega": 0.008271362332483123,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_bsm_ce_otm_or_itm_90_7d_vol40"
+    },
+    {
+      "expected": {
+        "delta": 0.8395861633988814,
+        "gamma": 0.016851335118066146,
+        "iv": 0.2,
+        "price": 13.60676283235803,
+        "rho": 0.3517592675376506,
+        "status": "ok",
+        "theta": -0.019461784488229602,
+        "vega": 0.16851335118066155,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "grid_bsm_ce_otm_or_itm_90_half_year_vol20"
+    },
+    {
+      "expected": {
+        "delta": 0.7258131009305309,
+        "gamma": 0.011643593856804186,
+        "iv": 0.4,
+        "price": 17.811012927690953,
+        "rho": 0.2738514858268107,
+        "status": "ok",
+        "theta": -0.033285291233592765,
+        "vega": 0.23287187713608382,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.5
+      },
+      "name": "grid_bsm_ce_otm_or_itm_90_half_year_vol40"
+    },
+    {
+      "expected": {
+        "delta": 0.5206086526609315,
+        "gamma": 0.1438164501472179,
+        "iv": 0.2,
+        "price": 1.157622891595473,
+        "rho": 0.009762265660862569,
+        "status": "ok",
+        "theta": -0.08644217022226026,
+        "vega": 0.05516247402906987,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_bsm_ce_atm_7d_vol20"
+    },
+    {
+      "expected": {
+        "delta": 0.5185397902184132,
+        "gamma": 0.07192665083832692,
+        "iv": 0.4,
+        "price": 2.261131373371782,
+        "rho": 0.00951095708326813,
+        "status": "ok",
+        "theta": -0.16505839993861274,
+        "vega": 0.055176608862278174,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_bsm_ce_atm_7d_vol40"
+    },
+    {
+      "expected": {
+        "delta": 0.6015435887432733,
+        "gamma": 0.027099135106943895,
+        "iv": 0.2,
+        "price": 6.986607708669858,
+        "rho": 0.2658387558282874,
+        "status": "ok",
+        "theta": -0.02266900618743354,
+        "vega": 0.27099135106943906,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "grid_bsm_ce_atm_half_year_vol20"
+    },
+    {
+      "expected": {
+        "delta": 0.5913467998495647,
+        "gamma": 0.013640377383484953,
+        "iv": 0.4,
+        "price": 12.439715156816945,
+        "rho": 0.23347482414069767,
+        "status": "ok",
+        "theta": -0.03659213101580129,
+        "vega": 0.2728075476696991,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.5
+      },
+      "name": "grid_bsm_ce_atm_half_year_vol40"
+    },
+    {
+      "expected": {
+        "delta": 0.00035036252157686536,
+        "gamma": 0.00046135069235958803,
+        "iv": 0.2,
+        "price": 0.00024852795492099483,
+        "rho": 6.671618340256405e-06,
+        "status": "ok",
+        "theta": -0.0002580300767767685,
+        "vega": 0.00017695642994614336,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_bsm_ce_itm_or_otm_110_7d_vol20"
+    },
+    {
+      "expected": {
+        "delta": 0.04707114929753568,
+        "gamma": 0.01774057730783395,
+        "iv": 0.4,
+        "price": 0.10574176020656623,
+        "rho": 0.0008824551284062744,
+        "status": "ok",
+        "theta": -0.039573917679425155,
+        "vega": 0.01360920998957125,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_bsm_ce_itm_or_otm_110_7d_vol40"
+    },
+    {
+      "expected": {
+        "delta": 0.33964817515617873,
+        "gamma": 0.025818922162975867,
+        "iv": 0.2,
+        "price": 2.9687567787187916,
+        "rho": 0.15498030368449542,
+        "status": "ok",
+        "theta": -0.018736658096814893,
+        "vega": 0.2581892216297587,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "grid_bsm_ce_itm_or_otm_110_half_year_vol20"
+    },
+    {
+      "expected": {
+        "delta": 0.45853913968579185,
+        "gamma": 0.013966716325990216,
+        "iv": 0.4,
+        "price": 8.421084162058271,
+        "rho": 0.1871641490326046,
+        "status": "ok",
+        "theta": -0.03602182974939793,
+        "vega": 0.27933432651980444,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.5
+      },
+      "name": "grid_bsm_ce_itm_or_otm_110_half_year_vol40"
+    },
+    {
+      "expected": {
+        "delta": -5.7623849772510476e-05,
+        "gamma": 8.506148539886885e-05,
+        "iv": 0.2,
+        "price": 3.734017262889931e-05,
+        "rho": -1.1122760561413597e-06,
+        "status": "ok",
+        "theta": -4.573407888987419e-05,
+        "vega": 3.2626323166689415e-05,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_bsm_pe_otm_or_itm_90_7d_vol20"
+    },
+    {
+      "expected": {
+        "delta": -0.02565714474999203,
+        "gamma": 0.01078231161198693,
+        "iv": 0.4,
+        "price": 0.0549330995250088,
+        "rho": -0.0005025899457991639,
+        "status": "ok",
+        "theta": -0.02323606669039853,
+        "vega": 0.008271362332483123,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_bsm_pe_otm_or_itm_90_7d_vol40"
+    },
+    {
+      "expected": {
+        "delta": -0.15542631579380087,
+        "gamma": 0.016851335118066146,
+        "iv": 0.2,
+        "price": 1.227535397907337,
+        "rho": -0.08385083488643712,
+        "status": "ok",
+        "theta": -0.006672965714748899,
+        "vega": 0.16851335118066155,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "grid_bsm_pe_otm_or_itm_90_half_year_vol20"
+    },
+    {
+      "expected": {
+        "delta": -0.2691993782621514,
+        "gamma": 0.011643593856804186,
+        "iv": 0.4,
+        "price": 5.4317854932402625,
+        "rho": -0.16175861659727703,
+        "status": "ok",
+        "theta": -0.02049647246011206,
+        "vega": 0.23287187713608382,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.5
+      },
+      "name": "grid_bsm_pe_otm_or_itm_90_half_year_vol40"
+    },
+    {
+      "expected": {
+        "delta": -0.47919958490591696,
+        "gamma": 0.1438164501472179,
+        "iv": 0.2,
+        "price": 1.052219265893065,
+        "rho": -0.009391924501243652,
+        "status": "ok",
+        "theta": -0.07139533715117258,
+        "vega": 0.05516247402906987,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_bsm_pe_atm_7d_vol20"
+    },
+    {
+      "expected": {
+        "delta": -0.4812684473484352,
+        "gamma": 0.07192665083832692,
+        "iv": 0.4,
+        "price": 2.155727747669374,
+        "rho": -0.00964323307883809,
+        "status": "ok",
+        "theta": -0.15001156686752504,
+        "vega": 0.055176608862278174,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_bsm_pe_atm_7d_vol40"
+    },
+    {
+      "expected": {
+        "delta": -0.3934688904494091,
+        "gamma": 0.027099135106943895,
+        "iv": 0.2,
+        "price": 4.2876047725322195,
+        "rho": -0.21817246908736565,
+        "status": "ok",
+        "theta": -0.008156311818362839,
+        "vega": 0.27099135106943906,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "grid_bsm_pe_atm_half_year_vol20"
+    },
+    {
+      "expected": {
+        "delta": -0.4036656793431176,
+        "gamma": 0.013640377383484953,
+        "iv": 0.4,
+        "price": 9.740712220679313,
+        "rho": -0.25053640077495537,
+        "status": "ok",
+        "theta": -0.022079436646730583,
+        "vega": 0.2728075476696991,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.5
+      },
+      "name": "grid_bsm_pe_atm_half_year_vol40"
+    },
+    {
+      "expected": {
+        "delta": -0.9994578750452716,
+        "gamma": 0.00046135069235958803,
+        "iv": 0.2,
+        "price": 9.882386915350764,
+        "rho": -0.021062937559976593,
+        "status": "ok",
+        "theta": 0.01656740636650651,
+        "vega": 0.00017695642994614336,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_bsm_pe_itm_or_otm_110_7d_vol20"
+    },
+    {
+      "expected": {
+        "delta": -0.9527370882693128,
+        "gamma": 0.01774057730783395,
+        "iv": 0.4,
+        "price": 9.987880147602425,
+        "rho": -0.020187154049910574,
+        "status": "ok",
+        "theta": -0.022748481236141874,
+        "vega": 0.01360920998957125,
+        "years_to_expiry": 0.019178082191780823
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.019178082191780823
+      },
+      "name": "grid_bsm_pe_itm_or_otm_110_7d_vol40"
+    },
+    {
+      "expected": {
+        "delta": -0.6553643040365035,
+        "gamma": 0.025818922162975867,
+        "iv": 0.2,
+        "price": 9.949978340894233,
+        "rho": -0.377432043722723,
+        "status": "ok",
+        "theta": -0.0025000881321541896,
+        "vega": 0.2581892216297587,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.2,
+        "years": 0.5
+      },
+      "name": "grid_bsm_pe_itm_or_otm_110_half_year_vol20"
+    },
+    {
+      "expected": {
+        "delta": -0.5364733395068905,
+        "gamma": 0.013966716325990216,
+        "iv": 0.4,
+        "price": 15.402305724233706,
+        "rho": -0.3452481983746138,
+        "status": "ok",
+        "theta": -0.019785259784737226,
+        "vega": 0.27933432651980444,
+        "years_to_expiry": 0.5
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility": 0.4,
+        "years": 0.5
+      },
+      "name": "grid_bsm_pe_itm_or_otm_110_half_year_vol40"
+    }
+  ],
+  "description": "Black-76 (underlying = future price) and Black-Scholes-Merton (underlying = spot, optional continuous dividend_yield) price and Greeks for a given volatility. years is in 365-day years; theta is per calendar day, vega per 0.01 volatility, rho per 0.01 rate; Black-76 rho holds the future fixed. years <= 0 gives the expired result.",
+  "source": "tradesmart.greeks.black76 / black_scholes",
+  "tolerance": {
+    "abs": 1e-09,
+    "rel": 1e-09
+  }
+}

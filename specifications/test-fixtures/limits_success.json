@@ -1,0 +1,20 @@
+{
+  "request_time": "16:13:47 20-06-2026",
+  "stat": "Ok",
+  "prfname": "CLIENT_SHIFT",
+  "cash": "0.00",
+  "payin": "0.00",
+  "payout": "0.00",
+  "brkcollamt": "0.00",
+  "unclearedcash": "0.00",
+  "aux_daycash": "0.00",
+  "aux_brkcollamt": "0.00",
+  "aux_unclearedcash": "0.00",
+  "daycash": "0.00",
+  "turnoverlmt": "0.00",
+  "pendordvallmt": "0.00",
+  "remarks_amt": "0.00",
+  "remarks_text": "",
+  "blk_amt": "0.00",
+  "cac_daycash": "0.00"
+}

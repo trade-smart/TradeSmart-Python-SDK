@@ -1,0 +1,556 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "state": "long_buildup"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": 100,
+        "price_change": 1.5
+      },
+      "name": "price_up_oi_up_is_long_buildup"
+    },
+    {
+      "expected": {
+        "state": "short_buildup"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": 100,
+        "price_change": -1.5
+      },
+      "name": "price_down_oi_up_is_short_buildup"
+    },
+    {
+      "expected": {
+        "state": "long_unwinding"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": -100,
+        "price_change": -1.5
+      },
+      "name": "price_down_oi_down_is_long_unwinding"
+    },
+    {
+      "expected": {
+        "state": "short_covering"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": -100,
+        "price_change": 1.5
+      },
+      "name": "price_up_oi_down_is_short_covering"
+    },
+    {
+      "expected": {
+        "state": "long_buildup"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": 1e-12,
+        "price_change": 1e-12
+      },
+      "name": "tiny_positive_changes"
+    },
+    {
+      "expected": {
+        "state": "neutral"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": 100,
+        "price_change": 0
+      },
+      "name": "price_change_zero_is_neutral"
+    },
+    {
+      "expected": {
+        "state": "neutral"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": 0,
+        "price_change": 1.5
+      },
+      "name": "oi_change_zero_is_neutral"
+    },
+    {
+      "expected": {
+        "state": "neutral"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": 0.0,
+        "price_change": 0.0
+      },
+      "name": "both_zero_is_neutral"
+    },
+    {
+      "expected": {
+        "state": "neutral"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": 5,
+        "price_change": -0.0
+      },
+      "name": "negative_zero_is_neutral"
+    },
+    {
+      "expected": {
+        "state": "neutral"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": 100,
+        "price_change": null
+      },
+      "name": "price_change_null_is_neutral"
+    },
+    {
+      "expected": {
+        "state": "neutral"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": null,
+        "price_change": 1.5
+      },
+      "name": "oi_change_null_is_neutral"
+    },
+    {
+      "expected": {
+        "state": "neutral"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": null,
+        "price_change": null
+      },
+      "name": "both_null_is_neutral"
+    },
+    {
+      "expected": {
+        "state": "neutral"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": 100,
+        "price_change": "NaN"
+      },
+      "name": "price_change_nan_is_neutral"
+    },
+    {
+      "expected": {
+        "state": "neutral"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": "NaN",
+        "price_change": 1.5
+      },
+      "name": "oi_change_nan_is_neutral"
+    },
+    {
+      "expected": {
+        "state": "neutral"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": 100,
+        "price_change": "Infinity"
+      },
+      "name": "price_change_infinity_is_neutral"
+    },
+    {
+      "expected": {
+        "state": "neutral"
+      },
+      "input": {
+        "function": "classify_buildup",
+        "oi_change": "-Infinity",
+        "price_change": 1.5
+      },
+      "name": "oi_change_negative_infinity_is_neutral"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "200",
+        "price_change": "5.5",
+        "state": "long_buildup"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100.0",
+          "lp": "105.5",
+          "oi": "1200",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_long_buildup"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "200",
+        "price_change": "-4.5",
+        "state": "short_buildup"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100.0",
+          "lp": "95.5",
+          "oi": "1200",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_short_buildup"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "-200",
+        "price_change": "-4.5",
+        "state": "long_unwinding"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100.0",
+          "lp": "95.5",
+          "oi": "800",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_long_unwinding"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "-200",
+        "price_change": "5.5",
+        "state": "short_covering"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100.0",
+          "lp": "105.5",
+          "oi": "800",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_short_covering"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "200",
+        "price_change": "0.0",
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100.0",
+          "lp": "100.0",
+          "oi": "1200",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_price_unchanged_is_neutral"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "0",
+        "price_change": "5.0",
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100.0",
+          "lp": "105.0",
+          "oi": "1000",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_oi_unchanged_is_neutral"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "200",
+        "price_change": null,
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100.0",
+          "oi": "1200",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_missing_lp"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "200",
+        "price_change": null,
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "lp": "105.0",
+          "oi": "1200",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_missing_c"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": null,
+        "price_change": "5.0",
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100.0",
+          "lp": "105.0",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_missing_oi"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": null,
+        "price_change": "5.0",
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100.0",
+          "lp": "105.0",
+          "oi": "1200"
+        }
+      },
+      "name": "snapshot_missing_poi"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": null,
+        "price_change": null,
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {}
+      },
+      "name": "snapshot_empty"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": null,
+        "price_change": null,
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": null,
+          "lp": null,
+          "oi": null,
+          "poi": null
+        }
+      },
+      "name": "snapshot_null_values"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": null,
+        "price_change": null,
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100",
+          "lp": " ",
+          "oi": "",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_blank_strings"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "200",
+        "price_change": null,
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100",
+          "lp": "abc",
+          "oi": "1200",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_garbage_strings"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "200",
+        "price_change": null,
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100",
+          "lp": "NaN",
+          "oi": "1200",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_nan_string"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": null,
+        "price_change": "5",
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100",
+          "lp": "105",
+          "oi": "Infinity",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_infinity_string"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "200",
+        "price_change": "5.5",
+        "state": "long_buildup"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": 100,
+          "lp": 105.5,
+          "oi": 1200,
+          "poi": 1000
+        }
+      },
+      "name": "snapshot_json_numbers"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "200",
+        "price_change": null,
+        "state": "neutral"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100",
+          "lp": true,
+          "oi": "1200",
+          "poi": "1000"
+        }
+      },
+      "name": "snapshot_booleans_are_missing"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "200",
+        "price_change": "5.5",
+        "state": "long_buildup"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": " 100.0 ",
+          "lp": " 105.5 ",
+          "oi": " 1200 ",
+          "poi": " 1000 "
+        }
+      },
+      "name": "snapshot_padded_strings"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "0.25",
+        "price_change": "0.05",
+        "state": "long_buildup"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100.10",
+          "lp": "100.15",
+          "oi": "1000.5",
+          "poi": "1000.25"
+        }
+      },
+      "name": "snapshot_decimal_precision"
+    },
+    {
+      "expected": {
+        "basis": "previous_close_and_previous_oi",
+        "oi_change": "200",
+        "price_change": "5",
+        "state": "long_buildup"
+      },
+      "input": {
+        "function": "buildup_from_snapshot",
+        "snapshot": {
+          "c": "100",
+          "lp": "105",
+          "oi": "1200",
+          "poi": "1000",
+          "ts": "X",
+          "v": "9"
+        }
+      },
+      "name": "snapshot_extra_keys_are_ignored"
+    }
+  ],
+  "description": "Open-interest buildup. classify_buildup takes price_change and oi_change (JSON numbers, null, or the strings NaN / Infinity / -Infinity for non-finite values). buildup_from_snapshot takes a stream snapshot with the wire keys lp, c, oi, poi (strings; blank or non-numeric means missing) and returns the state with price_change = lp - c and oi_change = oi - poi as Decimal strings or null.",
+  "source": "tradesmart.analytics.classify_buildup / buildup_from_snapshot",
+  "tolerance": {
+    "decimal_abs": "0"
+  }
+}

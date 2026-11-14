@@ -1,0 +1,7 @@
+{
+  "invalid_token": {"stat": "Not_Ok", "emsg": "Invalid Access Token", "request_time": "14:30:01 15-01-2025"},
+  "session_expired": {"stat": "Not_Ok", "emsg": "Session Expired :  Invalid Session Key"},
+  "no_data": {"stat": "Not_Ok", "request_time": "15:05:38 20-06-2026", "emsg": "Error Occurred : 5 \"no data\""},
+  "search_no_data": {"stat": "Not_Ok", "emsg": "No Data :   "},
+  "order_reject": {"request_time": "16:23:45 20-06-2026", "stat": "Not_Ok", "emsg": "Rejected : ORA:Order not found to Cancel"}
+}

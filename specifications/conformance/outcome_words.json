@@ -1,0 +1,1090 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "error": null,
+        "info": "PlaceOrder accepted order_id=26111000000001",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"norenordno\":\"26111000000001\",\"request_time\":\"10:00:00 10-11-2026\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "accepted_ack"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "PlaceOrder rejected order_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"RMS:Blocked\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "not_ok_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "RateLimitError",
+        "info": "PlaceOrder rejected order_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"Too many requests\"}",
+            "status": 429
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "server_429_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "AuthenticationError",
+        "info": "PlaceOrder rejected order_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"Session Expired : Invalid Session Key\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "session_expired_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceOrder unknown order_id=-",
+        "requests": 1,
+        "warning": "PlaceOrder: order status unknown; check orders() before acting"
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "<html>Bad gateway</html>",
+            "status": 502
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "non_json_body_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceOrder unknown order_id=-",
+        "requests": 1,
+        "warning": "PlaceOrder: order status unknown; check orders() before acting"
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "ok_without_order_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceOrder unknown order_id=-",
+        "requests": 1,
+        "warning": "PlaceOrder: order status unknown; check orders() before acting"
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "read_timeout"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "read_timeout_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceOrder unknown order_id=-",
+        "requests": 1,
+        "warning": "PlaceOrder: order status unknown; check orders() before acting"
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "connection_reset"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "connection_reset_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceOrder unknown order_id=-",
+        "requests": 1,
+        "warning": "PlaceOrder: order status unknown; check orders() before acting"
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "hook_exception"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "hook_exception_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "info": "PlaceOrder not_sent order_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "connect_error"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "connect_error_is_not_sent"
+    },
+    {
+      "expected": {
+        "error": "RequestTimeoutError",
+        "info": "PlaceOrder not_sent order_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "connect_timeout"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "connect_timeout_is_not_sent"
+    },
+    {
+      "expected": {
+        "error": "RequestTimeoutError",
+        "info": "PlaceOrder not_sent order_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "pool_timeout"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "pool_timeout_is_not_sent"
+    },
+    {
+      "expected": {
+        "error": "AuthenticationError",
+        "info": "PlaceOrder not_sent order_id=-",
+        "requests": 0,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"norenordno\":\"26111000000001\",\"request_time\":\"10:00:00 10-11-2026\"}"
+          }
+        ],
+        "token": "none"
+      },
+      "name": "no_token_is_not_sent"
+    },
+    {
+      "expected": {
+        "error": "AuthenticationError",
+        "info": "PlaceOrder not_sent order_id=-",
+        "requests": 0,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"norenordno\":\"26111000000001\",\"request_time\":\"10:00:00 10-11-2026\"}"
+          }
+        ],
+        "token": "expired"
+      },
+      "name": "expired_access_token_is_not_sent"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "info": "PlaceOrder not_sent order_id=-",
+        "requests": 0,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": true,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"norenordno\":\"26111000000001\",\"request_time\":\"10:00:00 10-11-2026\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "closed_client_is_not_sent"
+    },
+    {
+      "expected": {
+        "error": "RateLimitError",
+        "info": "PlaceOrder not_sent order_id=-",
+        "requests": 0,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 10,
+        "rate_limit_mode": "raise",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"norenordno\":\"26111000000001\",\"request_time\":\"10:00:00 10-11-2026\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "client_rate_limit_is_not_sent"
+    },
+    {
+      "expected": {
+        "error": "RateLimitError",
+        "info": "PlaceOrder not_sent order_id=-",
+        "requests": 0,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 0.5,
+        "prior_orders": 10,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"norenordno\":\"26111000000001\",\"request_time\":\"10:00:00 10-11-2026\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "client_rate_limit_wait_over_the_cap_is_not_sent"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "info": null,
+        "requests": 0,
+        "warning": null
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": true,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"norenordno\":\"26111000000001\",\"request_time\":\"10:00:00 10-11-2026\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "invalid_parameters_log_nothing"
+    },
+    {
+      "expected": {
+        "error": "KeyboardInterrupt",
+        "info": "PlaceOrder unknown order_id=-",
+        "requests": 1,
+        "warning": "PlaceOrder: outcome unknown - check orders()"
+      },
+      "input": {
+        "call": "place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "keyboard_interrupt"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "keyboard_interrupt_after_send_is_unknown"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "CancelOrder accepted order_id=26111000000001",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "cancel_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"request_time\":\"10:00:00 10-11-2026\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "cancel_accepted_names_the_callers_order_id"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "ModifyOrder accepted order_id=26111000000001",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "modify_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"norenordno\":\"26111000000001\",\"request_time\":\"10:00:00 10-11-2026\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "modify_accepted"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "ExitSNOOrder rejected order_id=26111000000001",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "exit_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"RMS:Blocked\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "exit_rejected"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "PlaceOrder accepted order_id=26111000000001",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "request_place_order",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"norenordno\":\"26111000000001\",\"request_time\":\"10:00:00 10-11-2026\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_place_order_is_logged"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": null,
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "request_order_book_state_changing",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "[]"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_state_changing_order_book_is_not_logged"
+    },
+    {
+      "expected": {
+        "error": "APIError",
+        "info": null,
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "limits",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"RMS:Blocked\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "reads_are_not_logged"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "PlaceGTTOrder accepted al_id=26111200000010",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "request_place_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Oi created\",\"al_id\":\"26111200000010\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_place_gtt_accepted_logs_the_al_id"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceGTTOrder unknown al_id=-",
+        "requests": 1,
+        "warning": "PlaceGTTOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "request_place_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"al_id\":\"26111200000010\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_place_gtt_ok_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "PlaceGTTOrder rejected al_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "request_place_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"RMS:Blocked\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_place_gtt_not_ok_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceGTTOrder unknown al_id=-",
+        "requests": 1,
+        "warning": "PlaceGTTOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "request_place_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "read_timeout"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_place_gtt_read_timeout_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "CancelGTTOrder unknown al_id=26111200000099",
+        "requests": 1,
+        "warning": "CancelGTTOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "request_cancel_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "read_timeout"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_cancel_gtt_unknown_names_the_payload_al_id"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "CancelGTTOrder accepted al_id=26111200000099",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "request_cancel_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Oi delete success\",\"al_id\":\"26111200000099\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_cancel_gtt_accepted"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "PlaceGTTOrder accepted al_id=26111200000010",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "request_place_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"OI created\",\"al_id\":\"26111200000010\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_place_gtt_test_env_case_word_is_accepted"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "CancelGTTOrder unknown al_id=26111200000099",
+        "requests": 1,
+        "warning": "CancelGTTOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "request_cancel_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"OI deleted\",\"al_id\":\"26111200000099\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_cancel_gtt_test_env_word_oi_deleted_is_unknown"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "PlaceIceBergOrder accepted order_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "request_place_iceberg",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"true\",\"aq_id\":\"26111200000020\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_place_iceberg_accepted"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "PlaceIceBergOrder rejected order_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "request_place_iceberg",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"false\",\"rejreason\":\"Insufficient margin\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_place_iceberg_false_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceIceBergOrder unknown order_id=-",
+        "requests": 1,
+        "warning": "PlaceIceBergOrder: order status unknown; check orders() before acting"
+      },
+      "input": {
+        "call": "request_place_iceberg",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"True\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_place_iceberg_capitalised_true_is_unknown"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "PlaceGTTOrder accepted al_id=26111200000010",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Oi created\",\"al_id\":\"26111200000010\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_gtt_accepted_logs_the_al_id"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceGTTOrder unknown al_id=-",
+        "requests": 1,
+        "warning": "PlaceGTTOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "place_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"al_id\":\"26111200000010\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_gtt_ok_is_unknown"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "PlaceGTTOrder accepted al_id=26111200000010",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"OI created\",\"al_id\":\"26111200000010\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_gtt_test_env_case_word_is_accepted"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "PlaceGTTOrder rejected al_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"RMS:Blocked\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_gtt_not_ok_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceGTTOrder unknown al_id=-",
+        "requests": 1,
+        "warning": "PlaceGTTOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "place_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "read_timeout"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_gtt_read_timeout_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "info": "PlaceGTTOrder not_sent al_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "connect_error"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_gtt_connect_error_is_not_sent"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "ModifyGTTOrder accepted al_id=26111200000010",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "modify_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Oi replaced\",\"al_id\":\"26111200000010\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "modify_gtt_accepted_logs_the_al_id"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "ModifyGTTOrder unknown al_id=26111200000010",
+        "requests": 1,
+        "warning": "ModifyGTTOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "modify_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "read_timeout"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "modify_gtt_read_timeout_is_unknown"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "CancelGTTOrder accepted al_id=26111200000010",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "cancel_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Oi delete success\",\"al_id\":\"26111200000010\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "cancel_gtt_accepted_logs_the_al_id"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "CancelGTTOrder unknown al_id=26111200000010",
+        "requests": 1,
+        "warning": "CancelGTTOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "cancel_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "read_timeout"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "cancel_gtt_read_timeout_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "CancelGTTOrder unknown al_id=26111200000010",
+        "requests": 1,
+        "warning": "CancelGTTOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "cancel_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"OI deleted\",\"al_id\":\"26111200000010\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "cancel_gtt_test_env_word_oi_deleted_is_unknown"
+    }
+  ],
+  "description": "The order outcome log (logger tradesmart.orders) of one call. input.call is an order method (place_order, modify_order, cancel_order, exit_order), a typed GTT write (place_gtt with the arguments of the order_validation.json gtt_ cases, modify_gtt the same with alert_id 26111200000010, cancel_gtt that alert_id), request_place_order (request('placeorder', ..., state_changing=True)), request_place_gtt (request('placegttorder', {exch: NSE})), request_cancel_gtt (request('CANCELGTTORDER', {al_id: '26111200000099'})), request_place_iceberg (request('placeicebergorder', {exch: NSE})), request_order_book_state_changing (not an order endpoint) or limits (a read). input.token is valid, none or expired (an AccessToken past its expiry); closed closes the client first; prior_orders accepted orders are placed first in the same instant (so an 11th order exceeds the 10 per second limit; their lines are not shown; order_rate_limit_max_wait is the configured wait cap); replies answer the call's requests in turn: {status, body} or {failure: kind} (kinds as in transport_failures.json). expected.info is the INFO line without its time ('<Endpoint> <word> order_id=<id>', id '-' when none; 'al_id=<id>' for the GTT writes, the ack's al_id else the payload's), expected.warning the WARNING line (it names pending_gtts() for the GTT writes, orders() otherwise), both null when not logged; expected.error is the error type raised (null when the call returned) and expected.requests how many requests reached the transport.",
+  "source": "tradesmart._transport.outcome via tradesmart.TradeSmart (in-memory transport)",
+  "tolerance": {}
+}

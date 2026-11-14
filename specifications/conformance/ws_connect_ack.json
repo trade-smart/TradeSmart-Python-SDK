@@ -1,0 +1,106 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "accepted": true
+      },
+      "input": {
+        "s": "Ok"
+      },
+      "name": "ack_s_Ok"
+    },
+    {
+      "expected": {
+        "accepted": true
+      },
+      "input": {
+        "s": "OK"
+      },
+      "name": "ack_s_OK_as_sent_by_the_live_server"
+    },
+    {
+      "expected": {
+        "accepted": true
+      },
+      "input": {
+        "s": "ok"
+      },
+      "name": "ack_s_ok_lowercase"
+    },
+    {
+      "expected": {
+        "accepted": true
+      },
+      "input": {
+        "s": " Ok "
+      },
+      "name": "ack_s_Ok_padded_with_spaces"
+    },
+    {
+      "expected": {
+        "accepted": true
+      },
+      "input": {
+        "s": "oK"
+      },
+      "name": "ack_s_oK_mixed_case"
+    },
+    {
+      "expected": {
+        "accepted": false
+      },
+      "input": {
+        "s": "Not_Ok"
+      },
+      "name": "ack_s_Not_Ok"
+    },
+    {
+      "expected": {
+        "accepted": false
+      },
+      "input": {
+        "s": "NOT_OK"
+      },
+      "name": "ack_s_NOT_OK"
+    },
+    {
+      "expected": {
+        "accepted": false
+      },
+      "input": {
+        "s": ""
+      },
+      "name": "ack_s_empty"
+    },
+    {
+      "expected": {
+        "accepted": false
+      },
+      "input": {
+        "s": "Okay"
+      },
+      "name": "ack_s_Okay"
+    },
+    {
+      "expected": {
+        "accepted": false
+      },
+      "input": {
+        "s": "Ok."
+      },
+      "name": "ack_s_Ok_with_a_suffix"
+    },
+    {
+      "expected": {
+        "accepted": false
+      },
+      "input": {
+        "s": "O k"
+      },
+      "name": "ack_s_space_inside"
+    }
+  ],
+  "description": "WebSocket connect acknowledgement: the ack field s is accepted when, trimmed and compared case-insensitively, it equals ok. The server may send Ok or OK.",
+  "source": "tradesmart.stream.async_stream.AsyncTradeSmartStream (connect)",
+  "tolerance": {}
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "stat": "Ok",
+    "exch_tsym": [
+      {
+        "exch": "NSE",
+        "tsym": "TESTCO-EQ",
+        "token": "1001",
+        "pp": "2",
+        "ti": "0.05",
+        "ls": "1",
+        "lp": "105.25",
+        "cname": "TEST COMPANY LIMITED",
+        "dname": "TESTCO"
+      }
+    ],
+    "holdqty": "10",
+    "dpqty": "10",
+    "npoadqty": "0",
+    "brkcolqty": "0",
+    "colqty": "0",
+    "benqty": "0",
+    "unplgdqty": "10",
+    "btstqty": "0",
+    "btstcolqty": "0",
+    "usedqty": "0",
+    "upldprc": "100.00"
+  }
+]

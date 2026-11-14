@@ -1,0 +1,28 @@
+[
+  {
+    "stat": "Ok",
+    "ai_t": "LTP_B_O",
+    "al_id": "26111200000010",
+    "tsym": "INFY-EQ",
+    "exch": "NSE",
+    "token": "1594",
+    "remarks": "Buy INFY below 1500",
+    "validity": "GTT",
+    "pp": "2",
+    "ls": "1",
+    "actid": "TEST123",
+    "trantype": "B",
+    "prctyp": "LMT",
+    "qty": 1,
+    "prc": "1500.00",
+    "prd": "C",
+    "s_prdt_ali": "CNC",
+    "ret": "DAY",
+    "ordersource": "API",
+    "d": "1500.00",
+    "norentm": "10:41:27 13-11-2026",
+    "sms_flag": "0",
+    "email_flag": "0",
+    "push_flag": "0"
+  }
+]

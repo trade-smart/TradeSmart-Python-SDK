@@ -1,0 +1,9 @@
+{
+  "stat": "Ok",
+  "values": [
+    {"exch": "NFO", "token": "175200", "tsym": "TCS30JUN26C2280", "optt": "CE", "pp": "2", "ls": "175", "ti": "0.05", "strprc": "2280.00", "instname": "OPTSTK", "cname": "TCS JUN 2280 CE ", "dname": "TCS JUN 2280 CE "},
+    {"exch": "NFO", "token": "144182", "tsym": "TCS30JUN26C2300", "optt": "CE", "pp": "2", "ls": "175", "ti": "0.05", "strprc": "2300.00", "instname": "OPTSTK", "cname": "TCS JUN 2300 CE ", "dname": "TCS JUN 2300 CE "},
+    {"exch": "NFO", "token": "175201", "tsym": "TCS30JUN26P2280", "optt": "PE", "pp": "2", "ls": "175", "ti": "0.05", "strprc": "2280.00", "instname": "OPTSTK", "cname": "TCS JUN 2280 PE ", "dname": "TCS JUN 2280 PE "},
+    {"exch": "NFO", "token": "144183", "tsym": "TCS30JUN26P2300", "optt": "PE", "pp": "2", "ls": "175", "ti": "0.05", "strprc": "2300.00", "instname": "OPTSTK", "cname": "TCS JUN 2300 PE ", "dname": "TCS JUN 2300 PE "}
+  ]
+}

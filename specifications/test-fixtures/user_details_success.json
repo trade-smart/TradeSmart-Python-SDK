@@ -1,0 +1,22 @@
+{
+  "request_time": "15:09:30 20-06-2026",
+  "uname": "Test User",
+  "m_num": "",
+  "email": "user@example.com",
+  "access_type": ["TT", "MOB", "WEB", "API"],
+  "exarr": ["NSE", "NFO", "CDS", "MCX", "BSE", "BFO", "BCD"],
+  "prarr": [
+    {"prd": "C", "s_prdt_ali": "CNC", "exch": ["NSE", "BSE"]},
+    {"prd": "I", "s_prdt_ali": "MIS", "exch": ["NSE", "BSE", "NFO", "BFO", "CDS", "BCD", "MCX"]},
+    {"prd": "M", "s_prdt_ali": "NRML", "exch": ["BFO", "CDS", "BCD", "MCX", "NSE", "BSE", "NFO"]},
+    {"prd": "H", "s_prdt_ali": "CO", "exch": ["NSE", "BSE", "NFO", "BFO", "CDS", "BCD", "MCX"]},
+    {"prd": "B", "s_prdt_ali": "BO", "exch": ["NSE", "BSE", "NFO", "BFO", "CDS", "BCD", "MCX"]}
+  ],
+  "orarr": ["MKT", "LMT", "SL-LMT", "SL-MKT", "DS"],
+  "brkname": "VNS",
+  "uid": "TEST123",
+  "brnchid": "HO",
+  "actid": "TEST123",
+  "uprev": "INVESTOR",
+  "stat": "Ok"
+}

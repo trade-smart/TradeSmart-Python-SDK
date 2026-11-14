@@ -1,0 +1,360 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "pcr": "1"
+      },
+      "input": {
+        "by": "oi",
+        "rows": [
+          {
+            "open_interest": "1000",
+            "option_type": "CE",
+            "strike": "24000",
+            "volume": "100"
+          },
+          {
+            "open_interest": "1500",
+            "option_type": "PE",
+            "strike": "24000",
+            "volume": "300"
+          },
+          {
+            "open_interest": "2000",
+            "option_type": "CE",
+            "strike": "24100",
+            "volume": "200"
+          },
+          {
+            "open_interest": "1500",
+            "option_type": "PE",
+            "strike": "24100",
+            "volume": "100"
+          }
+        ]
+      },
+      "name": "by_oi"
+    },
+    {
+      "expected": {
+        "pcr": "1.333333333333333333333333333"
+      },
+      "input": {
+        "by": "volume",
+        "rows": [
+          {
+            "open_interest": "1000",
+            "option_type": "CE",
+            "strike": "24000",
+            "volume": "100"
+          },
+          {
+            "open_interest": "1500",
+            "option_type": "PE",
+            "strike": "24000",
+            "volume": "300"
+          },
+          {
+            "open_interest": "2000",
+            "option_type": "CE",
+            "strike": "24100",
+            "volume": "200"
+          },
+          {
+            "open_interest": "1500",
+            "option_type": "PE",
+            "strike": "24100",
+            "volume": "100"
+          }
+        ]
+      },
+      "name": "by_volume"
+    },
+    {
+      "expected": {
+        "pcr": "0.3333333333333333333333333333"
+      },
+      "input": {
+        "by": "oi",
+        "rows": [
+          {
+            "open_interest": "3",
+            "option_type": "CE",
+            "strike": "1",
+            "volume": null
+          },
+          {
+            "open_interest": "1",
+            "option_type": "PE",
+            "strike": "1",
+            "volume": null
+          }
+        ]
+      },
+      "name": "repeating_quotient"
+    },
+    {
+      "expected": {
+        "pcr": null
+      },
+      "input": {
+        "by": "oi",
+        "rows": [
+          {
+            "open_interest": "100",
+            "option_type": "PE",
+            "strike": "24000",
+            "volume": "10"
+          }
+        ]
+      },
+      "name": "no_calls_is_null"
+    },
+    {
+      "expected": {
+        "pcr": null
+      },
+      "input": {
+        "by": "oi",
+        "rows": [
+          {
+            "open_interest": "0",
+            "option_type": "CE",
+            "strike": "24000",
+            "volume": "5"
+          },
+          {
+            "open_interest": "100",
+            "option_type": "PE",
+            "strike": "24000",
+            "volume": "10"
+          }
+        ]
+      },
+      "name": "calls_with_zero_oi_is_null"
+    },
+    {
+      "expected": {
+        "pcr": "0"
+      },
+      "input": {
+        "by": "oi",
+        "rows": [
+          {
+            "open_interest": "100",
+            "option_type": "CE",
+            "strike": "24000",
+            "volume": "10"
+          }
+        ]
+      },
+      "name": "no_puts_is_zero"
+    },
+    {
+      "expected": {
+        "pcr": null
+      },
+      "input": {
+        "by": "oi",
+        "rows": []
+      },
+      "name": "empty_chain_is_null"
+    },
+    {
+      "expected": {
+        "pcr": "0.5"
+      },
+      "input": {
+        "by": "oi",
+        "rows": [
+          {
+            "open_interest": "100",
+            "option_type": "CE",
+            "strike": "24000",
+            "volume": null
+          },
+          {
+            "open_interest": null,
+            "option_type": "PE",
+            "strike": "24000",
+            "volume": null
+          },
+          {
+            "open_interest": "50",
+            "option_type": "PE",
+            "strike": "24100",
+            "volume": null
+          }
+        ]
+      },
+      "name": "missing_oi_counts_as_zero"
+    },
+    {
+      "expected": {
+        "pcr": "0.5"
+      },
+      "input": {
+        "by": "volume",
+        "rows": [
+          {
+            "open_interest": null,
+            "option_type": "CE",
+            "strike": "24000",
+            "volume": "10"
+          },
+          {
+            "open_interest": null,
+            "option_type": "PE",
+            "strike": "24000",
+            "volume": null
+          },
+          {
+            "open_interest": null,
+            "option_type": "PE",
+            "strike": "24100",
+            "volume": "5"
+          }
+        ]
+      },
+      "name": "missing_volume_counts_as_zero"
+    },
+    {
+      "expected": {
+        "pcr": null
+      },
+      "input": {
+        "by": "oi",
+        "rows": [
+          {
+            "open_interest": null,
+            "option_type": "CE",
+            "strike": "24000",
+            "volume": "10"
+          },
+          {
+            "open_interest": null,
+            "option_type": "PE",
+            "strike": "24000",
+            "volume": "20"
+          }
+        ]
+      },
+      "name": "all_oi_missing_is_null"
+    },
+    {
+      "expected": {
+        "pcr": "1"
+      },
+      "input": {
+        "by": "oi",
+        "rows": [
+          {
+            "open_interest": "100",
+            "option_type": "CE",
+            "strike": "24000",
+            "volume": null
+          },
+          {
+            "open_interest": "100",
+            "option_type": "PE",
+            "strike": "24000",
+            "volume": null
+          },
+          {
+            "open_interest": "999",
+            "option_type": "XX",
+            "strike": "24000",
+            "volume": null
+          }
+        ]
+      },
+      "name": "other_option_types_are_ignored"
+    },
+    {
+      "expected": {
+        "pcr": null
+      },
+      "input": {
+        "by": "oi",
+        "rows": [
+          {
+            "open_interest": "100",
+            "option_type": "ce",
+            "strike": "24000",
+            "volume": null
+          },
+          {
+            "open_interest": "100",
+            "option_type": "pe",
+            "strike": "24000",
+            "volume": null
+          }
+        ]
+      },
+      "name": "lowercase_option_types_are_ignored"
+    },
+    {
+      "expected": {
+        "pcr": "0.5"
+      },
+      "input": {
+        "by": "oi",
+        "rows": [
+          {
+            "open_interest": "100.5",
+            "option_type": "CE",
+            "strike": "24000",
+            "volume": null
+          },
+          {
+            "open_interest": "50.25",
+            "option_type": "PE",
+            "strike": "24000",
+            "volume": null
+          }
+        ]
+      },
+      "name": "decimal_open_interest"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "by": "price",
+        "rows": [
+          {
+            "open_interest": "1000",
+            "option_type": "CE",
+            "strike": "24000",
+            "volume": "100"
+          },
+          {
+            "open_interest": "1500",
+            "option_type": "PE",
+            "strike": "24000",
+            "volume": "300"
+          },
+          {
+            "open_interest": "2000",
+            "option_type": "CE",
+            "strike": "24100",
+            "volume": "200"
+          },
+          {
+            "open_interest": "1500",
+            "option_type": "PE",
+            "strike": "24100",
+            "volume": "100"
+          }
+        ]
+      },
+      "name": "invalid_by_is_an_error"
+    }
+  ],
+  "description": "Put-call ratio of a chain: sum(PE) / sum(CE) by open interest (by=oi) or volume (by=volume); null when the call sum is zero. Missing values count as zero. Decimal values are strings.",
+  "source": "tradesmart.analytics.pcr",
+  "tolerance": {
+    "decimal_abs": "1e-12"
+  }
+}

@@ -1,0 +1,2135 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"norenordno\":\"26111000000001\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2001.00\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"ordersource\":\"API\"}",
+        "endpoint": "ModifyOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_id": "26111000000001",
+          "order_type": "LIMIT",
+          "price": "2001.00",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ"
+        },
+        "call": "modify_order"
+      },
+      "name": "modify_limit"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"norenordno\":\"26111000000001\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"0\",\"prctyp\":\"MKT\",\"prd\":\"C\",\"ordersource\":\"API\"}",
+        "endpoint": "ModifyOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_id": "26111000000001",
+          "order_type": "MARKET",
+          "price": null,
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ"
+        },
+        "call": "modify_order"
+      },
+      "name": "modify_market_price_0_no_amo"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"norenordno\":\"26111000000001\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2001.00\",\"prctyp\":\"SL-LMT\",\"prd\":\"C\",\"trgprc\":\"2000.50\",\"ret\":\"IOC\",\"remarks\":\"my-tag\",\"ordersource\":\"API\"}",
+        "endpoint": "ModifyOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_id": "26111000000001",
+          "order_type": "SL",
+          "price": "2001.00",
+          "product": "CNC",
+          "quantity": 1,
+          "tag": "my-tag",
+          "tradingsymbol": "ACC-EQ",
+          "trigger_price": "2000.50",
+          "validity": "IOC"
+        },
+        "call": "modify_order"
+      },
+      "name": "modify_validity_and_trigger"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"norenordno\":\"26111000000001\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2001.00\",\"prctyp\":\"LMT\",\"prd\":\"I\",\"ordersource\":\"API\"}",
+        "endpoint": "ModifyOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "nse",
+          "order_id": "26111000000001",
+          "order_type": "LMT",
+          "price": "2001.00",
+          "product": "i",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ"
+        },
+        "call": "modify_order"
+      },
+      "name": "modify_words_and_wire_codes"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"norenordno\":\"26111000000001\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2001.00\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"remarks\":\"t\",\"ordersource\":\"API\",\"algo_id\":\"153763\"}",
+        "endpoint": "ModifyOrder"
+      },
+      "input": {
+        "arguments": {
+          "algo_id": "153763",
+          "exchange": "NSE",
+          "order_id": "26111000000001",
+          "order_type": "LIMIT",
+          "price": "2001.00",
+          "product": "CNC",
+          "quantity": 1,
+          "tag": "t",
+          "tradingsymbol": "ACC-EQ"
+        },
+        "call": "modify_order"
+      },
+      "name": "modify_algo_id_sent_last"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "algo_id"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "algo_id": "  ",
+          "exchange": "NSE",
+          "order_id": "26111000000001",
+          "order_type": "LIMIT",
+          "price": "2001.00",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ"
+        },
+        "call": "modify_order"
+      },
+      "name": "error_modify_blank_algo_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "norenordno"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_id": "",
+          "order_type": "LIMIT",
+          "price": "2001.00",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ"
+        },
+        "call": "modify_order"
+      },
+      "name": "error_modify_without_order_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "prc"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_id": "26111000000001",
+          "order_type": "LIMIT",
+          "price": null,
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ"
+        },
+        "call": "modify_order"
+      },
+      "name": "error_modify_limit_without_price"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"norenordno\":\"26111000000001\"}",
+        "endpoint": "CancelOrder"
+      },
+      "input": {
+        "arguments": {
+          "order_id": "26111000000001"
+        },
+        "call": "cancel_order"
+      },
+      "name": "cancel"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "norenordno"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "order_id": ""
+        },
+        "call": "cancel_order"
+      },
+      "name": "error_cancel_without_order_id"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"norenordno\":\"26111000000001\",\"prd\":\"B\"}",
+        "endpoint": "ExitSNOOrder"
+      },
+      "input": {
+        "arguments": {
+          "order_id": "26111000000001",
+          "product": "BO"
+        },
+        "call": "exit_order"
+      },
+      "name": "exit_bracket"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"norenordno\":\"26111000000001\",\"prd\":\"H\"}",
+        "endpoint": "ExitSNOOrder"
+      },
+      "input": {
+        "arguments": {
+          "order_id": "26111000000001",
+          "product": "H"
+        },
+        "call": "exit_order"
+      },
+      "name": "exit_cover_wire_code"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "order_id": "26111000000001",
+          "product": "CNC"
+        },
+        "call": "exit_order"
+      },
+      "name": "error_exit_with_cnc"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000.05\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"LMT\"}",
+        "endpoint": "GetOrderMargin"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "order_margin"
+      },
+      "name": "order_margin_limit"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"0\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"MKT\"}",
+        "endpoint": "GetOrderMargin"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "MARKET",
+          "price": "0",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "order_margin"
+      },
+      "name": "order_margin_market"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"SL-LMT\",\"trgprc\":\"1999.5\"}",
+        "endpoint": "GetOrderMargin"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "SL",
+          "price": "2000",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY",
+          "trigger_price": "1999.5"
+        },
+        "call": "order_margin"
+      },
+      "name": "order_margin_stop_loss"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "qty"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 0,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "order_margin"
+      },
+      "name": "error_order_margin_zero_quantity"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000.05\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "limit_buy_minimal"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000.05\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "nse",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "cnc",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "buy"
+        },
+        "call": "place_order"
+      },
+      "name": "words_any_case"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000.05\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "2000.05",
+          "product": "C",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "B"
+        },
+        "call": "place_order"
+      },
+      "name": "wire_codes"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000.05\",\"prd\":\"I\",\"trantype\":\"S\",\"prctyp\":\"LMT\",\"ret\":\"IOC\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "MIS",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "SELL",
+          "validity": "IOC"
+        },
+        "call": "place_order"
+      },
+      "name": "sell_intraday_ioc"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"0\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"MKT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "MARKET",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "market_order_price_defaults_to_0"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"0\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"MKT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "MKT",
+          "price": "0",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "market_order_explicit_zero_price"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000\",\"trgprc\":\"1999.5\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"SL-LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "SL",
+          "price": "2000",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY",
+          "trigger_price": "1999.5"
+        },
+        "call": "place_order"
+      },
+      "name": "stop_loss_limit"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"0\",\"trgprc\":\"1999.5\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"SL-MKT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "SL-M",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY",
+          "trigger_price": "1999.5"
+        },
+        "call": "place_order"
+      },
+      "name": "stop_loss_market"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000.05\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"Yes\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "amo": true,
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "amo_true"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"10\",\"prc\":\"2000.05\",\"dscqty\":\"5\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"remarks\":\"my-tag\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "disclosed_quantity": 5,
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 10,
+          "tag": "my-tag",
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "tag_and_disclosed_quantity"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000.50\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.50",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "decimal_price_trailing_zeros_kept"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000.05\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": 2000.05,
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "json_number_price"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": 2000,
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "integer_price"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"0\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"MKT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\",\"mkt_protection\":\"5\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "market_protection": "5",
+          "order_type": "MARKET",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "market_protection"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NFO\",\"tsym\":\"NIFTY\",\"qty\":\"65\",\"prc\":\"2000.05\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NFO",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 65,
+          "tradingsymbol": "NIFTY",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "nfo_quantity_in_units"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000.05\",\"prd\":\"H\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\",\"blprc\":\"10\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "book_loss_price": "10",
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CO",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "cover_order"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000.05\",\"prd\":\"B\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\",\"blprc\":\"10\",\"bpprc\":\"20\",\"trailprc\":\"1\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "book_loss_price": "10",
+          "book_profit_price": "20",
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "BO",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "trail_price": "1",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "bracket_order"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000.05\",\"prd\":\"F\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "MTF",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "mtf_on_nse"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"2000.05\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\",\"algo_id\":\"153763\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "algo_id": "153763",
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "algo_id_sent_last"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"ACC-EQ\",\"qty\":\"1\",\"prc\":\"0\",\"prd\":\"C\",\"trantype\":\"B\",\"prctyp\":\"MKT\",\"ret\":\"DAY\",\"amo\":\"No\",\"ordersource\":\"API\",\"mkt_protection\":\"5\",\"algo_id\":\"153763\"}",
+        "endpoint": "PlaceOrder"
+      },
+      "input": {
+        "arguments": {
+          "algo_id": "153763",
+          "exchange": "NSE",
+          "market_protection": "5",
+          "order_type": "MARKET",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "algo_id_after_market_protection"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "algo_id"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "algo_id": "",
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_empty_algo_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "algo_id"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "algo_id": "   ",
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_blank_algo_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "algo_id"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "algo_id": 153763,
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_integer_algo_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "algo_id"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "algo_id": true,
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_boolean_algo_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "exch"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "XYZ",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_unknown_exchange"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "prd"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "DELIVERY",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_unknown_product"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "prctyp"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "STOP",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_unknown_order_type"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "ret"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY",
+          "validity": "GTC"
+        },
+        "call": "place_order"
+      },
+      "name": "error_unknown_validity"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "qty"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 0,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_zero_quantity"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "qty"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": true,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_boolean_quantity"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "prc"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_limit_without_price"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "0",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_limit_with_zero_price"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "prc"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "-1",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_negative_price"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "prc"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "abc",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_non_numeric_price"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "SL",
+          "price": "2000",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_stop_loss_without_trigger"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY",
+          "trigger_price": "1999"
+        },
+        "call": "place_order"
+      },
+      "name": "error_trigger_on_limit_order"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "disclosed_quantity": 6,
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 5,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_disclosed_above_quantity"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CO",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_cover_without_book_loss"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "book_loss_price": "10",
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "BO",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_bracket_without_book_profit"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "book_loss_price": "10",
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CNC",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_book_loss_on_cnc"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "book_loss_price": "10",
+          "book_profit_price": "5",
+          "exchange": "NSE",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "CO",
+          "quantity": 1,
+          "tradingsymbol": "ACC-EQ",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_book_profit_on_cover"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "exchange": "MCX",
+          "order_type": "LIMIT",
+          "price": "2000.05",
+          "product": "MTF",
+          "quantity": 1,
+          "tradingsymbol": "CRUDEOIL",
+          "transaction_type": "BUY"
+        },
+        "call": "place_order"
+      },
+      "name": "error_mtf_on_mcx"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"LTP_B_O\",\"d\":\"1500\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_documented_example"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"LTP_B_O\",\"d\":\"1500\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_defaults_validity_day_alert_validity_gtt"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"LTP_B_O\",\"d\":\"1500\",\"validity\":\"DAY\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "DAY",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_alert_validity_day"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"LTP_B_O\",\"d\":\"1500\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "nse",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "cnc",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "buy",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_words_any_case"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"LTP_A_O\",\"d\":\"1500\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "ltp_above",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_alert_type_member_name"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"LTP_A_52HIGH_O\",\"d\":\"1500\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_A_52HIGH_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_52_week_high_alert_type"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"VOLUME_A_O\",\"d\":\"100000\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "VOLUME_A_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "100000",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_volume_alert_type"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"CH_PER_B_O\",\"d\":\"-5\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "CH_PER_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "-5",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_negative_trigger_value"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"LTP_B_O\",\"d\":\"1500.5\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": 1500.5,
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_json_number_trigger_value"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"LTP_B_O\",\"d\":\"1500\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"MKT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"0\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "MARKET",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_market_order_price_defaults_to_0"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"LTP_B_O\",\"d\":\"1500\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"SL-LMT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"10\",\"prc\":\"1500\",\"trgprc\":\"1499.5\",\"dscqty\":\"1\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "disclosed_quantity": 1,
+          "exchange": "NSE",
+          "order_type": "SL-LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 10,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_price": "1499.5",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_stop_loss_trigger_price_and_disclosed_quantity"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NFO\",\"tsym\":\"NIFTY25NOV26FUT\",\"ai_t\":\"LTP_B_O\",\"d\":\"1500\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"M\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NFO",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "NRML",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "NIFTY25NOV26FUT",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_nrml_on_nfo"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"LTP_B_O\",\"d\":\"1500\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"H\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "CO",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_cover_order_without_book_loss"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"MCX\",\"tsym\":\"CRUDEOIL\",\"ai_t\":\"LTP_B_O\",\"d\":\"1500\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"200\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "MCX",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 200,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "CRUDEOIL",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_mcx_quantity_in_trade_units"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"exch\":\"BFO\",\"tsym\":\"SENSEX25NOV26FUT\",\"ai_t\":\"LTP_B_O\",\"d\":\"1500\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"M\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "PlaceGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "BFO",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "M",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "SENSEX25NOV26FUT",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_place_bfo"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"al_id\":\"26111200000010\",\"exch\":\"NSE\",\"tsym\":\"INFY-EQ\",\"ai_t\":\"LTP_B_O\",\"d\":\"1550\",\"validity\":\"GTT\",\"remarks\":\"Buy INFY below 1500\",\"trantype\":\"B\",\"prctyp\":\"LMT\",\"prd\":\"C\",\"ret\":\"DAY\",\"qty\":\"1\",\"prc\":\"1500\"}",
+        "endpoint": "ModifyGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_id": "26111200000010",
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1550",
+          "validity": "DAY"
+        },
+        "call": "modify_gtt"
+      },
+      "name": "gtt_modify_al_id_third"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "CancelGTTOrder"
+      },
+      "input": {
+        "arguments": {
+          "alert_id": "26111200000010"
+        },
+        "call": "cancel_gtt"
+      },
+      "name": "gtt_cancel"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "ai_t"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_X_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_unknown_alert_type"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "validity"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "EOS",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_alert_validity_eos"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "ret"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "GTT"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_validity_gtt_is_not_a_retention"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "exch"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "CDS",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_cds"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "exch"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "BCD",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_bcd"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "prd"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "MIS",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_mis"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "prd"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "BO",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_bracket"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "prd"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "MTF",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_mtf"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "remarks"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "  ",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_blank_tag"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "remarks"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": 5,
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_integer_tag"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "d"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": true,
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_boolean_trigger_value"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "d"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "nan",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_nan_trigger_value"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "d"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "abc",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_text_trigger_value"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "prc"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_limit_without_price"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "SL-LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_stop_loss_without_trigger"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_price": "1499",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_trigger_on_limit_order"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "qty"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 0,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_zero_quantity"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": []
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "disclosed_quantity": 6,
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 5,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_disclosed_above_quantity"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "al_id"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_id": 26111200000010,
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "modify_gtt"
+      },
+      "name": "gtt_error_modify_integer_alert_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "al_id"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_id": " ",
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "modify_gtt"
+      },
+      "name": "gtt_error_modify_blank_alert_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "prd"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_id": "26111200000010",
+          "alert_type": "LTP_B_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "MIS",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "modify_gtt"
+      },
+      "name": "gtt_error_modify_mis"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "al_id"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_id": ""
+        },
+        "call": "cancel_gtt"
+      },
+      "name": "gtt_error_cancel_blank_alert_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "al_id"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_id": 26111200000010
+        },
+        "call": "cancel_gtt"
+      },
+      "name": "gtt_error_cancel_integer_alert_id"
+    }
+  ],
+  "description": "Order-call arguments (uid TEST123) to the endpoint and the exact request body (see jdata_encoding.json), or {\"error\": \"RequestValidationError\", \"fields\": [...]} when client-side validation rejects the arguments before anything is sent; fields lists the wire keys of the field-level errors, sorted (empty when only a cross-field rule failed, such as MTF on MCX). input.call is place_order (PlaceOrder; wire key order uid, actid, exch, tsym, qty, prc, trgprc, dscqty, prd, trantype, prctyp, ret, amo, remarks, ordersource, blprc, bpprc, trailprc, mkt_protection, algo_id; amo is always sent as Yes or No), modify_order (ModifyOrder; no amo; ret only when a validity is given; algo_id last, as on PlaceOrder; algo_id must be a non-blank string when given), cancel_order (CancelOrder: uid, norenordno), exit_order (ExitSNOOrder: uid, norenordno, prd H or B), order_margin (GetOrderMargin, a read), place_gtt (PlaceGTTOrder; wire key order uid, actid, exch, tsym, ai_t, d, validity, remarks, trantype, prctyp, prd, ret, qty, prc, trgprc, dscqty; alert_type -> ai_t, trigger_value -> d, alert_validity -> validity (DAY or GTT, default GTT), validity -> ret (default DAY), tag -> remarks (required, non-blank); exchanges NSE, NFO, BSE, BFO, MCX and products CNC, NRML, CO only; quantity in the exchange's trade units, a whole multiple of the lot size, on MCX too; no ordersource, no algo_id), modify_gtt (ModifyGTTOrder: the same keys with al_id third; validity and alert_validity have no defaults on modify_gtt, so every modify_gtt case gives both and both are always sent) or cancel_gtt (CancelGTTOrder: uid, al_id); GTT case names start with gtt_. Absent optional keys are omitted; a MARKET / SL-M order without a price is sent with prc \"0\".",
+  "source": "tradesmart.endpoints.orders.place_order_call / modify_order_call / cancel_order_call / exit_sno_order_call / order_margin_call; tradesmart.endpoints.gtt.place_gtt_call / modify_gtt_call / cancel_gtt_call",
+  "tolerance": {}
+}

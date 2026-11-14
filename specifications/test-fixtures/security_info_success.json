@@ -1,0 +1,7 @@
+{
+  "request_time": "15:21:22 20-06-2026", "stat": "Ok", "exch": "NSE", "tsym": "TCS-EQ",
+  "cname": "TATA CONSULTANCY SERV LT", "symname": "TCS", "seg": "EQT", "instname": "EQ",
+  "isin": "INE467B01029", "pp": "2", "prcftr": "1.000000", "ls": "1", "ti": "0.10", "mult": "1",
+  "issue_d": "25-08-2004", "listing_d": "25-08-2004", "uc": "2337.50", "lc": "1912.50",
+  "prcftr_d": "(1 / 1 ) * (1 / 1)", "token": "11536", "frzqty": "47035"
+}

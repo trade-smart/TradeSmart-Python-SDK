@@ -1,0 +1,25 @@
+# Python SDK. This file also goes into the source distribution.
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Secrets / local config: never commit credentials
+.env
+.env.*
+!.env.example
+*.secret
+*credentials*.json
+
+# Observations recorded by the live tests and probes
+.live-results/

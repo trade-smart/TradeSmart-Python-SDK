@@ -1,0 +1,221 @@
+# Conformance vectors
+
+Language-neutral JSON test vectors for the TradeSmart SDKs. They are **generated from the Python SDK**
+(`sdk-python/`, version 2.0.0), which is the reference implementation: an SDK in another language
+conforms when it produces every `expected` value below from the matching `input`. The behaviour they
+pin down is described in `../sdk-behaviour.md`.
+
+## Files
+
+| File | What it covers |
+|---|---|
+| `checksum.json` | Authorisation checksum (SHA-256 of App Key + Secret Key + code), including the worked example from TradeSmart's documentation |
+| `not_ok_classification.json` | Response classification: HTTP status (3xx included: redirects are never followed), `stat` / `emsg` and the endpoint kind decide the error type (or the empty list) |
+| `expiry_instants.json` | Expiry instant per exchange (with and without the `expiry_time` override) and the has-expired rule around the close |
+| `contract_selection.json` | Script-master rows to option contract (`find_option`) and underlying future (`select_future`), including the BFO `Strike` column and the `OPT`→`FUT` future-symbol fallback (spec 10.4) |
+| `greeks_prices.json` | Black-76 and Black-Scholes-Merton price and Greeks for a given volatility |
+| `implied_volatility.json` | Price to implied volatility round trips, and the cases where no volatility exists |
+| `greeks_edge_cases.json` | `greeks_from_price` status rules: expired, near expiry, at or below intrinsic (half-tick rule), no price, the one-minute floor, absurd inputs |
+| `carry_forward.json` | Cost-of-carry adjustment of the underlying future to the option's expiry, and the MCX no-carry rule |
+| `pcr.json` | Put-call ratio by open interest and volume |
+| `max_pain.json` | Max-pain strike and payouts (ties, all-zero and missing open interest) |
+| `buildup.json` | Price / open-interest buildup classification, and the version computed from a stream snapshot |
+| `ws_connect_ack.json` | Which WebSocket connect-acknowledgement `s` values are accepted |
+| `config_defaults.json` | Every client configuration default and its validation |
+| `jdata_encoding.json` | REST body bytes: `jData=` + compact JSON in wire key order, UTF-8, no HTML escaping, the exact escapes of control characters, only `%` `&` `+` percent-encoded |
+| `token_expiry.json` | Access-token expiry: the first 06:00 IST strictly after the issue instant (any input offset), and the `is_expired` boundary (`now >= expires_at`) |
+| `token_file.json` | The shared token file: the timestamp format the writer uses, the exact forms a reader accepts (`Z`, 0-9 fraction digits, `±HH:MM`), the forms it refuses (`+0530`, basic format, space separator, 10+ digits) and the expiry cap |
+| `scrip_keys.json` | Stream subscription keys `EXCH\|TOKEN`: accepted forms, upper-casing, de-duplication, rejected tokens |
+| `time_conversion.json` | Request times to epoch seconds, and the documented response time formats (IST text, epoch seconds) |
+| `round_to_tick.json` | `round_to_tick`: nearest tick, half-way away from zero, the tick's decimal places, invalid ticks |
+| `retry_schedule.json` | Read retries: back-off delay bounds per attempt, `Retry-After` (clamped to `[0, cap]`, non-finite ignored), the cap, which errors are retried |
+| `order_validation.json` | Order-call arguments (`place_order`, `modify_order`, `cancel_order`, `exit_order`, `order_margin`, and the GTT calls `place_gtt`, `modify_gtt`, `cancel_gtt` in the `gtt_*` cases) to the endpoint and exact body, or the client-side validation error and the wire keys it names |
+| `read_payloads.json` | Read-method arguments (`profile` … `daily_history`, `pending_gtts`, `triggered_gtts`, `gtt_alert_types`) to the endpoint and exact body: `OrderBook` with `uid` only, `EODChartData` without `uid`, `GetTrgOi` with `uid` and `actid`, optional `TPSeries` keys, time inputs, string ids, or the validation error |
+| `request_names.json` | The low-level `request()`: endpoint-name canonicalisation (`" /placeorder/ "` → `PlaceOrder`, `placegttorder` → `PlaceGTTOrder`, `limits` kept), the state-changing flag, the rate group, the success words and required ack field, `uid` appended, wire values, rejected names and `null` values |
+| `outcome_words.json` | The order outcome log line (`accepted`, `rejected`, `unknown`, `not_sent`) and WARNING per kind of result, including invalid parameters (no line), a closed client, no or expired token, the client rate limit and send-time failures; the GTT writes (typed `place_gtt`, `modify_gtt`, `cancel_gtt` and through `request()`) log `al_id=` and point to `pending_gtts()` |
+| `success_words.json` | Per-endpoint success words: the GTT words (`Oi created`, `Oi replaced`, `Oi delete success`, compared ignoring letter case only, so the test environment's `OI created` passes; each with a non-blank `al_id` and no `emsg`) and the exact iceberg `true` / `false`; every other variant (`Ok`, another word such as `OI deleted`, other spacing or padding, iceberg `True`, missing `al_id`, JSON booleans) is `OrderStatusUnknownError`; other endpoints accept only `Ok` |
+| `transport_failures.json` | Failure while sending, per kind (connect error/timeout, pool timeout, read/write timeout, reset, protocol, decoding, the caller's hook) and per call kind (`place_order`, `cancel_order`, the typed GTT writes, a state-changing `request()`, a read): the error raised and how many requests were sent (a write is never retried) |
+| `script_master_parse.json` | Script-master text to rows: delimiter choice and tie-break, quoting, blank rows, trimming, short / long rows, duplicate headers, the empty trailing column, BOM, invalid UTF-8 and NUL |
+| `script_master_freshness.json` | The script-master cache decision: fresh file, the 15-minute re-check window, conditional request and 304, failed re-check keeping the file, the file vanishing after a 304, failed first downloads, unusable `.checked` stamps |
+| `stream_backlog.json` | The stream backpressure merge rule (9.7): rules a and b, the shared-field copy, no merge across an ack or unknown message, per instrument, and the two WARNINGs |
+| `slice_plan.json` | Sliced orders (5.7): the largest slice from the lot size and freeze quantity (in units on every exchange, MCX included), `max_slice_quantity`, the remainder slice, the `max_slices` cap and every refusal before sending |
+
+## File shape
+
+```json
+{
+  "description": "what the file covers and how to read input / expected",
+  "source": "python module / function the values come from",
+  "tolerance": {"abs": 1e-9, "rel": 1e-9},
+  "cases": [
+    {"name": "unique_snake_case_name", "input": { }, "expected": { }}
+  ]
+}
+```
+
+Run each case independently: build the SDK call from `input`, compare its result with `expected`.
+A case name is unique within its file and says what it demonstrates. Files that cover several
+functions name the function in `input.function` (`expiry_instants`, `contract_selection`,
+`carry_forward`, `buildup`, `token_expiry`, `token_file`, `retry_schedule`, `time_conversion`) or
+`input.call` (`order_validation`, `read_payloads`, `outcome_words`, `transport_failures`); pick
+the function to call from it.
+
+### Input keys and parameter names
+
+Input keys are the Python parameter names of the function under test (convert them to your
+language's case style), except where a file describes its own input. In particular:
+
+| File | Input key | Parameter |
+|---|---|---|
+| `greeks_prices.json` | `model` = `black76`, `underlying` | `black76(forward, ...)`: `underlying` is `forward` |
+| `greeks_prices.json` | `model` = `bsm`, `underlying` | `black_scholes(spot, ...)`: `underlying` is `spot` |
+| `greeks_prices.json` | `volatility` | `volatility` of `black76` / `black_scholes` |
+| `implied_volatility.json`, `greeks_edge_cases.json` | `underlying`, `option_price`, `model`, `dividend_yield`, `tick_size` | the parameters of `implied_volatility` / `greeks_from_price` (`volatility_used` is informational) |
+| `pcr.json`, `max_pain.json` | `rows[].strike`, `option_type`, `open_interest`, `volume` | the `ChainRow` fields `strike`, `option_type`, `open_interest`, `volume` (`models.md`) |
+| `buildup.json` | `snapshot.lp`, `c`, `oi`, `poi` | the wire keys of a stream `snapshot()` (`buildup_from_snapshot`) |
+| `carry_forward.json` | `dividend_yield` (optional, absent = 0) | the `dividend_yield` of `option_greeks` |
+
+The result types (`Greeks`, `OptionGreeks`, `ChainRow`, `OptionChainSnapshot`, `MaxPain`,
+`BuildupReading`) and their field names are listed in `../models.md`; the function signatures
+in `../sdk-behaviour.md` sections 10.8 and 11.5.
+
+## Value encoding
+
+- **Decimal values are strings** (`"24000"`, `"0.05"`, `"1.333333333333333333333333333"`): prices
+  that the SDK keeps as `Decimal`, strikes, tick sizes, open interest, volume, the PCR, payouts and
+  buildup changes. Compare them as decimal numbers, not as text (`"1.50"` equals `"1.5"`), unless the
+  file's tolerance is empty, in which case the strings are compared as text (the strike `"24000.00"`
+  in `contract_selection.json` keeps its trailing zeros).
+- **`null` means "no value"** (Python `None`): in an `input` it is an absent or missing value, in an
+  `expected` it is an absent result (for example the PCR with no call open interest). A numeric field
+  is never `NaN` or infinity: the SDK returns `null` instead, and no file contains `NaN` / `Infinity`
+  literals. Where an input must be non-finite (`buildup.json`, `config_defaults.json`,
+  `retry_schedule.json`), it is the string `"NaN"`, `"Infinity"` or `"-Infinity"`.
+- **Floats** (greeks, rates, years, volatilities) are JSON numbers written with the shortest
+  round-trip representation. **Dates** are `YYYY-MM-DD`; **instants** are ISO 8601 with the IST
+  offset (`2026-11-26T15:30:00+05:30`). **Times** are `HH:MM` in IST. **Durations** are seconds.
+- **Script-master rows** are objects of strings keyed by the script-master column names.
+- **Errors**: `{"error": "<TypeName>"}`. The names are the Python exception classes
+  (`ValueError`, `ConfigurationError`, `RequestValidationError`, `AuthenticationError`,
+  `RateLimitError`, `NotFoundError`, `ServerError`, `OrderRejectedError`, `APIError`,
+  `ResponseParseError`, `OrderStatusUnknownError`, `NetworkError`, `RequestTimeoutError`, `TypeError`, `KeyboardInterrupt`). `ValueError` means "invalid argument or data",
+  `RequestValidationError` "request parameters rejected before sending" (the SDK's own error type,
+  not a `ValueError`) and `ConfigurationError` "invalid client configuration": map each to your language's equivalent error, but keep the distinctions between the
+  API error types, which are the contract. `not_ok_classification.json` also gives the `emsg` the
+  error carries (`null` when none) and its `message`; `config_defaults.json` gives the
+  `ConfigurationError` `message` (compare it exactly, except that Python's `True` / `False` /
+  `None` may be your language's own words); `order_validation.json` and `read_payloads.json`
+  give `fields`, the sorted wire keys named by the `RequestValidationError` entries (an empty
+  list when only a cross-field rule failed). Other files give the type only; `KeyboardInterrupt`
+  and `TypeError` stand for "the interruption passes through unchanged" and "a programming
+  error, not an SDK error".
+- **Time-dependent cases** carry their own `now` (an instant in IST). Inject a clock; never read the
+  real one.
+
+## Tolerances
+
+`tolerance` holds the allowed difference for the numbers of the file; an empty object means exact.
+
+| Key | Meaning |
+|---|---|
+| `abs` | absolute tolerance on JSON numbers |
+| `rel` | relative tolerance on JSON numbers |
+| `decimal_abs` | absolute tolerance on Decimal strings (`"0"`: exact value, ignoring trailing zeros) |
+
+A number passes when `|actual - expected| <= abs + rel * |expected|` (use `0` for a missing key).
+Integers, booleans, `null`, text and the set of keys must match exactly.
+
+| File | Tolerance | Why |
+|---|---|---|
+| `greeks_prices.json` | abs 1e-9, rel 1e-9 | closed-form maths; differences come from the `exp` / `erf` implementations |
+| `implied_volatility.json` | abs 1e-6 on `iv` | the solver stops when the model price is within 1e-8 of the target; also assert that re-pricing your IV gives the input price within 1e-8 |
+| `greeks_edge_cases.json` | abs 1e-6, rel 1e-6 | values at a solved implied volatility |
+| `carry_forward.json` | abs 1e-9, rel 1e-12 | |
+| `pcr.json` | decimal_abs 1e-12 | repeating quotients are rounded differently by different decimal libraries |
+| `max_pain.json`, `buildup.json` | decimal_abs 0 | exact decimal arithmetic |
+| `config_defaults.json` | abs 1e-12 | |
+| `retry_schedule.json` | abs 1e-12 | delay bounds are products of floats |
+| the others | none | exact |
+
+One exception to "keys must match exactly": the keys of `max_pain.json`'s `payouts` object are
+strikes, written as the Python decimal text of the input strike (`"24000"`, `"24000.5"`).
+Compare those keys as decimal numbers, like the values.
+
+## Notes per file
+
+- `config_defaults.json`: the `user_agent` default is `"tradesmart-python/<version>"` in the
+  vectors. Compare it as `"<your-sdk-name>/<your-version>"`, not literally. In `input`, `overrides`
+  are constructor arguments and `fields` (when not `null`) the only fields `expected` lists.
+- `ws_connect_ack.json`: `input.s` is the `s` field of the `ak` acknowledgement; `expected.accepted`
+  says whether the connection continues (`true`) or is rejected as an authentication failure. The
+  live server sends `"OK"`, TradeSmart's documentation says `"Ok"`: accept any case, trimmed.
+- `implied_volatility.json`: `volatility_used` is informational (the volatility the price was made
+  from); it is not an argument of the function.
+- `greeks_edge_cases.json`: every numeric value is finite or `null`. The absurd-input cases (huge or
+  tiny prices and strikes, enormous time, extreme rates) check that clamping and the finite-or-null
+  rule hold; they are the cases most sensitive to your floating-point operations.
+- `not_ok_classification.json`: `input.body` is the raw response text and is parsed regardless of
+  the HTTP status. `expect` is `"object"` or `"list"`; `allow_empty` marks a list endpoint where a
+  `no data` reply is an empty list; `state_changing` marks `PlaceOrder`, `PlaceMultiOrder`,
+  `ModifyOrder`, `CancelOrder`, `ExitSNOOrder`, `GenAcsTok` and the GTT and iceberg writes (never
+  retried). Its success word is always `Ok`; the GTT and iceberg words are in `success_words.json`.
+- `success_words.json`: classify `input.body` as a reply to `input.endpoint` with that endpoint's
+  success words (`expect` object, `allow_empty` false, state-changing as the endpoint is). Compare
+  `stat` exactly: no case folding, no trimming, and a JSON boolean is not the string `"true"`.
+  `input.expect` is the shape the caller asked for: a JSON array on a GTT or iceberg write is
+  unknown even with `expect` `"list"`.
+- `jdata_encoding.json`: `input.payload` is a list of `[key, value]` pairs because the key order is
+  part of the contract (JSON objects in these files are written with sorted keys). Compare the body
+  text exactly, and `utf8_hex` with the bytes you send.
+- `order_validation.json`: `input.call` names the client method and `input.arguments` uses its
+  Python parameter names (map them to your language's case style); `uid` is `TEST123`. Words and
+  wire codes are both accepted, in any case. `expected.endpoint` is the endpoint the call posts to.
+  A case named `gtt_error_*` (like `error_*`) is a refusal; every other case is a body.
+- `token_file.json`: `write` cases run your login writer for a token issued at `input.issued_at`
+  and compare the two timestamp texts it stores; `read` cases put the given texts into a token file
+  (with a synthetic client id and token) and load it. `{"error": "invalid"}` means the file is
+  refused (the Python SDK's `from_env()` then has no usable saved login, and its error names the
+  problem).
+- `retry_schedule.json`: `max` is the exclusive upper bound of the jittered delay; assert
+  `min <= delay < max` (or `delay == min` when `min == max`) with an injected random source.
+- `time_conversion.json`: `parse_ist` and `parse_epoch` are the parsers of the `ISTDateTime` and
+  `EpochTime` field types listed in `../models.md`.
+- `carry_forward.json`: `dividend_yield` is optional in `input`; absent means 0.
+- `read_payloads.json`, `outcome_words.json`, `transport_failures.json` and
+  `script_master_freshness.json`: drive your real client (for `script_master_freshness.json`, its
+  script-master download) with an in-memory HTTP transport (a mock handler) that records the request and answers as the
+  case says; no network. In `outcome_words.json` the limiter clock is frozen while the prior
+  orders and the call run, so the 11th order of the same instant is over the 10 per second
+  limit. `requests` counts the requests that reached the transport.
+- `request_names.json`: `rate_group` uses the Python group names: `place_order` is the orders
+  group of 3.4.
+- `transport_failures.json`: map each failure kind to your HTTP library's error (connect refused,
+  connect timeout, pool-acquire timeout, read / write timeout, reset, protocol error, a body
+  decoding error) or to an exception thrown by the caller's own hook or handler. Reads are
+  retried with `max_retries` 2 (3 requests) and an instant back-off.
+- `script_master_freshness.json`: pin your clock to `input.now` and set the cached file's
+  modification time to `file_mtime`; `checked` is the exact sidecar text before and after (the
+  SDK writes the UTC ISO 8601 form of `now`). Its `responses` are served in turn by the in-memory
+  transport.
+- `stream_backlog.json`: feed the messages to your delivery buffer exactly as received (the
+  dictionaries are wire JSON objects); compare the delivered objects as sets of keys and values.
+- `slice_plan.json`: the pure slice planner of `place_sliced_order` (no request is sent).
+  `input.quantity`, `max_slice_quantity`, `lot_size`, `freeze_quantity` (`frzqty`) and the
+  expected slices are all in trade units on every exchange, MCX included (F21).
+  `freeze_quantity` `null` or `0` means unknown. `expected` is a list of integers or
+  `{"error": "ValueError"}`.
+
+## Regenerating and keeping in sync (Python SDK)
+
+```
+cd sdk-python
+docker compose run --rm dev python scripts/gen_conformance.py
+docker compose run --rm dev pytest tests/unit/test_conformance_vectors.py
+```
+
+The generator (`sdk-python/scripts/gen_conformance.py`) is deterministic: sorted keys, no
+timestamps, so an unchanged SDK leaves `git diff` empty. `test_conformance_vectors.py` re-evaluates
+every case with the SDK, and fails when a value differs, when a listed file is missing, when a JSON
+file exists that this README does not list, or when the generator's cases changed without
+regenerating. If a change to the Python SDK changes a vector on purpose, regenerate and review the
+diff: it is a behaviour change every other SDK has to follow.

@@ -1,0 +1,440 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "UserDetails"
+      },
+      "input": {
+        "arguments": {},
+        "call": "profile"
+      },
+      "name": "profile_sends_uid"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\"}",
+        "endpoint": "Limits"
+      },
+      "input": {
+        "arguments": {},
+        "call": "margins"
+      },
+      "name": "margins_sends_uid_and_actid"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\"}",
+        "endpoint": "PositionBook"
+      },
+      "input": {
+        "arguments": {},
+        "call": "positions"
+      },
+      "name": "positions_sends_uid_and_actid"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"prd\":\"C\"}",
+        "endpoint": "Holdings"
+      },
+      "input": {
+        "arguments": {},
+        "call": "holdings"
+      },
+      "name": "holdings_default_product_is_cnc"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"prd\":\"M\"}",
+        "endpoint": "Holdings"
+      },
+      "input": {
+        "arguments": {
+          "product": "nrml"
+        },
+        "call": "holdings"
+      },
+      "name": "holdings_product_word_any_case"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\",\"prd\":\"I\"}",
+        "endpoint": "Holdings"
+      },
+      "input": {
+        "arguments": {
+          "product": "I"
+        },
+        "call": "holdings"
+      },
+      "name": "holdings_product_wire_code"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "prd"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "product": "DELIVERY"
+        },
+        "call": "holdings"
+      },
+      "name": "error_holdings_unknown_product"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "OrderBook"
+      },
+      "input": {
+        "arguments": {},
+        "call": "orders"
+      },
+      "name": "orders_sends_uid_only"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"norenordno\":\"26111000000001\"}",
+        "endpoint": "SingleOrdHist"
+      },
+      "input": {
+        "arguments": {
+          "order_id": "26111000000001"
+        },
+        "call": "order_history"
+      },
+      "name": "order_history"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "norenordno"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "order_id": 26111000000001
+        },
+        "call": "order_history"
+      },
+      "name": "error_order_history_integer_id"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\"}",
+        "endpoint": "TradeBook"
+      },
+      "input": {
+        "arguments": {},
+        "call": "trades"
+      },
+      "name": "trades_sends_uid_and_actid"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"stext\":\"RELIANCE\"}",
+        "endpoint": "SearchScrip"
+      },
+      "input": {
+        "arguments": {
+          "text": "RELIANCE"
+        },
+        "call": "search_instruments"
+      },
+      "name": "search_instruments"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"exch\":\"NSE\",\"token\":\"2885\"}",
+        "endpoint": "GetQuotes"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "nse",
+          "token": "2885"
+        },
+        "call": "quote"
+      },
+      "name": "quote_exchange_any_case"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "token"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "token": 2885
+        },
+        "call": "quote"
+      },
+      "name": "error_quote_integer_token"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "exch"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "XYZ",
+          "token": "2885"
+        },
+        "call": "quote"
+      },
+      "name": "error_quote_unknown_exchange"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"exch\":\"NFO\",\"token\":\"43650\"}",
+        "endpoint": "GetSecurityInfo"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NFO",
+          "token": "43650"
+        },
+        "call": "security_info"
+      },
+      "name": "security_info"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"exch\":\"NFO\",\"tsym\":\"NIFTY24NOV26C24000\",\"strprc\":\"24000\",\"cnt\":\"5\"}",
+        "endpoint": "GetOptionChain"
+      },
+      "input": {
+        "arguments": {
+          "count": 5,
+          "exchange": "NFO",
+          "strike_price": "24000",
+          "tradingsymbol": "NIFTY24NOV26C24000"
+        },
+        "call": "option_chain"
+      },
+      "name": "option_chain"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "cnt"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "count": 0,
+          "exchange": "NFO",
+          "strike_price": "24000",
+          "tradingsymbol": "NIFTY24NOV26C24000"
+        },
+        "call": "option_chain"
+      },
+      "name": "error_option_chain_zero_count"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"exch\":\"NSE\",\"token\":\"22\"}",
+        "endpoint": "TPSeries"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "token": "22"
+        },
+        "call": "historical_data"
+      },
+      "name": "historical_data_without_times"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"exch\":\"NSE\",\"token\":\"22\",\"st\":\"1794282300\",\"et\":\"1794285900\",\"intrv\":\"5\"}",
+        "endpoint": "TPSeries"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "from_date": {
+            "datetime": "2026-11-10T09:15:00+05:30"
+          },
+          "interval": 5,
+          "to_date": {
+            "datetime": "2026-11-10T04:45:00+00:00"
+          },
+          "token": "22"
+        },
+        "call": "historical_data"
+      },
+      "name": "historical_data_aware_datetimes_and_interval"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"exch\":\"NSE\",\"token\":\"22\",\"st\":\"1794249000\"}",
+        "endpoint": "TPSeries"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "from_date": {
+            "date": "2026-11-10"
+          },
+          "token": "22"
+        },
+        "call": "historical_data"
+      },
+      "name": "historical_data_date_is_00_00_ist"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"exch\":\"NSE\",\"token\":\"22\",\"st\":\"1762746300\",\"et\":\"1762768800\"}",
+        "endpoint": "TPSeries"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "from_date": 1762746300,
+          "to_date": 1762768800,
+          "token": "22"
+        },
+        "call": "historical_data"
+      },
+      "name": "historical_data_epoch_seconds"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "time"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "from_date": {
+            "datetime": "2026-11-10T09:15:00"
+          },
+          "token": "22"
+        },
+        "call": "historical_data"
+      },
+      "name": "error_historical_data_naive_datetime"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "time"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "from_date": 1762746300.5,
+          "token": "22"
+        },
+        "call": "historical_data"
+      },
+      "name": "error_historical_data_float_time"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "time"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "from_date": "1762746300",
+          "token": "22"
+        },
+        "call": "historical_data"
+      },
+      "name": "error_historical_data_text_time"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "intrv"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "exchange": "NSE",
+          "interval": 7,
+          "token": "22"
+        },
+        "call": "historical_data"
+      },
+      "name": "error_historical_data_unknown_interval"
+    },
+    {
+      "expected": {
+        "body": "jData={\"sym\":\"NSE:RELIANCE-EQ\",\"from\":\"1793471400\",\"to\":\"1794249000\"}",
+        "endpoint": "EODChartData"
+      },
+      "input": {
+        "arguments": {
+          "exchange": "nse",
+          "from_date": {
+            "date": "2026-11-01"
+          },
+          "to_date": {
+            "date": "2026-11-10"
+          },
+          "tradingsymbol": "RELIANCE-EQ"
+        },
+        "call": "daily_history"
+      },
+      "name": "daily_history_dates"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "GetPendingGTTOrder"
+      },
+      "input": {
+        "arguments": {},
+        "call": "pending_gtts"
+      },
+      "name": "pending_gtts_sends_uid_only"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\",\"actid\":\"TEST123\"}",
+        "endpoint": "GetTrgOi"
+      },
+      "input": {
+        "arguments": {},
+        "call": "triggered_gtts"
+      },
+      "name": "triggered_gtts_sends_uid_and_actid"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "GetEnabledGTTs"
+      },
+      "input": {
+        "arguments": {},
+        "call": "gtt_alert_types"
+      },
+      "name": "gtt_alert_types_sends_uid_only"
+    }
+  ],
+  "description": "Read-method arguments (uid TEST123) to the endpoint and the exact request body, or {\"error\": \"RequestValidationError\", \"fields\": [...]} (wire keys, see order_validation.json) when the arguments are rejected before anything is sent. input.call names the client method, input.arguments its parameters; a time argument is {\"datetime\": ISO 8601} (an offset is required), {\"date\": YYYY-MM-DD} (00:00 IST) or an integer of epoch seconds; a float or text time is rejected. Ids and tokens must be strings (an integer is rejected, never converted). OrderBook sends uid only; EODChartData sends sym = EXCH:TSYM, from, to and no uid; optional TPSeries keys (st, et, intrv) are omitted when not given. GetPendingGTTOrder and GetEnabledGTTs send uid only; GetTrgOi sends uid and actid.",
+  "source": "tradesmart.TradeSmart read methods (request captured by an in-memory transport)",
+  "tolerance": {}
+}

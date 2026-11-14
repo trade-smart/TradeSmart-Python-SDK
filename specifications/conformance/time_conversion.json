@@ -1,0 +1,269 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "epoch": "1794282300"
+      },
+      "input": {
+        "function": "to_epoch",
+        "value": {
+          "datetime": "2026-11-10T09:15:00+05:30"
+        }
+      },
+      "name": "to_epoch_ist_datetime"
+    },
+    {
+      "expected": {
+        "epoch": "1794282300"
+      },
+      "input": {
+        "function": "to_epoch",
+        "value": {
+          "datetime": "2026-11-10T03:45:00+00:00"
+        }
+      },
+      "name": "to_epoch_utc_datetime"
+    },
+    {
+      "expected": {
+        "epoch": "1794282300"
+      },
+      "input": {
+        "function": "to_epoch",
+        "value": {
+          "datetime": "2026-11-10T09:15:00.900+05:30"
+        }
+      },
+      "name": "to_epoch_fraction_is_truncated"
+    },
+    {
+      "expected": {
+        "epoch": "1794249000"
+      },
+      "input": {
+        "function": "to_epoch",
+        "value": {
+          "date": "2026-11-10"
+        }
+      },
+      "name": "to_epoch_date_is_00_00_ist"
+    },
+    {
+      "expected": {
+        "epoch": "1794282300"
+      },
+      "input": {
+        "function": "to_epoch",
+        "value": {
+          "epoch": 1794282300
+        }
+      },
+      "name": "to_epoch_epoch_int_passes_through"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError"
+      },
+      "input": {
+        "function": "to_epoch",
+        "value": {
+          "datetime": "2026-11-10T09:15:00"
+        }
+      },
+      "name": "to_epoch_naive_datetime_is_an_error"
+    },
+    {
+      "expected": {
+        "datetime": "2026-11-10T09:15:00+05:30"
+      },
+      "input": {
+        "function": "parse_ist",
+        "value": "09:15:00 10-11-2026"
+      },
+      "name": "parse_ist_time_first_quote_format"
+    },
+    {
+      "expected": {
+        "datetime": "2026-11-10T09:15:00+05:30"
+      },
+      "input": {
+        "function": "parse_ist",
+        "value": "10-11-2026 09:15:00"
+      },
+      "name": "parse_ist_date_first_order_format"
+    },
+    {
+      "expected": {
+        "datetime": "2026-11-10T09:15:00+05:30"
+      },
+      "input": {
+        "function": "parse_ist",
+        "value": "10/11/2026 09:15:00"
+      },
+      "name": "parse_ist_slash_date_format"
+    },
+    {
+      "expected": {
+        "datetime": "2026-11-10T00:00:00+05:30"
+      },
+      "input": {
+        "function": "parse_ist",
+        "value": "10-11-2026"
+      },
+      "name": "parse_ist_date_only"
+    },
+    {
+      "expected": {
+        "datetime": "2026-11-26T00:00:00+05:30"
+      },
+      "input": {
+        "function": "parse_ist",
+        "value": "26-NOV-2026"
+      },
+      "name": "parse_ist_month_name_upper_case"
+    },
+    {
+      "expected": {
+        "datetime": "2026-11-26T00:00:00+05:30"
+      },
+      "input": {
+        "function": "parse_ist",
+        "value": "26-Nov-2026"
+      },
+      "name": "parse_ist_month_name_title_case"
+    },
+    {
+      "expected": {
+        "datetime": "2026-11-10T09:15:00+05:30"
+      },
+      "input": {
+        "function": "parse_ist",
+        "value": "  10-11-2026 09:15:00 "
+      },
+      "name": "parse_ist_padded_text_is_trimmed"
+    },
+    {
+      "expected": {
+        "datetime": null
+      },
+      "input": {
+        "function": "parse_ist",
+        "value": "2026-11-10T09:15:00"
+      },
+      "name": "parse_ist_unknown_format_is_null"
+    },
+    {
+      "expected": {
+        "datetime": null
+      },
+      "input": {
+        "function": "parse_ist",
+        "value": ""
+      },
+      "name": "parse_ist_empty_is_null"
+    },
+    {
+      "expected": {
+        "datetime": null
+      },
+      "input": {
+        "function": "parse_ist",
+        "value": null
+      },
+      "name": "parse_ist_null_is_null"
+    },
+    {
+      "expected": {
+        "datetime": null
+      },
+      "input": {
+        "function": "parse_ist",
+        "value": 1794282300
+      },
+      "name": "parse_ist_number_is_null"
+    },
+    {
+      "expected": {
+        "datetime": "2026-11-10T03:45:00+00:00"
+      },
+      "input": {
+        "function": "parse_epoch",
+        "value": "1794282300"
+      },
+      "name": "parse_epoch_string_seconds"
+    },
+    {
+      "expected": {
+        "datetime": "2026-11-10T03:45:00+00:00"
+      },
+      "input": {
+        "function": "parse_epoch",
+        "value": 1794282300
+      },
+      "name": "parse_epoch_number_seconds"
+    },
+    {
+      "expected": {
+        "datetime": "2026-11-10T03:45:00+00:00"
+      },
+      "input": {
+        "function": "parse_epoch",
+        "value": "1794282300.9"
+      },
+      "name": "parse_epoch_decimal_seconds_truncated"
+    },
+    {
+      "expected": {
+        "datetime": "2026-11-10T03:45:00+00:00"
+      },
+      "input": {
+        "function": "parse_epoch",
+        "value": " 1794282300 "
+      },
+      "name": "parse_epoch_padded_string"
+    },
+    {
+      "expected": {
+        "datetime": null
+      },
+      "input": {
+        "function": "parse_epoch",
+        "value": "0"
+      },
+      "name": "parse_epoch_zero_is_null"
+    },
+    {
+      "expected": {
+        "datetime": null
+      },
+      "input": {
+        "function": "parse_epoch",
+        "value": ""
+      },
+      "name": "parse_epoch_empty_is_null"
+    },
+    {
+      "expected": {
+        "datetime": null
+      },
+      "input": {
+        "function": "parse_epoch",
+        "value": null
+      },
+      "name": "parse_epoch_null_is_null"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "parse_epoch",
+        "value": "abc"
+      },
+      "name": "parse_epoch_text_is_an_error"
+    }
+  ],
+  "description": "input.function is to_epoch (request times: value is {datetime: ISO with offset}, {date: YYYY-MM-DD} meaning 00:00 IST, or {epoch: int}; expected.epoch is the decimal epoch-seconds string, fractions truncated; a datetime without an offset is RequestValidationError), parse_ist (response text times in the documented formats, read as IST; unknown formats, blanks and non-strings are null) or parse_epoch (epoch-seconds fields such as lut / ft; 0 and blank are null; expected.datetime is UTC; non-numeric text is {\"error\": \"ValueError\"}).",
+  "source": "tradesmart.endpoints.market.to_epoch / tradesmart.models.base._parse_ist, _parse_epoch",
+  "tolerance": {}
+}

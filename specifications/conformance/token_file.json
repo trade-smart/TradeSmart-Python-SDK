@@ -1,0 +1,258 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "issued_at": "2026-11-10T09:15:30+05:30"
+      },
+      "input": {
+        "function": "write",
+        "issued_at": "2026-11-10T09:15:30.123456+05:30"
+      },
+      "name": "write_seconds_precision_numeric_offset"
+    },
+    {
+      "expected": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "issued_at": "2026-11-10T03:45:30+00:00"
+      },
+      "input": {
+        "function": "write",
+        "issued_at": "2026-11-10T03:45:30+00:00"
+      },
+      "name": "write_utc_instant_keeps_its_offset"
+    },
+    {
+      "expected": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "issued_at": "2026-11-10T09:15:30+05:30"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10T09:15:30+05:30"
+      },
+      "name": "read_numeric_offset_as_written"
+    },
+    {
+      "expected": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "issued_at": "2026-11-10T09:15:30+05:30"
+      },
+      "input": {
+        "expires_at": "2026-11-11T00:30:00Z",
+        "function": "read",
+        "issued_at": "2026-11-10T03:45:30Z"
+      },
+      "name": "read_z_suffix"
+    },
+    {
+      "expected": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "issued_at": "2026-11-10T09:15:30+05:30"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10T03:45:30z"
+      },
+      "name": "read_lower_case_z_suffix"
+    },
+    {
+      "expected": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "issued_at": "2026-11-10T09:15:30.123000+05:30"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10T03:45:30.123Z"
+      },
+      "name": "read_three_fraction_digits"
+    },
+    {
+      "expected": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "issued_at": "2026-11-10T09:15:30.123456+05:30"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10T03:45:30.123456789Z"
+      },
+      "name": "read_nine_fraction_digits_truncated"
+    },
+    {
+      "expected": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "issued_at": "2026-11-10T09:15:30.100000+05:30"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10T03:45:30.1Z"
+      },
+      "name": "read_one_fraction_digit"
+    },
+    {
+      "expected": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "issued_at": "2026-11-10T08:45:30+05:30"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-09T22:15:30-05:00"
+      },
+      "name": "read_other_offset"
+    },
+    {
+      "expected": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "issued_at": "2026-11-10T09:15:30+05:30"
+      },
+      "input": {
+        "expires_at": "2026-11-20T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10T09:15:30+05:30"
+      },
+      "name": "read_edited_expiry_is_capped"
+    },
+    {
+      "expected": {
+        "error": "invalid"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10T09:15:30"
+      },
+      "name": "read_naive_is_refused"
+    },
+    {
+      "expected": {
+        "error": "invalid"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10"
+      },
+      "name": "read_date_only_is_refused"
+    },
+    {
+      "expected": {
+        "error": "invalid"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "yesterday"
+      },
+      "name": "read_not_a_timestamp_is_refused"
+    },
+    {
+      "expected": {
+        "error": "invalid"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": " "
+      },
+      "name": "read_blank_is_refused"
+    },
+    {
+      "expected": {
+        "error": "invalid"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10T09:15:30+0530"
+      },
+      "name": "read_offset_without_colon_is_refused"
+    },
+    {
+      "expected": {
+        "error": "invalid"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "20261110T091530+05:30"
+      },
+      "name": "read_basic_format_is_refused"
+    },
+    {
+      "expected": {
+        "error": "invalid"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10 09:15:30+05:30"
+      },
+      "name": "read_space_separator_is_refused"
+    },
+    {
+      "expected": {
+        "error": "invalid"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10T03:45:30.1234567890Z"
+      },
+      "name": "read_ten_fraction_digits_is_refused"
+    },
+    {
+      "expected": {
+        "error": "invalid"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10T09:15+05:30"
+      },
+      "name": "read_no_seconds_is_refused"
+    },
+    {
+      "expected": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "issued_at": "2026-11-10T09:15:30+05:30"
+      },
+      "input": {
+        "expires_at": "\t2026-11-11T06:00:00+05:30 ",
+        "function": "read",
+        "issued_at": " 2026-11-10T09:15:30+05:30\n"
+      },
+      "name": "read_padded_is_accepted"
+    },
+    {
+      "expected": {
+        "error": "invalid"
+      },
+      "input": {
+        "expires_at": "2026-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2026-11-10t09:15:30+05:30"
+      },
+      "name": "read_lower_case_t_is_refused"
+    },
+    {
+      "expected": {
+        "error": "invalid"
+      },
+      "input": {
+        "expires_at": "2099-11-11T06:00:00+05:30",
+        "function": "read",
+        "issued_at": "2099-11-10T09:15:30+05:30"
+      },
+      "name": "read_issued_at_in_the_future_is_refused"
+    }
+  ],
+  "description": "The shared token file (JSON with client_id, access_token, issued_at, expires_at). input.function write: the SDK's writer stores a login issued at input.issued_at; expected holds the two timestamps as written (YYYY-MM-DDTHH:MM:SS+HH:MM: seconds precision, numeric offset, never Z). input.function read: a file holding the given issued_at / expires_at texts, as another SDK may write them; expected holds the instants read, at +05:30, with expires_at capped at the first 06:00 IST after issued_at, or {\"error\": \"invalid\"} when the file is refused. A reader accepts exactly YYYY-MM-DDTHH:MM:SS, optionally . and 1 to 9 fraction digits (more than 6 are truncated), then Z, z or +HH:MM / -HH:MM, after trimming surrounding whitespace; every other form (no offset, an offset without a colon, the basic format, a space or lower-case t separator, no seconds, 10 or more fraction digits) is refused, and so is an issued_at more than 5 minutes after the reader's clock (the 2099 case).",
+  "source": "tradesmart._token_store.save / load",
+  "tolerance": {}
+}

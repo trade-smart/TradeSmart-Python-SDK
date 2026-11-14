@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "about": "Pinned answers of undocumented UAT behaviour, keyed by case id. Empty until the first full run, then pinned from it; an entry is {\"verdict\": \"accept\" | \"reject\", \"words\": \"<text the rejection must contain>\"}. Never pin \"accept\" for a recorded fill case (ids ending in -fill, -partial or -partial-close: the partial-fill probe and its close, the CO/BO and holdings fill cases): whether they fill depends on the market of the moment; expect.load_pinned refuses such a pin.",
+  "cases": {}
+}

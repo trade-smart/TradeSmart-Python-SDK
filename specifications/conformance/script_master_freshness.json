@@ -1,0 +1,530 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "checked": "2026-11-10T04:30:00+00:00",
+        "file": "downloaded",
+        "file_mtime": "2026-11-10T07:00:00+05:30",
+        "requests": [
+          {
+            "if_modified_since": null
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": null,
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "last_modified": "Tue, 10 Nov 2026 01:30:00 GMT",
+            "status": 200
+          }
+        ]
+      },
+      "name": "no_file_full_download"
+    },
+    {
+      "expected": {
+        "checked": "2026-11-10T04:30:00+00:00",
+        "file": "downloaded",
+        "file_mtime": "2026-11-10T07:00:00+05:30",
+        "requests": [
+          {
+            "if_modified_since": null
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-10T07:05:00+05:30",
+        "force": true,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "last_modified": "Tue, 10 Nov 2026 01:30:00 GMT",
+            "status": 200
+          }
+        ]
+      },
+      "name": "force_downloads_a_fresh_file"
+    },
+    {
+      "expected": {
+        "checked": null,
+        "file": "cached",
+        "file_mtime": "2026-11-10T07:05:00+05:30",
+        "requests": [],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-10T07:05:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": []
+      },
+      "name": "modified_after_todays_refresh_is_used"
+    },
+    {
+      "expected": {
+        "checked": null,
+        "file": "cached",
+        "file_mtime": "2026-11-10T07:00:00+05:30",
+        "requests": [],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-10T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": []
+      },
+      "name": "modified_exactly_at_the_refresh_is_used"
+    },
+    {
+      "expected": {
+        "checked": null,
+        "file": "cached",
+        "file_mtime": "2026-11-09T07:30:00+05:30",
+        "requests": [],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-09T07:30:00+05:30",
+        "force": false,
+        "now": "2026-11-10T06:30:00+05:30",
+        "responses": []
+      },
+      "name": "before_07_00_yesterdays_refresh_applies"
+    },
+    {
+      "expected": {
+        "checked": "2026-11-10T04:20:00+00:00",
+        "file": "cached",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "requests": [],
+        "warnings": 0
+      },
+      "input": {
+        "checked": "2026-11-10T04:20:00+00:00",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": []
+      },
+      "name": "older_file_checked_10_minutes_ago_is_used"
+    },
+    {
+      "expected": {
+        "checked": "2026-11-10T04:30:00+00:00",
+        "file": "cached",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "requests": [
+          {
+            "if_modified_since": "Mon, 09 Nov 2026 01:30:00 GMT"
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": "2026-11-10T04:14:00+00:00",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "status": 304
+          }
+        ]
+      },
+      "name": "older_file_checked_16_minutes_ago_is_rechecked"
+    },
+    {
+      "expected": {
+        "checked": "2026-11-10T04:30:00+00:00",
+        "file": "cached",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "requests": [
+          {
+            "if_modified_since": "Mon, 09 Nov 2026 01:30:00 GMT"
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "status": 304
+          }
+        ]
+      },
+      "name": "older_file_without_a_check_gets_304"
+    },
+    {
+      "expected": {
+        "checked": "2026-11-10T04:30:00+00:00",
+        "file": "downloaded",
+        "file_mtime": "2026-11-10T07:00:00+05:30",
+        "requests": [
+          {
+            "if_modified_since": "Mon, 09 Nov 2026 01:30:00 GMT"
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "last_modified": "Tue, 10 Nov 2026 01:30:00 GMT",
+            "status": 200
+          }
+        ]
+      },
+      "name": "older_file_replaced_by_a_new_one"
+    },
+    {
+      "expected": {
+        "checked": "2026-11-10T04:30:00+00:00",
+        "file": "cached",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "requests": [
+          {
+            "if_modified_since": "Mon, 09 Nov 2026 01:30:00 GMT"
+          }
+        ],
+        "warnings": 1
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "status": 503
+          }
+        ]
+      },
+      "name": "recheck_server_error_keeps_the_file"
+    },
+    {
+      "expected": {
+        "checked": "2026-11-10T04:30:00+00:00",
+        "file": "cached",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "requests": [
+          {
+            "if_modified_since": "Mon, 09 Nov 2026 01:30:00 GMT"
+          }
+        ],
+        "warnings": 1
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "failure": "connect_error"
+          }
+        ]
+      },
+      "name": "recheck_network_error_keeps_the_file"
+    },
+    {
+      "expected": {
+        "checked": "2026-11-10T04:30:00+00:00",
+        "file": "cached",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "requests": [
+          {
+            "if_modified_since": "Mon, 09 Nov 2026 01:30:00 GMT"
+          }
+        ],
+        "warnings": 1
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "failure": "read_timeout"
+          }
+        ]
+      },
+      "name": "recheck_timeout_keeps_the_file"
+    },
+    {
+      "expected": {
+        "checked": null,
+        "error": "NotFoundError",
+        "requests": [
+          {
+            "if_modified_since": "Mon, 09 Nov 2026 01:30:00 GMT"
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "status": 404
+          }
+        ]
+      },
+      "name": "recheck_not_found_raises"
+    },
+    {
+      "expected": {
+        "checked": null,
+        "error": "AuthenticationError",
+        "requests": [
+          {
+            "if_modified_since": "Mon, 09 Nov 2026 01:30:00 GMT"
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "status": 403
+          }
+        ]
+      },
+      "name": "recheck_forbidden_raises"
+    },
+    {
+      "expected": {
+        "checked": "2026-11-10T04:30:00+00:00",
+        "file": "downloaded",
+        "file_mtime": "2026-11-10T07:00:00+05:30",
+        "requests": [
+          {
+            "if_modified_since": "Mon, 09 Nov 2026 01:30:00 GMT"
+          },
+          {
+            "if_modified_since": null
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "delete_file": true,
+            "status": 304
+          },
+          {
+            "last_modified": "Tue, 10 Nov 2026 01:30:00 GMT",
+            "status": 200
+          }
+        ]
+      },
+      "name": "not_modified_but_file_vanished"
+    },
+    {
+      "expected": {
+        "checked": null,
+        "error": "ServerError",
+        "requests": [
+          {
+            "if_modified_since": null
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": null,
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "status": 503
+          }
+        ]
+      },
+      "name": "first_download_server_error_raises"
+    },
+    {
+      "expected": {
+        "checked": null,
+        "error": "NetworkError",
+        "requests": [
+          {
+            "if_modified_since": null
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": null,
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "failure": "connect_error"
+          }
+        ]
+      },
+      "name": "first_download_network_error_raises"
+    },
+    {
+      "expected": {
+        "checked": null,
+        "error": "ResponseParseError",
+        "requests": [
+          {
+            "if_modified_since": null
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": null,
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "status": 302
+          }
+        ]
+      },
+      "name": "first_download_redirect_is_a_parse_error"
+    },
+    {
+      "expected": {
+        "checked": null,
+        "error": "ServerError",
+        "requests": [
+          {
+            "if_modified_since": null
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": null,
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": true,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "status": 503
+          }
+        ]
+      },
+      "name": "forced_download_failure_raises"
+    },
+    {
+      "expected": {
+        "checked": "2026-11-10T04:30:00+00:00",
+        "file": "cached",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "requests": [
+          {
+            "if_modified_since": "Mon, 09 Nov 2026 01:30:00 GMT"
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": "2026-11-10T05:00:00+00:00",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "status": 304
+          }
+        ]
+      },
+      "name": "future_check_stamp_counts_as_none"
+    },
+    {
+      "expected": {
+        "checked": "2026-11-10T04:30:00+00:00",
+        "file": "cached",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "requests": [
+          {
+            "if_modified_since": "Mon, 09 Nov 2026 01:30:00 GMT"
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": "2026-11-10T04:25:00",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "status": 304
+          }
+        ]
+      },
+      "name": "naive_check_stamp_counts_as_none"
+    },
+    {
+      "expected": {
+        "checked": "2026-11-10T04:30:00+00:00",
+        "file": "cached",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "requests": [
+          {
+            "if_modified_since": "Mon, 09 Nov 2026 01:30:00 GMT"
+          }
+        ],
+        "warnings": 0
+      },
+      "input": {
+        "checked": "yesterday",
+        "file_mtime": "2026-11-09T07:00:00+05:30",
+        "force": false,
+        "now": "2026-11-10T10:00:00+05:30",
+        "responses": [
+          {
+            "status": 304
+          }
+        ]
+      },
+      "name": "unreadable_check_stamp_counts_as_none"
+    }
+  ],
+  "description": "download_instruments('NSE') with the cached file in a given state (refresh time 07:00 IST, re-check window 15 minutes). input.now is the clock; file_mtime the cached file's modification time (null: no file); checked the text of the .checked sidecar (null: none); force the argument; responses answer the requests in turn ({status, last_modified}: a 200 carries a new file; {failure: kind}; delete_file removes the cached file before answering). expected.requests lists each request's If-Modified-Since header (null for a full download); file is downloaded or cached and file_mtime its modification time afterwards (a download takes the Last-Modified time), or error is the error type; checked is the sidecar text afterwards (UTC ISO 8601 of now when a check was recorded); warnings counts the WARNING lines (one when a failed re-check keeps the cached file).",
+  "source": "tradesmart.instruments.Instruments.download (in-memory transport, clock pinned)",
+  "tolerance": {}
+}

@@ -1,0 +1,1657 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "stat": "Oi created"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi created\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_word_with_al_id_is_success"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "emsg": "",
+          "stat": "Oi created"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi created\",\"al_id\":\"26111200000010\",\"emsg\":\"\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_word_with_blank_emsg_is_success"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Ok\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_ok_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi created\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_word_without_al_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi created\",\"al_id\":\" \"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_word_blank_al_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi created\",\"al_id\":26111200000010}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_word_numeric_al_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi created\",\"al_id\":\"26111200000010\",\"emsg\":\"Invalid input\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_word_with_emsg_is_unknown"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "stat": "oi created"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"oi created\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_lower_case_is_success"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "stat": "OI CREATED"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"OI CREATED\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_upper_case_is_success"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "stat": "OI created"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"OI created\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_test_env_case_is_success"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"OI CREATED\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_upper_case_without_al_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi  created\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_double_space_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\" Oi created\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_leading_space_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi created \",\"al_id\":\"26111200000010\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_trailing_space_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"al_id\":\"26111200000010\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_missing_stat_is_unknown"
+    },
+    {
+      "expected": {
+        "emsg": "Invalid",
+        "error": "OrderRejectedError",
+        "message": "PlaceGTTOrder failed: Invalid"
+      },
+      "input": {
+        "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"Invalid\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_not_ok_is_rejected"
+    },
+    {
+      "expected": {
+        "emsg": "Session Expired :  Invalid Session Key",
+        "error": "AuthenticationError",
+        "message": "PlaceGTTOrder failed: Session Expired :  Invalid Session Key"
+      },
+      "input": {
+        "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"Session Expired :  Invalid Session Key\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 401
+      },
+      "name": "place_gtt_not_ok_http_401_is_authentication"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "<html>Bad gateway</html>",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 502
+      },
+      "name": "place_gtt_non_json_is_unknown"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "stat": "Oi replaced"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi replaced\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_word_with_al_id_is_success"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "emsg": "",
+          "stat": "Oi replaced"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi replaced\",\"al_id\":\"26111200000010\",\"emsg\":\"\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_word_with_blank_emsg_is_success"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Ok\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_ok_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi replaced\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_word_without_al_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi replaced\",\"al_id\":\" \"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_word_blank_al_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi replaced\",\"al_id\":26111200000010}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_word_numeric_al_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi replaced\",\"al_id\":\"26111200000010\",\"emsg\":\"Invalid input\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_word_with_emsg_is_unknown"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "stat": "oi replaced"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"oi replaced\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_lower_case_is_success"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "stat": "OI REPLACED"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"OI REPLACED\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_upper_case_is_success"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "stat": "OI replaced"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"OI replaced\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_test_env_case_is_success"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"OI REPLACED\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_upper_case_without_al_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi  replaced\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_double_space_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\" Oi replaced\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_leading_space_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi replaced \",\"al_id\":\"26111200000010\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_trailing_space_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"al_id\":\"26111200000010\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_missing_stat_is_unknown"
+    },
+    {
+      "expected": {
+        "emsg": "Invalid",
+        "error": "OrderRejectedError",
+        "message": "ModifyGTTOrder failed: Invalid"
+      },
+      "input": {
+        "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"Invalid\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_gtt_not_ok_is_rejected"
+    },
+    {
+      "expected": {
+        "emsg": "Session Expired :  Invalid Session Key",
+        "error": "AuthenticationError",
+        "message": "ModifyGTTOrder failed: Session Expired :  Invalid Session Key"
+      },
+      "input": {
+        "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"Session Expired :  Invalid Session Key\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 401
+      },
+      "name": "modify_gtt_not_ok_http_401_is_authentication"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "<html>Bad gateway</html>",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 502
+      },
+      "name": "modify_gtt_non_json_is_unknown"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "stat": "Oi delete success"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi delete success\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_word_with_al_id_is_success"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "emsg": "",
+          "stat": "Oi delete success"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi delete success\",\"al_id\":\"26111200000010\",\"emsg\":\"\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_word_with_blank_emsg_is_success"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Ok\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_ok_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi delete success\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_word_without_al_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi delete success\",\"al_id\":\" \"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_word_blank_al_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi delete success\",\"al_id\":26111200000010}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_word_numeric_al_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi delete success\",\"al_id\":\"26111200000010\",\"emsg\":\"Invalid input\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_word_with_emsg_is_unknown"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "stat": "oi delete success"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"oi delete success\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_lower_case_is_success"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "stat": "OI DELETE SUCCESS"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"OI DELETE SUCCESS\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_upper_case_is_success"
+    },
+    {
+      "expected": {
+        "returns": {
+          "al_id": "26111200000010",
+          "stat": "OI delete success"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"OI delete success\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_test_env_case_is_success"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"OI DELETE SUCCESS\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_upper_case_without_al_id_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi  delete success\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_double_space_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\" Oi delete success\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_leading_space_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi delete success \",\"al_id\":\"26111200000010\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_trailing_space_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"al_id\":\"26111200000010\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_missing_stat_is_unknown"
+    },
+    {
+      "expected": {
+        "emsg": "Invalid",
+        "error": "OrderRejectedError",
+        "message": "CancelGTTOrder failed: Invalid"
+      },
+      "input": {
+        "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"Invalid\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_not_ok_is_rejected"
+    },
+    {
+      "expected": {
+        "emsg": "Session Expired :  Invalid Session Key",
+        "error": "AuthenticationError",
+        "message": "CancelGTTOrder failed: Session Expired :  Invalid Session Key"
+      },
+      "input": {
+        "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"Session Expired :  Invalid Session Key\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 401
+      },
+      "name": "cancel_gtt_not_ok_http_401_is_authentication"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "<html>Bad gateway</html>",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 502
+      },
+      "name": "cancel_gtt_non_json_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi replaced\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_gtt_word_of_modify_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"OI deleted\",\"al_id\":\"26111200000010\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_gtt_test_env_word_oi_deleted_is_unknown"
+    },
+    {
+      "expected": {
+        "returns": {
+          "aq_id": "1",
+          "stat": "true"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"true\",\"aq_id\":\"1\"}",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_iceberg_true_is_success"
+    },
+    {
+      "expected": {
+        "emsg": "Insufficient margin",
+        "error": "OrderRejectedError",
+        "message": "PlaceIceBergOrder failed: Insufficient margin"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\",\"rejreason\":\"Insufficient margin\"}",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_iceberg_false_is_rejected_with_rejreason"
+    },
+    {
+      "expected": {
+        "emsg": "Invalid",
+        "error": "OrderRejectedError",
+        "message": "PlaceIceBergOrder failed: Invalid"
+      },
+      "input": {
+        "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"Invalid\"}",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_iceberg_not_ok_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"True\"}",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_iceberg_capitalised_true_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"TRUE\"}",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_iceberg_upper_case_true_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":true}",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_iceberg_json_true_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Ok\",\"aq_id\":\"1\"}",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_iceberg_ok_is_unknown"
+    },
+    {
+      "expected": {
+        "returns": {
+          "aq_id": "1",
+          "stat": "true"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"true\",\"aq_id\":\"1\"}",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_iceberg_true_is_success"
+    },
+    {
+      "expected": {
+        "emsg": "Insufficient margin",
+        "error": "OrderRejectedError",
+        "message": "ModifyIceBergOrder failed: Insufficient margin"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\",\"rejreason\":\"Insufficient margin\"}",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_iceberg_false_is_rejected_with_rejreason"
+    },
+    {
+      "expected": {
+        "emsg": "Invalid",
+        "error": "OrderRejectedError",
+        "message": "ModifyIceBergOrder failed: Invalid"
+      },
+      "input": {
+        "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"Invalid\"}",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_iceberg_not_ok_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"True\"}",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_iceberg_capitalised_true_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"TRUE\"}",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_iceberg_upper_case_true_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":true}",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_iceberg_json_true_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Ok\",\"aq_id\":\"1\"}",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "modify_iceberg_ok_is_unknown"
+    },
+    {
+      "expected": {
+        "returns": {
+          "aq_id": "1",
+          "stat": "true"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"true\",\"aq_id\":\"1\"}",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_iceberg_true_is_success"
+    },
+    {
+      "expected": {
+        "emsg": "Insufficient margin",
+        "error": "OrderRejectedError",
+        "message": "CancelIceBergOrder failed: Insufficient margin"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\",\"rejreason\":\"Insufficient margin\"}",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_iceberg_false_is_rejected_with_rejreason"
+    },
+    {
+      "expected": {
+        "emsg": "Invalid",
+        "error": "OrderRejectedError",
+        "message": "CancelIceBergOrder failed: Invalid"
+      },
+      "input": {
+        "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"Invalid\"}",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_iceberg_not_ok_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"True\"}",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_iceberg_capitalised_true_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"TRUE\"}",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_iceberg_upper_case_true_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":true}",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_iceberg_json_true_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Ok\",\"aq_id\":\"1\"}",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "cancel_iceberg_ok_is_unknown"
+    },
+    {
+      "expected": {
+        "emsg": "Other",
+        "error": "OrderRejectedError",
+        "message": "PlaceIceBergOrder failed: Other"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\",\"emsg\":\"Bad request\",\"rejreason\":\"Other\"}",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "iceberg_false_prefers_a_non_blank_rejreason"
+    },
+    {
+      "expected": {
+        "emsg": "Bad request",
+        "error": "OrderRejectedError",
+        "message": "PlaceIceBergOrder failed: Bad request"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\",\"emsg\":\"Bad request\",\"rejreason\":\" \"}",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "iceberg_false_blank_rejreason_falls_back_to_emsg"
+    },
+    {
+      "expected": {
+        "emsg": "x",
+        "error": "AuthenticationError",
+        "message": "ModifyIceBergOrder failed: x"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\",\"rejreason\":\"x\"}",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "http_status": 403
+      },
+      "name": "iceberg_false_http_403_is_authentication"
+    },
+    {
+      "expected": {
+        "emsg": "x",
+        "error": "RateLimitError",
+        "message": "ModifyIceBergOrder failed: x"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\",\"rejreason\":\"x\"}",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "http_status": 429
+      },
+      "name": "iceberg_false_http_429_is_rate_limit"
+    },
+    {
+      "expected": {
+        "emsg": "x",
+        "error": "NotFoundError",
+        "message": "CancelIceBergOrder failed: x"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\",\"rejreason\":\"x\"}",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "http_status": 404
+      },
+      "name": "iceberg_false_http_404_is_not_found"
+    },
+    {
+      "expected": {
+        "emsg": "x",
+        "error": "OrderRejectedError",
+        "message": "CancelIceBergOrder failed: x"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\",\"rejreason\":\"x\"}",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "http_status": 500
+      },
+      "name": "iceberg_false_http_500_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\",\"rejreason\":\"x\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "false_outside_the_iceberg_writes_is_unknown"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "OrderRejectedError",
+        "message": "PlaceIceBergOrder failed (no error message from the server)"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\"}",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "iceberg_false_without_a_reason"
+    },
+    {
+      "expected": {
+        "emsg": "x",
+        "error": "AuthenticationError",
+        "message": "PlaceIceBergOrder failed: x"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\",\"rejreason\":\"x\"}",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 401
+      },
+      "name": "iceberg_false_http_401_is_authentication"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi created\",\"al_id\":\"1\",\"norenordno\":\"1\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_order_gtt_word_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "{\"stat\":\"true\",\"norenordno\":\"1\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_order_true_is_unknown"
+    },
+    {
+      "expected": {
+        "returns": {
+          "norenordno": "1",
+          "stat": "Ok"
+        }
+      },
+      "input": {
+        "body": "{\"stat\":\"Ok\",\"norenordno\":\"1\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "place_order_ok_is_success"
+    },
+    {
+      "expected": {
+        "error": "ResponseParseError"
+      },
+      "input": {
+        "body": "{\"stat\":\"Oi created\",\"al_id\":\"1\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "read_gtt_word_is_a_parse_error"
+    },
+    {
+      "expected": {
+        "error": "ResponseParseError"
+      },
+      "input": {
+        "body": "{\"stat\":\"false\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "read_false_is_a_parse_error"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "APIError",
+        "message": "GetPendingGTTOrder failed (no error message from the server)"
+      },
+      "input": {
+        "body": "{\"stat\":\"Not_Ok\"}",
+        "endpoint": "GetPendingGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "gtt_book_not_ok_read_is_an_api_error"
+    },
+    {
+      "expected": {
+        "returns": []
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "PlaceMultiOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "place_multi_order_list_with_expect_list_is_returned"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "CancelGTTOrder_empty_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "CancelGTTOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "CancelGTTOrder_empty_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"Oi created\",\"al_id\":\"1\"}]",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "CancelGTTOrder_ack_in_list_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"Oi created\",\"al_id\":\"1\"}]",
+        "endpoint": "CancelGTTOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "CancelGTTOrder_ack_in_list_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"true\"}]",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "CancelGTTOrder_true_in_list_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"true\"}]",
+        "endpoint": "CancelGTTOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "CancelGTTOrder_true_in_list_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "CancelIceBergOrder_empty_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "CancelIceBergOrder_empty_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"Oi created\",\"al_id\":\"1\"}]",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "CancelIceBergOrder_ack_in_list_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"Oi created\",\"al_id\":\"1\"}]",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "CancelIceBergOrder_ack_in_list_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"true\"}]",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "CancelIceBergOrder_true_in_list_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"true\"}]",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "CancelIceBergOrder_true_in_list_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "ModifyGTTOrder_empty_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "ModifyGTTOrder_empty_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"Oi created\",\"al_id\":\"1\"}]",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "ModifyGTTOrder_ack_in_list_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"Oi created\",\"al_id\":\"1\"}]",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "ModifyGTTOrder_ack_in_list_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"true\"}]",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "ModifyGTTOrder_true_in_list_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"true\"}]",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "ModifyGTTOrder_true_in_list_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "ModifyIceBergOrder_empty_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "ModifyIceBergOrder_empty_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"Oi created\",\"al_id\":\"1\"}]",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "ModifyIceBergOrder_ack_in_list_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"Oi created\",\"al_id\":\"1\"}]",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "ModifyIceBergOrder_ack_in_list_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"true\"}]",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "ModifyIceBergOrder_true_in_list_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"true\"}]",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "ModifyIceBergOrder_true_in_list_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "PlaceGTTOrder_empty_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "PlaceGTTOrder_empty_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"Oi created\",\"al_id\":\"1\"}]",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "PlaceGTTOrder_ack_in_list_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"Oi created\",\"al_id\":\"1\"}]",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "PlaceGTTOrder_ack_in_list_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"true\"}]",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "PlaceGTTOrder_true_in_list_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"true\"}]",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "PlaceGTTOrder_true_in_list_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "PlaceIceBergOrder_empty_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[]",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "PlaceIceBergOrder_empty_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"Oi created\",\"al_id\":\"1\"}]",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "PlaceIceBergOrder_ack_in_list_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"Oi created\",\"al_id\":\"1\"}]",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "PlaceIceBergOrder_ack_in_list_expect_list_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"true\"}]",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "http_status": 200
+      },
+      "name": "PlaceIceBergOrder_true_in_list_expect_object_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "body": "[{\"stat\":\"true\"}]",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "list",
+        "http_status": 200
+      },
+      "name": "PlaceIceBergOrder_true_in_list_expect_list_is_unknown"
+    }
+  ],
+  "description": "Per-endpoint success words. input.body is the raw reply to input.endpoint with input.http_status, for a call that expects input.expect (object or list); expected as in not_ok_classification.json ({returns} or {error, emsg, message}). Success is a stat string compared exactly (no trimming, no normalising), except that the three GTT words compare ignoring letter case only (casefold on both sides; the test environment answers 'OI created'): PlaceGTTOrder 'Oi created', ModifyGTTOrder 'Oi replaced', CancelGTTOrder 'Oi delete success' (each also needs a non-blank string al_id and no emsg other than a blank string; 'OI deleted' is another word, not a case variant), PlaceIceBergOrder, ModifyIceBergOrder and CancelIceBergOrder 'true' (the string, case-sensitive), every other endpoint 'Ok'. Not_Ok keeps the classification of not_ok_classification.json; on the three iceberg writes only, 'false' is a definite failure classified the same way, its message from a non-blank rejreason, else emsg. Any JSON array on these six writes, whatever expect, and anything else on them is OrderStatusUnknownError; on a read it is a ResponseParseError.",
+  "source": "tradesmart._transport.codec.parse_response with tradesmart._client_core.SUCCESS_STATS, SUCCESS_STATS_IGNORE_CASE and ACK_ID_FIELDS",
+  "tolerance": {}
+}

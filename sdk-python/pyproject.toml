@@ -1,0 +1,127 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tradesmart"
+dynamic = ["version"]
+description = "Python SDK for the TradeSmart API V2 (REST and WebSocket)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "TradeSmart Fintech Securities Limited" }]
+keywords = ["tradesmart", "trading", "broker", "api", "sdk", "websocket", "algo-trading", "india"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Typing :: Typed",
+]
+dependencies = [
+    "httpx>=0.27,<1",
+    # pydantic-core publishes wheels for Python 3.13 from pydantic 2.8, for 3.14 from 2.12 and
+    # for 3.15 from 2.14; an older pin would need a Rust build there.
+    "pydantic>=2.6,<3; python_version < '3.13'",
+    "pydantic>=2.8,<3; python_version == '3.13'",
+    "pydantic>=2.12,<3; python_version == '3.14'",
+    "pydantic>=2.14,<3; python_version >= '3.15'",
+    "websockets>=13,<18",
+]
+
+[project.urls]
+Homepage = "https://github.com/trade-smart/tradesmart-sdks"
+Documentation = "https://github.com/trade-smart/tradesmart-sdks/tree/main/sdk-python/docs"
+Source = "https://github.com/trade-smart/tradesmart-sdks/tree/main/sdk-python"
+Issues = "https://github.com/trade-smart/tradesmart-sdks/issues"
+Changelog = "https://github.com/trade-smart/tradesmart-sdks/blob/main/sdk-python/CHANGELOG.md"
+
+[project.scripts]
+tradesmart = "tradesmart._cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=5",
+    "pytest-xdist>=3.6",
+    "respx>=0.21",
+    "ruff>=0.6",
+    "mypy>=1.10,<2",
+    "build>=1.2",
+    "twine>=5",
+]
+
+[tool.hatch.version]
+path = "src/tradesmart/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tradesmart"]
+
+# Hatchling also ships the nearest .gitignore: sdk-python/.gitignore, never the repository root's.
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/README.md", "/CHANGELOG.md", "/LICENSE", "/NOTICE", "/pyproject.toml"]
+exclude = ["benchmarks", "scripts", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "live: hits the real TradeSmart API (opt-in, read-only)",
+    "live_orders: places real orders on the zero-funds test account (separately opt-in)",
+    "nse: live test on the NSE equity segment",
+    "nfo: live test on the NFO (index futures and options) segment",
+    "mcx: live test on the MCX (commodity futures and options) segment",
+    "uat_matrix: UAT live-order matrix (tests/live_orders/uat_matrix; UAT mode only)",
+    "smoke: UAT matrix smoke tier (runs with the UAT order opt-ins)",
+    "stress: UAT matrix stress tier (opt-in; selected only with -m stress)",
+    "m_shapes: UAT matrix family M1, order shape grid",
+    "m_modify: UAT matrix family M2, modify variants",
+    "m_reject: UAT matrix family M3, rejection paths",
+    "m_fills: UAT matrix family M4, fills and closes",
+    "m_cobo: UAT matrix family M5, cover / bracket orders and exit",
+    "m_amo: UAT matrix family M6, after-market orders",
+    "m_sliced: UAT matrix family M7, sliced orders",
+    "m_burst: UAT matrix family M8, burst and pacing",
+    "m_views: UAT matrix family M9, views and stream cross-checks",
+    "m_margin: UAT matrix family M10, order margin",
+    "m_tags: UAT matrix family M11, tags and encoding",
+    "m_hold: UAT matrix family M12, holdings SELL",
+    "m_gtt: UAT matrix family M13, GTT orders",
+    "m_bse: UAT matrix family M14, BSE and BFO canaries, BSE grid",
+    "m_mcx: UAT matrix family M15, MCX",
+    "m_algo: UAT matrix probe U15, algo_id (recorded only)",
+]
+# Parallel by default: 4 xdist workers (Docker Desktop is limited to 4 CPUs), one file per worker.
+# `pytest -n 0` runs serially (debugging, pdb); a live opt-in variable forces serial (tests/conftest.py).
+addopts = "-ra --strict-markers -m \"not live_orders\" -n 4 --dist loadfile"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+# The user guide's code blocks are hand-aligned snippets, checked by the docs tests, not by ruff.
+extend-exclude = ["docs/**"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "S", "ANN"]
+ignore = ["ANN401", "S311"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106", "ANN"]
+"examples/**" = ["S105", "S106"]
+"examples/offline_strategy_test.py" = ["S101"]  # a test file: plain assert is the point
+"benchmarks/**" = ["S106"]
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
+plugins = ["pydantic.mypy"]
+files = ["src"]

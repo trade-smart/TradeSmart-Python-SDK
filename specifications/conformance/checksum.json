@@ -1,0 +1,51 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "checksum": "7b482d7b380a3067eaba4c9c909b19253c4fa0edb5833e246401b8497c99a9c3"
+      },
+      "input": {
+        "app_key": "ABC",
+        "code": "x1y2z3",
+        "secret_key": "123"
+      },
+      "name": "worked_example_from_official_docs"
+    },
+    {
+      "expected": {
+        "checksum": "0dd8ef38f65c5f788f517a1257791022bd63ee104f1a9647a9ce67c08ea1c599"
+      },
+      "input": {
+        "app_key": "APPKEY-SYNTH-001",
+        "code": "code-0001",
+        "secret_key": "SECRET-SYNTH-001"
+      },
+      "name": "synthetic_typical"
+    },
+    {
+      "expected": {
+        "checksum": "87981328e117ed79d89f70d12fa027d3611d689483f0b46ea6a166b4585ced62"
+      },
+      "input": {
+        "app_key": "kéy",
+        "code": "cöde",
+        "secret_key": "sécret"
+      },
+      "name": "synthetic_non_ascii_is_utf8"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError"
+      },
+      "input": {
+        "app_key": "ABC",
+        "code": "",
+        "secret_key": "123"
+      },
+      "name": "empty_code_is_a_configuration_error"
+    }
+  ],
+  "description": "Authorisation checksum for GenAcsTok: lowercase hex SHA-256 of the UTF-8 bytes of app_key + secret_key + code, no separators. Any empty part is a ConfigurationError.",
+  "source": "tradesmart.auth.compute_checksum",
+  "tolerance": {}
+}

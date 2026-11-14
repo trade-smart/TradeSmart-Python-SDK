@@ -1,0 +1,960 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "emsg": "Session Expired : Invalid Session Key",
+        "error": "AuthenticationError",
+        "message": "Limits failed: Session Expired : Invalid Session Key"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Session Expired : Invalid Session Key\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 401,
+        "state_changing": false
+      },
+      "name": "http_401_not_ok"
+    },
+    {
+      "expected": {
+        "emsg": "Unauthorized",
+        "error": "AuthenticationError",
+        "message": "Limits failed: Unauthorized"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Unauthorized\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 401,
+        "state_changing": false
+      },
+      "name": "http_401_plain_message"
+    },
+    {
+      "expected": {
+        "emsg": "Forbidden",
+        "error": "AuthenticationError",
+        "message": "Limits failed: Forbidden"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Forbidden\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 403,
+        "state_changing": false
+      },
+      "name": "http_403_not_ok"
+    },
+    {
+      "expected": {
+        "emsg": "Not found",
+        "error": "NotFoundError",
+        "message": "Limits failed: Not found"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Not found\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 404,
+        "state_changing": false
+      },
+      "name": "http_404_not_ok"
+    },
+    {
+      "expected": {
+        "emsg": "Too many requests",
+        "error": "RateLimitError",
+        "message": "Limits failed: Too many requests"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Too many requests\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 429,
+        "state_changing": false
+      },
+      "name": "http_429_not_ok"
+    },
+    {
+      "expected": {
+        "emsg": "Internal error",
+        "error": "ServerError",
+        "message": "Limits failed: Internal error"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Internal error\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 500,
+        "state_changing": false
+      },
+      "name": "http_500_not_ok_read"
+    },
+    {
+      "expected": {
+        "emsg": "Unavailable",
+        "error": "ServerError",
+        "message": "Limits failed: Unavailable"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Unavailable\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 503,
+        "state_changing": false
+      },
+      "name": "http_503_not_ok_read"
+    },
+    {
+      "expected": {
+        "emsg": "RMS",
+        "error": "OrderRejectedError",
+        "message": "PlaceOrder failed: RMS"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"RMS\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 500,
+        "state_changing": true
+      },
+      "name": "http_500_not_ok_state_changing_is_a_definitive_rejection"
+    },
+    {
+      "expected": {
+        "emsg": "Session Expired : Invalid Session Key",
+        "error": "AuthenticationError",
+        "message": "Limits failed: Session Expired : Invalid Session Key"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Session Expired : Invalid Session Key\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "http_200_session_expired"
+    },
+    {
+      "expected": {
+        "emsg": "Invalid Access Token",
+        "error": "AuthenticationError",
+        "message": "Limits failed: Invalid Access Token"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Invalid Access Token\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "http_200_invalid_access_token"
+    },
+    {
+      "expected": {
+        "emsg": "invalid session key",
+        "error": "AuthenticationError",
+        "message": "Limits failed: invalid session key"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"invalid session key\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "http_200_invalid_session_lowercase"
+    },
+    {
+      "expected": {
+        "emsg": "INVALID USER ID",
+        "error": "AuthenticationError",
+        "message": "Limits failed: INVALID USER ID"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"INVALID USER ID\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "http_200_invalid_user_id_uppercase"
+    },
+    {
+      "expected": {
+        "emsg": "Invalid Acct Id",
+        "error": "AuthenticationError",
+        "message": "Limits failed: Invalid Acct Id"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Invalid Acct Id\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "http_200_invalid_acct_id"
+    },
+    {
+      "expected": {
+        "emsg": "Session Expired",
+        "error": "AuthenticationError",
+        "message": "Limits failed: Session Expired"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Session Expired\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 400,
+        "state_changing": false
+      },
+      "name": "http_400_session_expired"
+    },
+    {
+      "expected": {
+        "emsg": "Session Expired",
+        "error": "AuthenticationError",
+        "message": "PlaceOrder failed: Session Expired"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Session Expired\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": true
+      },
+      "name": "http_200_session_expired_on_state_changing"
+    },
+    {
+      "expected": {
+        "emsg": "Invalid Input : Missing uid",
+        "error": "APIError",
+        "message": "Limits failed: Invalid Input : Missing uid"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Invalid Input : Missing uid\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "http_200_plain_not_ok_read"
+    },
+    {
+      "expected": {
+        "emsg": "Bad request",
+        "error": "APIError",
+        "message": "Limits failed: Bad request"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Bad request\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 400,
+        "state_changing": false
+      },
+      "name": "http_400_plain_not_ok_read"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "APIError",
+        "message": "Limits failed (no error message from the server)"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "http_200_not_ok_without_emsg"
+    },
+    {
+      "expected": {
+        "returns": []
+      },
+      "input": {
+        "allow_empty": true,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"no data\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "no_data_on_list_endpoint_is_an_empty_list"
+    },
+    {
+      "expected": {
+        "returns": []
+      },
+      "input": {
+        "allow_empty": true,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Error : NO DATA found\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "no_data_is_case_insensitive_and_a_substring"
+    },
+    {
+      "expected": {
+        "emsg": "no data",
+        "error": "APIError",
+        "message": "Limits failed: no data"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"no data\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "no_data_without_allow_empty_is_a_plain_error"
+    },
+    {
+      "expected": {
+        "emsg": "Something else",
+        "error": "APIError",
+        "message": "Positions failed: Something else"
+      },
+      "input": {
+        "allow_empty": true,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Something else\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "other_not_ok_on_list_endpoint"
+    },
+    {
+      "expected": {
+        "returns": []
+      },
+      "input": {
+        "allow_empty": true,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Session Expired no data\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "no_data_check_runs_before_the_authentication_check"
+    },
+    {
+      "expected": {
+        "returns": []
+      },
+      "input": {
+        "allow_empty": true,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"no data\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 401,
+        "state_changing": false
+      },
+      "name": "no_data_on_http_401_is_still_an_empty_list"
+    },
+    {
+      "expected": {
+        "emsg": "RMS:Margin Shortfall",
+        "error": "OrderRejectedError",
+        "message": "PlaceOrder failed: RMS:Margin Shortfall"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"RMS:Margin Shortfall\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": true
+      },
+      "name": "order_rejected_http_200"
+    },
+    {
+      "expected": {
+        "emsg": "RMS:Margin Shortfall",
+        "error": "OrderRejectedError",
+        "message": "PlaceOrder failed: RMS:Margin Shortfall"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"RMS:Margin Shortfall\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 400,
+        "state_changing": true
+      },
+      "name": "order_rejected_http_400"
+    },
+    {
+      "expected": {
+        "emsg": "Order not found",
+        "error": "NotFoundError",
+        "message": "CancelOrder failed: Order not found"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Order not found\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "CancelOrder",
+        "expect": "object",
+        "http_status": 404,
+        "state_changing": true
+      },
+      "name": "order_rejected_http_404"
+    },
+    {
+      "expected": {
+        "emsg": "Too many requests",
+        "error": "RateLimitError",
+        "message": "PlaceOrder failed: Too many requests"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Too many requests\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 429,
+        "state_changing": true
+      },
+      "name": "order_not_ok_http_429_is_rate_limit"
+    },
+    {
+      "expected": {
+        "emsg": "Unauthorized",
+        "error": "AuthenticationError",
+        "message": "PlaceOrder failed: Unauthorized"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Unauthorized\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 401,
+        "state_changing": true
+      },
+      "name": "order_not_ok_http_401_is_authentication"
+    },
+    {
+      "expected": {
+        "returns": {
+          "stat": "Ok",
+          "uname": "SYNTH"
+        }
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Ok\", \"uname\": \"SYNTH\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "ok_object"
+    },
+    {
+      "expected": {
+        "returns": {
+          "norenordno": "1",
+          "stat": "Ok"
+        }
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Ok\", \"norenordno\": \"1\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": true
+      },
+      "name": "ok_object_on_state_changing"
+    },
+    {
+      "expected": {
+        "returns": [
+          {
+            "stat": "Ok",
+            "tsym": "X"
+          }
+        ]
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "[{\"stat\": \"Ok\", \"tsym\": \"X\"}]",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "ok_list"
+    },
+    {
+      "expected": {
+        "returns": []
+      },
+      "input": {
+        "allow_empty": true,
+        "body": "[]",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "empty_list_with_allow_empty"
+    },
+    {
+      "expected": {
+        "error": "ResponseParseError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Ok\"}",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "ok_object_where_a_list_is_expected"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Ok\", \"norenordno\": \"1\"}",
+        "endpoint": "PlaceMultiOrder",
+        "expect": "list",
+        "http_status": 200,
+        "state_changing": true
+      },
+      "name": "ok_object_where_a_list_is_expected_state_changing_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "ResponseParseError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "[1]",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "list_where_an_object_is_expected"
+    },
+    {
+      "expected": {
+        "returns": []
+      },
+      "input": {
+        "allow_empty": true,
+        "body": "[]",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "empty_list_where_an_object_is_expected_with_allow_empty"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "ServerError",
+        "message": "Positions failed: HTTP 500"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "[1]",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 500,
+        "state_changing": false
+      },
+      "name": "list_on_http_500"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "NotFoundError",
+        "message": "Positions failed: HTTP 404"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "[1]",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 404,
+        "state_changing": false
+      },
+      "name": "list_on_http_404"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "APIError",
+        "message": "Positions failed: HTTP 400"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "[1]",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 400,
+        "state_changing": false
+      },
+      "name": "list_on_http_400"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "AuthenticationError",
+        "message": "Positions failed: HTTP 401"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "[1]",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 401,
+        "state_changing": false
+      },
+      "name": "list_on_http_401"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "RateLimitError",
+        "message": "Positions failed: HTTP 429"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "[1]",
+        "endpoint": "Positions",
+        "expect": "list",
+        "http_status": 429,
+        "state_changing": false
+      },
+      "name": "list_on_http_429"
+    },
+    {
+      "expected": {
+        "error": "ResponseParseError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "<html>oops</html>",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "non_json_http_200_read"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "ServerError",
+        "message": "Limits failed: HTTP 502"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "<html>Bad Gateway</html>",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 502,
+        "state_changing": false
+      },
+      "name": "non_json_http_502_read"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "AuthenticationError",
+        "message": "Limits failed: HTTP 401"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "Unauthorized",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 401,
+        "state_changing": false
+      },
+      "name": "non_json_http_401_read"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "AuthenticationError",
+        "message": "Limits failed: HTTP 403"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "Forbidden",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 403,
+        "state_changing": false
+      },
+      "name": "non_json_http_403_read"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "RateLimitError",
+        "message": "Limits failed: HTTP 429"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "slow down",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 429,
+        "state_changing": false
+      },
+      "name": "non_json_http_429_read"
+    },
+    {
+      "expected": {
+        "error": "ResponseParseError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "<html>missing</html>",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 404,
+        "state_changing": false
+      },
+      "name": "non_json_http_404_read"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "<html>oops</html>",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": true
+      },
+      "name": "non_json_http_200_state_changing_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "<html>oops</html>",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 500,
+        "state_changing": true
+      },
+      "name": "non_json_http_500_state_changing_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": true
+      },
+      "name": "empty_body_state_changing_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "ResponseParseError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "empty_body_read"
+    },
+    {
+      "expected": {
+        "error": "ResponseParseError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"hello\": \"world\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "unexpected_shape_read"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "ServerError",
+        "message": "Limits failed: HTTP 500"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"hello\": \"world\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 500,
+        "state_changing": false
+      },
+      "name": "unexpected_shape_http_500_read"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"hello\": \"world\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": true
+      },
+      "name": "unexpected_shape_state_changing_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "null",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": true
+      },
+      "name": "json_scalar_state_changing_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "[]",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": true
+      },
+      "name": "list_on_state_changing_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "ResponseParseError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Pending\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "stat_other_than_ok_or_not_ok_is_unexpected"
+    },
+    {
+      "expected": {
+        "emsg": null,
+        "error": "APIError",
+        "message": "Limits failed (no error message from the server)"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": 5}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 200,
+        "state_changing": false
+      },
+      "name": "emsg_not_a_string_is_ignored"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "http_status": 307,
+        "state_changing": true
+      },
+      "name": "redirect_307_empty_body_state_changing_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "ResponseParseError"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "<html>Found</html>",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 302,
+        "state_changing": false
+      },
+      "name": "redirect_302_html_read_is_a_parse_error"
+    },
+    {
+      "expected": {
+        "emsg": "Moved",
+        "error": "APIError",
+        "message": "Limits failed: Moved"
+      },
+      "input": {
+        "allow_empty": false,
+        "body": "{\"stat\": \"Not_Ok\", \"emsg\": \"Moved\", \"request_time\": \"10:00:00 01-01-2026\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "http_status": 301,
+        "state_changing": false
+      },
+      "name": "redirect_301_not_ok_read"
+    }
+  ],
+  "description": "Response classification of the codec. input.body is the raw response text; expected is {\"returns\": <parsed JSON>} or {\"error\": <error type name>, \"emsg\": <string or null>, \"message\": <the error message>} (emsg and message only for API errors: \"<Endpoint> failed: <emsg>\", \"<Endpoint> failed (no error message from the server)\" or \"<Endpoint> failed: HTTP <status>\"). Error type names: AuthenticationError, RateLimitError, NotFoundError, ServerError, OrderRejectedError, APIError (plain), ResponseParseError, OrderStatusUnknownError. state_changing is true for PlaceOrder, PlaceMultiOrder, ModifyOrder, CancelOrder, ExitSNOOrder, GenAcsTok and the GTT and iceberg writes. The success word here is always 'Ok' (the GTT and iceberg words: success_words.json). HTTP redirects are never followed: a 3xx status is classified like any other status.",
+  "source": "tradesmart._transport.codec.parse_response",
+  "tolerance": {}
+}

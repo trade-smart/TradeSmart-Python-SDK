@@ -1,0 +1,1276 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 9.994592704185507,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_ce_m90_7d_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0000000000000049
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 11.674385507772456,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_ce_m90_7d_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.09999999999999874
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 9.874816482807745,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_ce_m90_half_year_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 13.542472701098788,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_ce_m90_half_year_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 30.521395831033075,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_ce_m90_half_year_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.09999999999999777
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 0.5517823473948624,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_ce_atm_7d_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 1.6552412276769886,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_ce_atm_7d_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0000000000000018
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 5.513461480506514,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_ce_atm_7d_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.10000000000000007
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 2.7301721164725876,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_ce_atm_half_year_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 8.17688821091329,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_ce_atm_half_year_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 26.74901491636981,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_ce_atm_half_year_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 0.016208729809886524,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_ce_m110_7d_vol30"
+    },
+    {
+      "expected": {
+        "iv": 0.9999999999999999
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 2.1114185085300434,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_ce_m110_7d_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.10000000000000019
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 0.2948200406773811,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_ce_m110_half_year_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 4.593928471228466,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_ce_m110_half_year_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 23.490436365633585,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_ce_m110_half_year_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 0.007050691087277405,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_pe_m90_7d_vol30"
+    },
+    {
+      "expected": {
+        "iv": 0.9999999999999996
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 1.6868434946742212,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_pe_m90_7d_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.09999999999999992
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 0.1945919844946884,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_pe_m90_half_year_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 3.862248202785729,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_pe_m90_half_year_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 20.841171332720016,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_pe_m90_half_year_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.09999999999999777
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 0.5517823473948624,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_pe_atm_7d_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 1.6552412276769886,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_pe_atm_7d_vol30"
+    },
+    {
+      "expected": {
+        "iv": 0.9999999999999992
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 5.5134614805065,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_pe_atm_7d_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.10000000000000007
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 2.7301721164725876,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_pe_atm_half_year_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 8.17688821091329,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_pe_atm_half_year_vol30"
+    },
+    {
+      "expected": {
+        "iv": 0.9999999999999998
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 26.749014916369802,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_pe_atm_half_year_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 10.003750742908153,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_pe_m110_7d_vol30"
+    },
+    {
+      "expected": {
+        "iv": 0.9999999999999994
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 12.098960521628314,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_black76_pe_m110_7d_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.09999999999999945
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 9.975044538990446,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_pe_m110_half_year_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 14.274152969541525,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_pe_m110_half_year_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0000000000000004
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 33.17066086394666,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.5
+      },
+      "name": "round_trip_black76_pe_m110_half_year_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 10.089919949590097,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_ce_m90_7d_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.000000000000004
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 11.750820738816074,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_ce_m90_7d_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.10000000000000095
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 12.21479699473538,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_ce_m90_half_year_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 15.37025582654855,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_ce_m90_half_year_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0000000000000002
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 32.23327345175892,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_ce_m90_half_year_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.0999999999999999
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 0.6012783196287401,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_ce_atm_7d_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 1.7043846808460685,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_ce_atm_7d_vol30"
+    },
+    {
+      "expected": {
+        "iv": 0.9999999999999987
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 5.564146653967661,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_ce_atm_7d_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.10000000000000007
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 4.160945209912121,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_ce_atm_half_year_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 9.56288535845703,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_ce_atm_half_year_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 28.329105711420027,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_ce_atm_half_year_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 0.0173447721758635,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_ce_m110_7d_vol30"
+    },
+    {
+      "expected": {
+        "iv": 0.9999999999999991
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 2.137203106417033,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_ce_m110_7d_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.09999999999999971
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 0.6119673314288008,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_ce_m110_half_year_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 5.545347327139098,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_ce_m110_half_year_vol30"
+    },
+    {
+      "expected": {
+        "iv": 0.9999999999999999
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 24.94479252375224,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_ce_m110_half_year_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 0.006561053421810348,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_pe_m90_7d_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0000000000000004
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 1.6674618426477714,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_pe_m90_7d_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.09999999999999991
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 0.08401199763907785,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_pe_m90_half_year_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 3.2394708294522587,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_pe_m90_half_year_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 20.102488454662627,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 90.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_pe_m90_half_year_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.09999999999999988
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 0.5054614365586829,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_pe_atm_7d_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 1.6085677977760184,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_pe_atm_7d_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0000000000000002
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 5.468329770897604,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_pe_atm_7d_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.09999999999999981
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 1.7103847111288886,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_pe_atm_half_year_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 7.112324859673812,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_pe_atm_half_year_vol30"
+    },
+    {
+      "expected": {
+        "iv": 0.9999999999999994
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 25.878545212636787,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_pe_atm_half_year_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 9.909069902204067,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_pe_m110_7d_vol30"
+    },
+    {
+      "expected": {
+        "iv": 1.0000000000000033
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 12.028928236445239,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.019178082191780823
+      },
+      "name": "round_trip_bsm_pe_m110_7d_vol100"
+    },
+    {
+      "expected": {
+        "iv": 0.09999999999999924
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 7.841631330958634,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 0.1,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_pe_m110_half_year_vol10"
+    },
+    {
+      "expected": {
+        "iv": 0.3
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 12.775011326668924,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 0.3,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_pe_m110_half_year_vol30"
+    },
+    {
+      "expected": {
+        "iv": 0.9999999999999994
+      },
+      "input": {
+        "dividend_yield": 0.015,
+        "model": "bsm",
+        "option_price": 32.174456523282075,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 110.00000000000001,
+        "underlying": 100.0,
+        "volatility_used": 1.0,
+        "years": 0.5
+      },
+      "name": "round_trip_bsm_pe_m110_half_year_vol100"
+    },
+    {
+      "expected": {
+        "iv": null
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 0.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "no_iv_price_zero"
+    },
+    {
+      "expected": {
+        "iv": null
+      },
+      "input": {
+        "model": "black76",
+        "option_price": -1.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "no_iv_price_negative"
+    },
+    {
+      "expected": {
+        "iv": null
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "years": 0.0
+      },
+      "name": "no_iv_expired_years_zero"
+    },
+    {
+      "expected": {
+        "iv": null
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "years": -0.5
+      },
+      "name": "no_iv_expired_years_negative"
+    },
+    {
+      "expected": {
+        "iv": null
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 19.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 80.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "no_iv_call_price_below_discounted_intrinsic"
+    },
+    {
+      "expected": {
+        "iv": null
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 19.0,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 120.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "no_iv_put_price_below_discounted_intrinsic"
+    },
+    {
+      "expected": {
+        "iv": null
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 120.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "no_iv_call_price_above_the_forward"
+    },
+    {
+      "expected": {
+        "iv": null
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 120.0,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "no_iv_put_price_above_the_discounted_strike"
+    },
+    {
+      "expected": {
+        "iv": null
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 99.9999999,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "no_iv_price_needing_volatility_above_500_percent"
+    },
+    {
+      "expected": {
+        "iv": null
+      },
+      "input": {
+        "model": "bsm",
+        "option_price": 120.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "no_iv_bsm_call_price_above_the_spot"
+    },
+    {
+      "expected": {
+        "iv": null
+      },
+      "input": {
+        "dividend_yield": 0.02,
+        "model": "bsm",
+        "option_price": 19.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 80.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "no_iv_bsm_price_below_intrinsic_with_yield"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "XX",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "error_invalid_option_type"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "model": "heston",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "error_invalid_model"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "error_zero_strike"
+    }
+  ],
+  "description": "Implied volatility from an option price. expected.iv is null when no volatility in [0.0001, 5.0] reproduces the price within 1e-8. volatility_used (informational, not an input of the function) is the volatility the price was generated from.",
+  "source": "tradesmart.greeks.implied_volatility",
+  "tolerance": {
+    "abs": 1e-06
+  }
+}

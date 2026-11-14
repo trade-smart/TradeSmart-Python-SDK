@@ -1,0 +1,229 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "keys": [
+          "NSE|22"
+        ]
+      },
+      "input": {
+        "instruments": "NSE|22"
+      },
+      "name": "single_string"
+    },
+    {
+      "expected": {
+        "keys": [
+          "NSE|22",
+          "NFO|43650"
+        ]
+      },
+      "input": {
+        "instruments": [
+          "NSE|22",
+          "NFO|43650"
+        ]
+      },
+      "name": "list_of_strings"
+    },
+    {
+      "expected": {
+        "keys": [
+          "NSE|22",
+          "MCX|432294"
+        ]
+      },
+      "input": {
+        "instruments": [
+          [
+            "NSE",
+            "22"
+          ],
+          [
+            "MCX",
+            "432294"
+          ]
+        ]
+      },
+      "name": "exchange_token_pairs"
+    },
+    {
+      "expected": {
+        "keys": [
+          "NSE|22",
+          "BSE|500325"
+        ]
+      },
+      "input": {
+        "instruments": [
+          "NSE|22",
+          [
+            "BSE",
+            "500325"
+          ]
+        ]
+      },
+      "name": "mixed_forms"
+    },
+    {
+      "expected": {
+        "keys": [
+          "NSE|22",
+          "MCX|1"
+        ]
+      },
+      "input": {
+        "instruments": [
+          "nse|22",
+          [
+            "mcx",
+            "1"
+          ]
+        ]
+      },
+      "name": "lower_case_exchange_is_upper_cased"
+    },
+    {
+      "expected": {
+        "keys": [
+          "NSE|22"
+        ]
+      },
+      "input": {
+        "instruments": [
+          " Nse |22"
+        ]
+      },
+      "name": "padded_exchange_is_trimmed"
+    },
+    {
+      "expected": {
+        "keys": [
+          "NSE|22",
+          "NSE|23"
+        ]
+      },
+      "input": {
+        "instruments": [
+          "NSE|22",
+          "nse|22",
+          "NSE|23",
+          [
+            "NSE",
+            "22"
+          ]
+        ]
+      },
+      "name": "duplicates_removed_first_kept"
+    },
+    {
+      "expected": {
+        "keys": [
+          "NSE|3",
+          "NSE|1",
+          "NSE|2"
+        ]
+      },
+      "input": {
+        "instruments": [
+          "NSE|3",
+          "NSE|1",
+          "NSE|2"
+        ]
+      },
+      "name": "order_is_kept"
+    },
+    {
+      "expected": {
+        "keys": []
+      },
+      "input": {
+        "instruments": []
+      },
+      "name": "empty_list"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError"
+      },
+      "input": {
+        "instruments": [
+          "XYZ|22"
+        ]
+      },
+      "name": "unknown_exchange"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError"
+      },
+      "input": {
+        "instruments": [
+          "NSE22"
+        ]
+      },
+      "name": "missing_separator"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError"
+      },
+      "input": {
+        "instruments": [
+          "NSE|"
+        ]
+      },
+      "name": "empty_token"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError"
+      },
+      "input": {
+        "instruments": [
+          "NSE|2 2"
+        ]
+      },
+      "name": "token_with_space"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError"
+      },
+      "input": {
+        "instruments": [
+          "NSE|22#23"
+        ]
+      },
+      "name": "token_with_hash"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError"
+      },
+      "input": {
+        "instruments": [
+          "NSE|22|23"
+        ]
+      },
+      "name": "token_with_second_pipe"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError"
+      },
+      "input": {
+        "instruments": [
+          [
+            "NSE",
+            22
+          ]
+        ]
+      },
+      "name": "pair_with_non_string_token"
+    }
+  ],
+  "description": "Stream subscription keys. input.instruments is one 'EXCH|TOKEN' string or a list of such strings and [exchange, token] pairs. expected.keys are the EXCH|TOKEN keys: exchange trimmed and upper-cased, duplicates removed (first kept), order kept. An unknown exchange, a missing |, or an empty token or one with whitespace, # or | is {\"error\": \"RequestValidationError\"}.",
+  "source": "tradesmart.stream.protocol.format_keys",
+  "tolerance": {}
+}

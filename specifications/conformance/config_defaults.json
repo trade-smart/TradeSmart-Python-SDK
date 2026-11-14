@@ -1,0 +1,871 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "algo_id": null,
+        "authorize_url": "https://v2api.tradesmartonline.in/OAuthlogin/authorize/oauth",
+        "backoff_base": 0.5,
+        "backoff_cap": 8.0,
+        "base_url": "https://v2api.tradesmartonline.in/NorenWClientAPIv2",
+        "check_token_expiry": true,
+        "connect_timeout": 5.0,
+        "heartbeat_interval": 30.0,
+        "instruments_dir": null,
+        "keepalive_expiry": 50.0,
+        "log_payloads": false,
+        "max_connections": 10,
+        "max_keepalive_connections": 5,
+        "max_retries": 2,
+        "order_rate_limit_max_wait": 1.0,
+        "order_rate_limit_per_minute": 200,
+        "order_rate_limit_per_second": 10,
+        "rate_limit_mode": "wait",
+        "read_timeout": 10.0,
+        "reconnect_backoff_base": 1.0,
+        "reconnect_backoff_cap": 60.0,
+        "reconnect_max_attempts": 20,
+        "script_master_base_url": "https://v2api.tradesmartonline.in",
+        "script_master_recheck_minutes": 15,
+        "script_master_refresh_time": "07:00",
+        "stream_backlog_limit": 1000,
+        "user_agent": "tradesmart-python/<version>",
+        "ws_auth_timeout": 10.0,
+        "ws_url": "wss://v2api.tradesmartonline.in/NorenWSAPI/"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {}
+      },
+      "name": "defaults"
+    },
+    {
+      "expected": {
+        "base_url": "https://x.example/api"
+      },
+      "input": {
+        "fields": [
+          "base_url"
+        ],
+        "overrides": {
+          "base_url": "https://x.example/api/"
+        }
+      },
+      "name": "base_url_trailing_slash_is_stripped"
+    },
+    {
+      "expected": {
+        "reconnect_max_attempts": null
+      },
+      "input": {
+        "fields": [
+          "reconnect_max_attempts"
+        ],
+        "overrides": {
+          "reconnect_max_attempts": null
+        }
+      },
+      "name": "reconnect_max_attempts_may_be_null"
+    },
+    {
+      "expected": {
+        "user_agent": "my-app/1"
+      },
+      "input": {
+        "fields": [
+          "user_agent"
+        ],
+        "overrides": {
+          "user_agent": "my-app/1"
+        }
+      },
+      "name": "explicit_user_agent_is_kept"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "base_url must start with http:// or https://"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "base_url": "ftp://x"
+        }
+      },
+      "name": "base_url_needs_http_scheme"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "ws_url must start with ws:// or wss://"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "ws_url": "https://x"
+        }
+      },
+      "name": "ws_url_needs_ws_scheme"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "connect_timeout must be a finite positive number"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "connect_timeout": 0
+        }
+      },
+      "name": "connect_timeout_must_be_positive"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "max_keepalive_connections must be <= max_connections"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "max_connections": 2,
+          "max_keepalive_connections": 3
+        }
+      },
+      "name": "keepalive_connections_cannot_exceed_max_connections"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "script_master_refresh_time must be HH:MM (24-hour, IST)"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "script_master_refresh_time": "7:00"
+        }
+      },
+      "name": "script_master_refresh_time_must_be_hh_mm"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "max_retries must be an integer >= 0"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "max_retries": -1
+        }
+      },
+      "name": "max_retries_cannot_be_negative"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "rate_limit_mode must be 'wait' or 'raise'"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "rate_limit_mode": "drop"
+        }
+      },
+      "name": "rate_limit_mode_must_be_wait_or_raise"
+    },
+    {
+      "expected": {
+        "algo_id": "153763",
+        "order_rate_limit_per_second": 30
+      },
+      "input": {
+        "fields": [
+          "order_rate_limit_per_second",
+          "algo_id"
+        ],
+        "overrides": {
+          "algo_id": "153763",
+          "order_rate_limit_per_second": 30
+        }
+      },
+      "name": "order_rate_limit_per_second_30_is_allowed"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_per_second above 10 needs algo_id (TradeSmart requires an algo ID for more than 10 orders per second)"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_per_second": 11
+        }
+      },
+      "name": "order_rate_limit_per_second_11_needs_algo_id"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_per_minute must be at least order_rate_limit_per_second"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_per_minute": 5,
+          "order_rate_limit_per_second": 10
+        }
+      },
+      "name": "order_rate_limit_per_minute_below_per_second_is_rejected"
+    },
+    {
+      "expected": {
+        "order_rate_limit_per_minute": 600
+      },
+      "input": {
+        "fields": [
+          "order_rate_limit_per_minute"
+        ],
+        "overrides": {
+          "order_rate_limit_per_minute": 600
+        }
+      },
+      "name": "order_rate_limit_per_minute_600_is_allowed"
+    },
+    {
+      "expected": {
+        "algo_id": null,
+        "order_rate_limit_per_second": 10
+      },
+      "input": {
+        "fields": [
+          "order_rate_limit_per_second",
+          "algo_id"
+        ],
+        "overrides": {
+          "order_rate_limit_per_second": 10
+        }
+      },
+      "name": "order_rate_limit_per_second_10_needs_no_algo_id"
+    },
+    {
+      "expected": {
+        "algo_id": "153763"
+      },
+      "input": {
+        "fields": [
+          "algo_id"
+        ],
+        "overrides": {
+          "algo_id": "153763"
+        }
+      },
+      "name": "algo_id_is_kept"
+    },
+    {
+      "expected": {
+        "order_rate_limit_max_wait": 0
+      },
+      "input": {
+        "fields": [
+          "order_rate_limit_max_wait"
+        ],
+        "overrides": {
+          "order_rate_limit_max_wait": 0
+        }
+      },
+      "name": "order_rate_limit_max_wait_zero_is_allowed"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "stream_backlog_limit must be an integer >= 1"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "stream_backlog_limit": 0
+        }
+      },
+      "name": "stream_backlog_limit_must_be_at_least_one"
+    },
+    {
+      "expected": {
+        "instruments_dir": "cache/instruments"
+      },
+      "input": {
+        "fields": [
+          "instruments_dir"
+        ],
+        "overrides": {
+          "instruments_dir": "cache/instruments"
+        }
+      },
+      "name": "instruments_dir_is_kept"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "instruments_dir must be a non-empty path or None"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "instruments_dir": ""
+        }
+      },
+      "name": "instruments_dir_must_not_be_empty"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "connect_timeout must be a finite positive number"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "connect_timeout": "NaN"
+        }
+      },
+      "name": "connect_timeout_nan_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "read_timeout must be a finite positive number"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "read_timeout": "Infinity"
+        }
+      },
+      "name": "read_timeout_infinity_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "backoff_cap must be a finite positive number"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "backoff_cap": "-Infinity"
+        }
+      },
+      "name": "backoff_cap_negative_infinity_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_max_wait must be a finite number >= 0"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_max_wait": "NaN"
+        }
+      },
+      "name": "order_rate_limit_max_wait_nan_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_max_wait must be a finite number >= 0"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_max_wait": "Infinity"
+        }
+      },
+      "name": "order_rate_limit_max_wait_infinity_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "max_retries must be an integer >= 0"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "max_retries": "NaN"
+        }
+      },
+      "name": "max_retries_nan_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "max_retries must be an integer >= 0"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "max_retries": 2.0
+        }
+      },
+      "name": "max_retries_float_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "max_retries must be an integer >= 0"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "max_retries": true
+        }
+      },
+      "name": "max_retries_boolean_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "stream_backlog_limit must be an integer >= 1"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "stream_backlog_limit": "NaN"
+        }
+      },
+      "name": "stream_backlog_limit_nan_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "stream_backlog_limit must be an integer >= 1"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "stream_backlog_limit": 1000.5
+        }
+      },
+      "name": "stream_backlog_limit_float_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "reconnect_max_attempts must be an integer >= 0 or None"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "reconnect_max_attempts": "NaN"
+        }
+      },
+      "name": "reconnect_max_attempts_nan_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "reconnect_max_attempts must be an integer >= 0 or None"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "reconnect_max_attempts": false
+        }
+      },
+      "name": "reconnect_max_attempts_boolean_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "reconnect_max_attempts must be an integer >= 0 or None"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "reconnect_max_attempts": -1
+        }
+      },
+      "name": "reconnect_max_attempts_negative_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "max_connections must be an integer >= 1"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "max_connections": 10.0
+        }
+      },
+      "name": "max_connections_float_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "max_keepalive_connections must be an integer >= 1"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "max_keepalive_connections": 0
+        }
+      },
+      "name": "max_keepalive_connections_zero_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "script_master_recheck_minutes must be an integer >= 1"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "script_master_recheck_minutes": 15.0
+        }
+      },
+      "name": "script_master_recheck_minutes_float_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "connect_timeout must be a finite positive number"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "connect_timeout": "5"
+        }
+      },
+      "name": "connect_timeout_string_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "connect_timeout must be a finite positive number"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "connect_timeout": true
+        }
+      },
+      "name": "connect_timeout_boolean_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "read_timeout must be a finite positive number"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "read_timeout": null
+        }
+      },
+      "name": "read_timeout_null_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_max_wait must be a finite number >= 0"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_max_wait": "1"
+        }
+      },
+      "name": "order_rate_limit_max_wait_string_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_per_second must be an integer from 1 to 30"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_per_second": 0
+        }
+      },
+      "name": "order_rate_limit_per_second_zero_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_per_second must be an integer from 1 to 30"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_per_second": 31
+        }
+      },
+      "name": "order_rate_limit_per_second_over_30_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_per_second must be an integer from 1 to 30"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_per_second": 10.0
+        }
+      },
+      "name": "order_rate_limit_per_second_float_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_per_second must be an integer from 1 to 30"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_per_second": true
+        }
+      },
+      "name": "order_rate_limit_per_second_boolean_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_per_second must be an integer from 1 to 30"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_per_second": "10"
+        }
+      },
+      "name": "order_rate_limit_per_second_string_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_per_minute must be an integer from 1 to 600"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_per_minute": 0
+        }
+      },
+      "name": "order_rate_limit_per_minute_zero_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_per_minute must be an integer from 1 to 600"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_per_minute": 601
+        }
+      },
+      "name": "order_rate_limit_per_minute_over_600_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_per_minute must be an integer from 1 to 600"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_per_minute": 2.5
+        }
+      },
+      "name": "order_rate_limit_per_minute_float_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_per_minute must be an integer from 1 to 600"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_per_minute": true
+        }
+      },
+      "name": "order_rate_limit_per_minute_boolean_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "order_rate_limit_per_minute must be an integer from 1 to 600"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "order_rate_limit_per_minute": "200"
+        }
+      },
+      "name": "order_rate_limit_per_minute_string_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "log_payloads must be True or False"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "log_payloads": "yes"
+        }
+      },
+      "name": "log_payloads_string_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "check_token_expiry must be True or False"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "check_token_expiry": 1
+        }
+      },
+      "name": "check_token_expiry_integer_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "base_url must be a string"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "base_url": 42
+        }
+      },
+      "name": "base_url_not_a_string_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "user_agent must contain only printable ASCII characters (no control characters)"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "user_agent": "my-app/1\r\nX-Evil: 1"
+        }
+      },
+      "name": "user_agent_control_character_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "user_agent must contain only printable ASCII characters (no control characters)"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "user_agent": "my-app/1 é"
+        }
+      },
+      "name": "user_agent_non_ascii_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "instruments_dir must be a non-empty path or None"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "instruments_dir": "   "
+        }
+      },
+      "name": "instruments_dir_blank_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "algo_id must be a non-blank string or None"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "algo_id": ""
+        }
+      },
+      "name": "algo_id_empty_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "algo_id must be a non-blank string or None"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "algo_id": "   "
+        }
+      },
+      "name": "algo_id_blank_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "algo_id must be a non-blank string or None"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "algo_id": true
+        }
+      },
+      "name": "algo_id_boolean_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError",
+        "message": "algo_id must be a non-blank string or None"
+      },
+      "input": {
+        "fields": null,
+        "overrides": {
+          "algo_id": 153763
+        }
+      },
+      "name": "algo_id_integer_is_rejected"
+    },
+    {
+      "expected": {
+        "connect_timeout": 3
+      },
+      "input": {
+        "fields": [
+          "connect_timeout"
+        ],
+        "overrides": {
+          "connect_timeout": 3
+        }
+      },
+      "name": "connect_timeout_integer_is_accepted"
+    },
+    {
+      "expected": {
+        "reconnect_max_attempts": 0
+      },
+      "input": {
+        "fields": [
+          "reconnect_max_attempts"
+        ],
+        "overrides": {
+          "reconnect_max_attempts": 0
+        }
+      },
+      "name": "reconnect_max_attempts_zero_is_accepted"
+    }
+  ],
+  "description": "ClientConfig defaults and validation. input.overrides are constructor arguments; expected holds the resulting fields (all of them when input.fields is null) or {\"error\": \"ConfigurationError\"}. user_agent defaults to \"<sdk-name>/<version>\" (tradesmart-python/<version> in the Python SDK); other SDKs substitute their own. Durations are seconds. The strings NaN, Infinity and -Infinity in input.overrides stand for those floating-point values (JSON has none): every duration must be a finite number > 0 (an integer or a float, never a boolean or a string), order_rate_limit_max_wait finite and >= 0; order_rate_limit_per_second an integer 1 to 30, above 10 only with algo_id set; order_rate_limit_per_minute an integer 1 to 600 (default 200), never below order_rate_limit_per_second; algo_id a non-blank string or null (a boolean or number rejected); the count settings (max_retries, max_connections, max_keepalive_connections, stream_backlog_limit, script_master_recheck_minutes, reconnect_max_attempts) must be integers (a float, even 2.0 or NaN, and a boolean are rejected); string settings must be strings and the two flags booleans. An error case also gives expected.message, the ConfigurationError text (it names the setting, never echoes the value).",
+  "source": "tradesmart.config.ClientConfig",
+  "tolerance": {
+    "abs": 1e-12
+  }
+}

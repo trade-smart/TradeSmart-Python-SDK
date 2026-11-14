@@ -1,0 +1,666 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"exch\":\"NSE\",\"uid\":\"TEST123\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "rate_group": "place_order",
+        "requires_ack_id": null,
+        "state_changing": true,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "payload": [
+          [
+            "exch",
+            "NSE"
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "documented_spelling"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"exch\":\"NSE\",\"uid\":\"TEST123\"}",
+        "endpoint": "PlaceOrder",
+        "expect": "object",
+        "rate_group": "place_order",
+        "requires_ack_id": null,
+        "state_changing": true,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": " /placeorder/ ",
+        "expect": "object",
+        "payload": [
+          [
+            "exch",
+            "NSE"
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "padded_lower_case_place_order_is_canonical"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"norenordno\":\"1\",\"uid\":\"TEST123\"}",
+        "endpoint": "CancelOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": true,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "CANCELORDER",
+        "expect": "object",
+        "payload": [
+          [
+            "norenordno",
+            "1"
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "upper_case_cancel_order_is_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "ModifyOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": true,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "modifyORDER",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "modify_order_any_case"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "ExitSNOOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": true,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "exitsnoorder",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "exit_sno_order_any_case"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "PlaceMultiOrder",
+        "expect": "object",
+        "rate_group": "place_order",
+        "requires_ack_id": null,
+        "state_changing": true,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "placemultiorder",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "place_multi_order_has_the_orders_group"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "GenAcsTok",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": true,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "genacstok",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "gen_acs_tok_is_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"exch\":\"NSE\",\"uid\":\"TEST123\"}",
+        "endpoint": "GetQuotes",
+        "expect": "object",
+        "rate_group": "quotes",
+        "requires_ack_id": null,
+        "state_changing": false,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "getquotes",
+        "expect": "object",
+        "payload": [
+          [
+            "exch",
+            "NSE"
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "get_quotes_any_case_has_the_quotes_group"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "GetQuotesMultiple",
+        "expect": "object",
+        "rate_group": "quotes",
+        "requires_ack_id": null,
+        "state_changing": false,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "GETQUOTESMULTIPLE",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "get_quotes_multiple_has_the_quotes_group"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "TPSeries",
+        "expect": "object",
+        "rate_group": "tpseries",
+        "requires_ack_id": null,
+        "state_changing": false,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "tpseries",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "tpseries_any_case_has_the_tpseries_group"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "limits",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": false,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "limits",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "unknown_name_is_sent_as_given"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "OrderBook",
+        "expect": "list",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": false,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "OrderBook",
+        "expect": "list",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "unknown_name_keeps_its_case"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "OrderBook",
+        "expect": "list",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": true,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "OrderBook",
+        "expect": "list",
+        "payload": [],
+        "state_changing": true
+      },
+      "name": "read_marked_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"actid\":\"TEST123\",\"uid\":\"TEST123\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": false,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "Limits",
+        "expect": "object",
+        "payload": [
+          [
+            "actid",
+            "TEST123"
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "uid_is_added_last_when_absent"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"OTHER1\",\"actid\":\"OTHER1\"}",
+        "endpoint": "Limits",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": false,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "Limits",
+        "expect": "object",
+        "payload": [
+          [
+            "uid",
+            "OTHER1"
+          ],
+          [
+            "actid",
+            "OTHER1"
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "given_uid_is_kept"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"flag\":\"Yes\",\"off\":\"No\",\"count\":\"5\",\"price\":\"101.5\",\"uid\":\"TEST123\"}",
+        "endpoint": "Custom",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": false,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "Custom",
+        "expect": "object",
+        "payload": [
+          [
+            "flag",
+            true
+          ],
+          [
+            "off",
+            false
+          ],
+          [
+            "count",
+            5
+          ],
+          [
+            "price",
+            101.5
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "values_are_converted_to_wire_strings"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError"
+      },
+      "input": {
+        "endpoint": "Place.Order",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "dot_in_name_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError"
+      },
+      "input": {
+        "endpoint": "api/PlaceOrder",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "inner_slash_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError"
+      },
+      "input": {
+        "endpoint": "Place Order",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "inner_space_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError"
+      },
+      "input": {
+        "endpoint": "PlaceOrder2",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "digits_are_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError"
+      },
+      "input": {
+        "endpoint": "Plàceorder",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "non_ascii_letter_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "ConfigurationError"
+      },
+      "input": {
+        "endpoint": " / ",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "empty_name_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "TypeError"
+      },
+      "input": {
+        "endpoint": "Limits",
+        "expect": "object",
+        "payload": [
+          [
+            "actid",
+            null
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "null_value_is_a_type_error"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"exch\":\"NSE\",\"uid\":\"TEST123\"}",
+        "endpoint": "PlaceGTTOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": "al_id",
+        "state_changing": true,
+        "success_stats": [
+          "Oi created"
+        ]
+      },
+      "input": {
+        "endpoint": "placegttorder",
+        "expect": "object",
+        "payload": [
+          [
+            "exch",
+            "NSE"
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "place_gtt_any_case_is_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"al_id\":\"1\",\"uid\":\"TEST123\"}",
+        "endpoint": "ModifyGTTOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": "al_id",
+        "state_changing": true,
+        "success_stats": [
+          "Oi replaced"
+        ]
+      },
+      "input": {
+        "endpoint": "MODIFYGTTORDER",
+        "expect": "object",
+        "payload": [
+          [
+            "al_id",
+            "1"
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "modify_gtt_any_case_is_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"al_id\":\"1\",\"uid\":\"TEST123\"}",
+        "endpoint": "CancelGTTOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": "al_id",
+        "state_changing": true,
+        "success_stats": [
+          "Oi delete success"
+        ]
+      },
+      "input": {
+        "endpoint": " /CancelGttOrder/ ",
+        "expect": "object",
+        "payload": [
+          [
+            "al_id",
+            "1"
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "cancel_gtt_any_case_is_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "PlaceIceBergOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": true,
+        "success_stats": [
+          "true"
+        ]
+      },
+      "input": {
+        "endpoint": "PLACEICEBERGORDER",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "place_iceberg_any_case_is_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "ModifyIceBergOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": true,
+        "success_stats": [
+          "true"
+        ]
+      },
+      "input": {
+        "endpoint": "modifyicebergorder",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "modify_iceberg_any_case_is_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "CancelIceBergOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": true,
+        "success_stats": [
+          "true"
+        ]
+      },
+      "input": {
+        "endpoint": "CancelIcebergOrder",
+        "expect": "object",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "cancel_iceberg_any_case_is_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "GetPendingGTTOrder",
+        "expect": "list",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": false,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "GetPendingGTTOrder",
+        "expect": "list",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "gtt_book_read_is_sent_as_given"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"uid\":\"TEST123\"}",
+        "endpoint": "GetIceBergOrder",
+        "expect": "list",
+        "rate_group": null,
+        "requires_ack_id": null,
+        "state_changing": false,
+        "success_stats": [
+          "Ok"
+        ]
+      },
+      "input": {
+        "endpoint": "GetIceBergOrder",
+        "expect": "list",
+        "payload": [],
+        "state_changing": false
+      },
+      "name": "iceberg_book_read_is_sent_as_given"
+    }
+  ],
+  "description": "The low-level request(endpoint, payload, state_changing, expect) call as built before sending. input.payload is the ordered list of [key, value] pairs. The endpoint is trimmed of whitespace and slashes and must then be ASCII letters only (else {\"error\": \"ConfigurationError\"}); the names PlaceOrder, PlaceMultiOrder, ModifyOrder, CancelOrder, ExitSNOOrder, GenAcsTok, PlaceGTTOrder, ModifyGTTOrder, CancelGTTOrder, PlaceIceBergOrder, ModifyIceBergOrder, CancelIceBergOrder, GetQuotes, GetQuotesMultiple and TPSeries match case-insensitively and are rewritten to that spelling, every other name is sent as given. expected.state_changing is the caller's flag or a state-changing name; expected.rate_group is place_order (the orders group), quotes, tpseries or null; allow_empty is always false; expected.success_stats is the sorted list of documented success words (['Ok'] except the GTT and iceberg writes; the GTT words compare ignoring letter case, see success_words.json) and expected.requires_ack_id the field a success must carry as a non-blank string (al_id for the GTT writes, else null). uid is appended when absent; values become wire strings (true / false as Yes / No); a null value is {\"error\": \"TypeError\"} (a programming error, nothing is sent).",
+  "source": "tradesmart._client_core.build_raw_call",
+  "tolerance": {}
+}

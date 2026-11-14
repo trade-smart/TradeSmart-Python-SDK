@@ -1,0 +1,491 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "max_pain": {
+          "payouts": {
+            "100": "1600",
+            "110": "1100",
+            "120": "1300"
+          },
+          "strike": "110"
+        }
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": "50",
+            "option_type": "CE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "PE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "30",
+            "option_type": "CE",
+            "strike": "110",
+            "volume": null
+          },
+          {
+            "open_interest": "40",
+            "option_type": "PE",
+            "strike": "110",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "120",
+            "volume": null
+          },
+          {
+            "open_interest": "60",
+            "option_type": "PE",
+            "strike": "120",
+            "volume": null
+          }
+        ]
+      },
+      "name": "textbook_three_strikes"
+    },
+    {
+      "expected": {
+        "max_pain": {
+          "payouts": {
+            "100": "100",
+            "110": "100"
+          },
+          "strike": "100"
+        }
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "PE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "110",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "PE",
+            "strike": "110",
+            "volume": null
+          }
+        ]
+      },
+      "name": "tie_goes_to_the_lowest_strike"
+    },
+    {
+      "expected": {
+        "max_pain": {
+          "payouts": {
+            "100": "0",
+            "110": "0",
+            "120": "0"
+          },
+          "strike": "100"
+        }
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": "10",
+            "option_type": "PE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "120",
+            "volume": null
+          },
+          {
+            "open_interest": "0",
+            "option_type": "CE",
+            "strike": "110",
+            "volume": null
+          }
+        ]
+      },
+      "name": "zero_payout_between_the_outer_rows_ties_to_the_lowest_strike"
+    },
+    {
+      "expected": {
+        "max_pain": {
+          "payouts": {
+            "100": "0",
+            "110": "0",
+            "120": "0"
+          },
+          "strike": "100"
+        }
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": "0",
+            "option_type": "CE",
+            "strike": "110",
+            "volume": null
+          },
+          {
+            "open_interest": "0",
+            "option_type": "PE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "0",
+            "option_type": "CE",
+            "strike": "120",
+            "volume": null
+          }
+        ]
+      },
+      "name": "all_zero_oi_ties_to_the_lowest_strike"
+    },
+    {
+      "expected": {
+        "max_pain": null
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": null,
+            "option_type": "CE",
+            "strike": "100",
+            "volume": "5"
+          },
+          {
+            "open_interest": null,
+            "option_type": "PE",
+            "strike": "100",
+            "volume": "5"
+          }
+        ]
+      },
+      "name": "all_oi_missing_is_null"
+    },
+    {
+      "expected": {
+        "max_pain": null
+      },
+      "input": {
+        "rows": []
+      },
+      "name": "empty_chain_is_null"
+    },
+    {
+      "expected": {
+        "max_pain": {
+          "payouts": {
+            "100": "100",
+            "110": "100"
+          },
+          "strike": "100"
+        }
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": null,
+            "option_type": "PE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "PE",
+            "strike": "110",
+            "volume": null
+          }
+        ]
+      },
+      "name": "some_oi_missing_counts_as_zero"
+    },
+    {
+      "expected": {
+        "max_pain": {
+          "payouts": {
+            "100": "0"
+          },
+          "strike": "100"
+        }
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "20",
+            "option_type": "PE",
+            "strike": "100",
+            "volume": null
+          }
+        ]
+      },
+      "name": "single_strike"
+    },
+    {
+      "expected": {
+        "max_pain": {
+          "payouts": {
+            "100": "0",
+            "110": "100",
+            "120": "300"
+          },
+          "strike": "100"
+        }
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "110",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "120",
+            "volume": null
+          }
+        ]
+      },
+      "name": "calls_only"
+    },
+    {
+      "expected": {
+        "max_pain": {
+          "payouts": {
+            "100": "300",
+            "110": "100",
+            "120": "0"
+          },
+          "strike": "120"
+        }
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": "10",
+            "option_type": "PE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "PE",
+            "strike": "110",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "PE",
+            "strike": "120",
+            "volume": null
+          }
+        ]
+      },
+      "name": "puts_only"
+    },
+    {
+      "expected": {
+        "max_pain": {
+          "payouts": {
+            "100": "100",
+            "105": "100",
+            "110": "100"
+          },
+          "strike": "100"
+        }
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "999",
+            "option_type": "XX",
+            "strike": "105",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "PE",
+            "strike": "110",
+            "volume": null
+          }
+        ]
+      },
+      "name": "other_option_types_are_ignored_but_their_strikes_are_candidates"
+    },
+    {
+      "expected": {
+        "max_pain": {
+          "payouts": {
+            "100": "1600",
+            "110": "1100",
+            "120": "1300"
+          },
+          "strike": "110"
+        }
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": "60",
+            "option_type": "PE",
+            "strike": "120",
+            "volume": null
+          },
+          {
+            "open_interest": "50",
+            "option_type": "CE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "30",
+            "option_type": "CE",
+            "strike": "110",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "PE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "40",
+            "option_type": "PE",
+            "strike": "110",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "120",
+            "volume": null
+          }
+        ]
+      },
+      "name": "unsorted_input_rows"
+    },
+    {
+      "expected": {
+        "max_pain": {
+          "payouts": {
+            "24000.5": "20025.000",
+            "24100.5": "10050.00",
+            "24200.5": "20100.00"
+          },
+          "strike": "24100.5"
+        }
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": "100.5",
+            "option_type": "CE",
+            "strike": "24000.5",
+            "volume": null
+          },
+          {
+            "open_interest": "200.25",
+            "option_type": "PE",
+            "strike": "24100.5",
+            "volume": null
+          },
+          {
+            "open_interest": "50",
+            "option_type": "CE",
+            "strike": "24200.5",
+            "volume": null
+          }
+        ]
+      },
+      "name": "decimal_strikes_and_oi"
+    },
+    {
+      "expected": {
+        "max_pain": {
+          "payouts": {
+            "100": "150",
+            "110": "200"
+          },
+          "strike": "100"
+        }
+      },
+      "input": {
+        "rows": [
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "10",
+            "option_type": "CE",
+            "strike": "100",
+            "volume": null
+          },
+          {
+            "open_interest": "15",
+            "option_type": "PE",
+            "strike": "110",
+            "volume": null
+          }
+        ]
+      },
+      "name": "duplicate_rows_for_a_strike_add_up"
+    }
+  ],
+  "description": "Max pain: the candidate strike (any strike in the chain) minimising the total payout to option buyers; ties go to the lowest strike; null when no row has open interest. payouts maps each candidate strike to its total payout. Decimal values are strings.",
+  "source": "tradesmart.analytics.max_pain",
+  "tolerance": {
+    "decimal_abs": "0"
+  }
+}

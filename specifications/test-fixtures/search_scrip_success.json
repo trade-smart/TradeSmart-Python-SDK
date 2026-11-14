@@ -1,0 +1,8 @@
+{
+  "stat": "Ok",
+  "values": [
+    {"exch": "BSE", "token": "532540", "tsym": "TCS", "cname": "TATA CONSULTANCY SERVICES LTD.", "instname": "A", "symname": "TCS", "seg": "EQT", "pp": "2", "ls": "1", "ti": "0.05"},
+    {"exch": "NSE", "token": "11536", "tsym": "TCS-EQ", "cname": "TATA CONSULTANCY SERV LT", "instname": "EQ", "symname": "TCS", "seg": "EQT", "pp": "2", "ls": "1", "ti": "0.10"},
+    {"exch": "NFO", "token": "62851", "tsym": "TCS30JUN26F", "dname": "TCS JUN FUT", "optt": "XX", "instname": "FUTSTK", "symname": "TCS", "seg": "DER", "exd": "30-JUN-2026", "pp": "2", "ls": "175", "ti": "0.10"}
+  ]
+}

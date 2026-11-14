@@ -1,0 +1,502 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "error": "NetworkError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_order",
+        "failure": "connect_error"
+      },
+      "name": "place_order_connect_error"
+    },
+    {
+      "expected": {
+        "error": "RequestTimeoutError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_order",
+        "failure": "connect_timeout"
+      },
+      "name": "place_order_connect_timeout"
+    },
+    {
+      "expected": {
+        "error": "RequestTimeoutError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_order",
+        "failure": "pool_timeout"
+      },
+      "name": "place_order_pool_timeout"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_order",
+        "failure": "read_timeout"
+      },
+      "name": "place_order_read_timeout"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_order",
+        "failure": "write_timeout"
+      },
+      "name": "place_order_write_timeout"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_order",
+        "failure": "connection_reset"
+      },
+      "name": "place_order_connection_reset"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_order",
+        "failure": "remote_protocol_error"
+      },
+      "name": "place_order_remote_protocol_error"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_order",
+        "failure": "decoding_error"
+      },
+      "name": "place_order_decoding_error"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_order",
+        "failure": "hook_exception"
+      },
+      "name": "place_order_hook_exception"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_order",
+        "failure": "hook_sdk_error"
+      },
+      "name": "place_order_hook_sdk_error"
+    },
+    {
+      "expected": {
+        "error": "KeyboardInterrupt",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_order",
+        "failure": "keyboard_interrupt"
+      },
+      "name": "place_order_keyboard_interrupt"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "requests": 1
+      },
+      "input": {
+        "call": "cancel_order",
+        "failure": "connect_error"
+      },
+      "name": "cancel_order_connect_error"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "cancel_order",
+        "failure": "read_timeout"
+      },
+      "name": "cancel_order_read_timeout"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "cancel_order",
+        "failure": "hook_exception"
+      },
+      "name": "cancel_order_hook_exception"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "requests": 1
+      },
+      "input": {
+        "call": "request_order_book_state_changing",
+        "failure": "connect_error"
+      },
+      "name": "request_state_changing_connect_error"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "request_order_book_state_changing",
+        "failure": "read_timeout"
+      },
+      "name": "request_state_changing_read_timeout"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "request_order_book_state_changing",
+        "failure": "hook_exception"
+      },
+      "name": "request_state_changing_hook_exception"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "requests": 3
+      },
+      "input": {
+        "call": "limits",
+        "failure": "connect_error"
+      },
+      "name": "read_connect_error"
+    },
+    {
+      "expected": {
+        "error": "RequestTimeoutError",
+        "requests": 3
+      },
+      "input": {
+        "call": "limits",
+        "failure": "connect_timeout"
+      },
+      "name": "read_connect_timeout"
+    },
+    {
+      "expected": {
+        "error": "RequestTimeoutError",
+        "requests": 3
+      },
+      "input": {
+        "call": "limits",
+        "failure": "pool_timeout"
+      },
+      "name": "read_pool_timeout"
+    },
+    {
+      "expected": {
+        "error": "RequestTimeoutError",
+        "requests": 3
+      },
+      "input": {
+        "call": "limits",
+        "failure": "read_timeout"
+      },
+      "name": "read_read_timeout"
+    },
+    {
+      "expected": {
+        "error": "RequestTimeoutError",
+        "requests": 3
+      },
+      "input": {
+        "call": "limits",
+        "failure": "write_timeout"
+      },
+      "name": "read_write_timeout"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "requests": 3
+      },
+      "input": {
+        "call": "limits",
+        "failure": "connection_reset"
+      },
+      "name": "read_connection_reset"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "requests": 3
+      },
+      "input": {
+        "call": "limits",
+        "failure": "remote_protocol_error"
+      },
+      "name": "read_remote_protocol_error"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "requests": 3
+      },
+      "input": {
+        "call": "limits",
+        "failure": "decoding_error"
+      },
+      "name": "read_decoding_error"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "requests": 1
+      },
+      "input": {
+        "call": "limits",
+        "failure": "hook_exception"
+      },
+      "name": "read_hook_exception"
+    },
+    {
+      "expected": {
+        "error": "ServerError",
+        "requests": 1
+      },
+      "input": {
+        "call": "limits",
+        "failure": "hook_sdk_error"
+      },
+      "name": "read_hook_sdk_error"
+    },
+    {
+      "expected": {
+        "error": "KeyboardInterrupt",
+        "requests": 1
+      },
+      "input": {
+        "call": "limits",
+        "failure": "keyboard_interrupt"
+      },
+      "name": "read_keyboard_interrupt"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_gtt",
+        "failure": "connect_error"
+      },
+      "name": "place_gtt_connect_error"
+    },
+    {
+      "expected": {
+        "error": "RequestTimeoutError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_gtt",
+        "failure": "connect_timeout"
+      },
+      "name": "place_gtt_connect_timeout"
+    },
+    {
+      "expected": {
+        "error": "RequestTimeoutError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_gtt",
+        "failure": "pool_timeout"
+      },
+      "name": "place_gtt_pool_timeout"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_gtt",
+        "failure": "read_timeout"
+      },
+      "name": "place_gtt_read_timeout"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_gtt",
+        "failure": "write_timeout"
+      },
+      "name": "place_gtt_write_timeout"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_gtt",
+        "failure": "connection_reset"
+      },
+      "name": "place_gtt_connection_reset"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_gtt",
+        "failure": "remote_protocol_error"
+      },
+      "name": "place_gtt_remote_protocol_error"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_gtt",
+        "failure": "decoding_error"
+      },
+      "name": "place_gtt_decoding_error"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_gtt",
+        "failure": "hook_exception"
+      },
+      "name": "place_gtt_hook_exception"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_gtt",
+        "failure": "hook_sdk_error"
+      },
+      "name": "place_gtt_hook_sdk_error"
+    },
+    {
+      "expected": {
+        "error": "KeyboardInterrupt",
+        "requests": 1
+      },
+      "input": {
+        "call": "place_gtt",
+        "failure": "keyboard_interrupt"
+      },
+      "name": "place_gtt_keyboard_interrupt"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "requests": 1
+      },
+      "input": {
+        "call": "modify_gtt",
+        "failure": "connect_error"
+      },
+      "name": "modify_gtt_connect_error"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "modify_gtt",
+        "failure": "read_timeout"
+      },
+      "name": "modify_gtt_read_timeout"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "modify_gtt",
+        "failure": "hook_exception"
+      },
+      "name": "modify_gtt_hook_exception"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "requests": 1
+      },
+      "input": {
+        "call": "cancel_gtt",
+        "failure": "connect_error"
+      },
+      "name": "cancel_gtt_connect_error"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "cancel_gtt",
+        "failure": "read_timeout"
+      },
+      "name": "cancel_gtt_read_timeout"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "requests": 1
+      },
+      "input": {
+        "call": "cancel_gtt",
+        "failure": "hook_exception"
+      },
+      "name": "cancel_gtt_hook_exception"
+    }
+  ],
+  "description": "A failure while a request is being sent, by kind: connect_error, connect_timeout and pool_timeout (nothing reached the server), read_timeout, write_timeout, connection_reset, remote_protocol_error, decoding_error (the request may have been executed), hook_exception (a non-SDK exception raised by the caller's own HTTP event hook or transport), hook_sdk_error (an SDK ServerError raised there) and keyboard_interrupt (passes through unchanged). input.call is place_order, cancel_order, place_gtt, modify_gtt, cancel_gtt (arguments as in outcome_words.json), request_state_changing (request('OrderBook', ..., state_changing=True)) or read (margins()). expected.error is the error type and expected.requests how many requests were sent (a read is retried for NetworkError and RequestTimeoutError: 3 attempts with max_retries 2).",
+  "source": "tradesmart._transport.sync_http (map_transport_error, map_unexpected_error) via tradesmart.TradeSmart",
+  "tolerance": {}
+}

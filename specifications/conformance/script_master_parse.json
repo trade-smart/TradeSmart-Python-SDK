@@ -1,0 +1,350 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "rows": [
+          {
+            "": "",
+            "Exchange": "NSE",
+            "Instrument": "EQ",
+            "LotSize": "1",
+            "Symbol": "ACC",
+            "TickSize": "0.05",
+            "Token": "22",
+            "TradingSymbol": "ACC-EQ"
+          }
+        ]
+      },
+      "input": {
+        "text": "Exchange,Token,LotSize,Symbol,TradingSymbol,Instrument,TickSize,\nNSE,22,1,ACC,ACC-EQ,EQ,0.05,\n"
+      },
+      "name": "empty_trailing_header_column"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "Exchange": "NSE",
+            "Token": "22",
+            "TradingSymbol": "ACC-EQ"
+          }
+        ]
+      },
+      "input": {
+        "text": "Exchange|Token|TradingSymbol\nNSE|22|ACC-EQ\n"
+      },
+      "name": "pipe_delimiter"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "Exchange": "NSE",
+            "Token": "22",
+            "TradingSymbol": "ACC-EQ"
+          }
+        ]
+      },
+      "input": {
+        "text": "Exchange\tToken\tTradingSymbol\nNSE\t22\tACC-EQ\n"
+      },
+      "name": "tab_delimiter"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "Exchange": "NSE",
+            "Token": "22"
+          }
+        ]
+      },
+      "input": {
+        "text": "Exchange;Token\nNSE;22\n"
+      },
+      "name": "semicolon_delimiter"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "1",
+            "B": "2",
+            "C,D": "3,4"
+          }
+        ]
+      },
+      "input": {
+        "text": "A|B|C,D\n1|2|3,4\n"
+      },
+      "name": "delimiter_most_frequent_in_header_wins"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "1",
+            "B|C": "2|3"
+          }
+        ]
+      },
+      "input": {
+        "text": "A,B|C\n1,2|3\n"
+      },
+      "name": "delimiter_tie_first_in_order_wins"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "1",
+            "B\tC": "2\t3"
+          }
+        ]
+      },
+      "input": {
+        "text": "A|B\tC\n1|2\t3\n"
+      },
+      "name": "delimiter_tie_pipe_before_tab"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "1",
+            "B;C": "2;3"
+          }
+        ]
+      },
+      "input": {
+        "text": "A\tB;C\n1\t2;3\n"
+      },
+      "name": "delimiter_tie_tab_before_semicolon"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "Exchange": "NSE"
+          }
+        ]
+      },
+      "input": {
+        "text": "Exchange\nNSE\n"
+      },
+      "name": "no_delimiter_is_one_column"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "1",
+            "B": "2"
+          }
+        ]
+      },
+      "input": {
+        "text": "\n  \nA|B\n1|2\n"
+      },
+      "name": "delimiter_from_first_non_blank_line"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "x,y",
+            "B": "2"
+          }
+        ]
+      },
+      "input": {
+        "text": "A,B\n\"x,y\",2\n"
+      },
+      "name": "quoted_field_holds_the_delimiter"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "say \"hi\"",
+            "B": "2"
+          }
+        ]
+      },
+      "input": {
+        "text": "A,B\n\"say \"\"hi\"\"\",2\n"
+      },
+      "name": "doubled_quote_in_quoted_field"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "line1\nline2",
+            "B": "2"
+          }
+        ]
+      },
+      "input": {
+        "text": "A,B\n\"line1\nline2\",2\n"
+      },
+      "name": "quoted_field_holds_a_line_break"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "1",
+            "B": "2"
+          },
+          {
+            "A": "3",
+            "B": "4"
+          }
+        ]
+      },
+      "input": {
+        "text": "A,B\n\n1,2\n , \n3,4\n"
+      },
+      "name": "blank_rows_are_skipped"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "1",
+            "B": "2"
+          }
+        ]
+      },
+      "input": {
+        "text": " A , B \n 1 , 2 \n"
+      },
+      "name": "header_and_values_are_trimmed"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "1",
+            "B": "2"
+          }
+        ]
+      },
+      "input": {
+        "text": "A,B,C\n1,2\n"
+      },
+      "name": "short_row_has_no_key_for_missing_columns"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "1",
+            "B": "2"
+          }
+        ]
+      },
+      "input": {
+        "text": "A,B\n1,2,3,4\n"
+      },
+      "name": "long_row_extra_cells_are_dropped"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "A": "3",
+            "B": "2"
+          }
+        ]
+      },
+      "input": {
+        "text": "A,B,A\n1,2,3\n"
+      },
+      "name": "duplicate_header_last_column_wins"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "Exchange": "NSE",
+            "Token": "22"
+          }
+        ]
+      },
+      "input": {
+        "text": "﻿Exchange,Token\nNSE,22\n"
+      },
+      "name": "byte_order_mark_is_ignored"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "Exchange": "NSE",
+            "Token": "22"
+          }
+        ]
+      },
+      "input": {
+        "text": "Exchange,Token\r\nNSE,22\r\n"
+      },
+      "name": "crlf_line_endings"
+    },
+    {
+      "expected": {
+        "rows": [
+          {
+            "LotSize": "0065",
+            "TickSize": "0.050",
+            "Token": "00022"
+          }
+        ]
+      },
+      "input": {
+        "text": "Token,LotSize,TickSize\n00022,0065,0.050\n"
+      },
+      "name": "values_stay_strings"
+    },
+    {
+      "expected": {
+        "rows": []
+      },
+      "input": {
+        "text": ""
+      },
+      "name": "empty_file"
+    },
+    {
+      "expected": {
+        "rows": []
+      },
+      "input": {
+        "text": "Exchange,Token\n"
+      },
+      "name": "header_only"
+    },
+    {
+      "expected": {
+        "error": "ResponseParseError"
+      },
+      "input": {
+        "bytes_hex": "45786368616e67650a4e5345ff0a"
+      },
+      "name": "not_utf8_is_a_parse_error"
+    },
+    {
+      "expected": {
+        "error": "ResponseParseError"
+      },
+      "input": {
+        "text": "Exchange,Token\nNSE,2\u00002\n"
+      },
+      "name": "nul_byte_is_a_parse_error"
+    }
+  ],
+  "description": "Parsing a script-master text file. input.text is the file content (UTF-8), or input.bytes_hex the raw bytes. expected.rows are the data rows keyed by the trimmed header cells (all values trimmed strings; a missing key means the row was shorter than the header), or {\"error\": \"ResponseParseError\"} for a file that is not UTF-8 text or not valid CSV (a NUL byte). The delimiter is whichever of , | TAB ; occurs most in the first non-blank line (first 4096 characters); a tie goes to the first in that order; , when none occurs. RFC 4180 quoting; rows whose cells are all blank are skipped; a UTF-8 byte-order mark is ignored; with duplicate header names the last column wins; extra cells are dropped.",
+  "source": "tradesmart.instruments.load",
+  "tolerance": {}
+}

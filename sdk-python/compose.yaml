@@ -1,0 +1,104 @@
+# Run every development command in Docker; nothing is installed on the host.
+#   docker compose build                      # once, and after pyproject.toml changes
+#   docker compose run --rm dev pytest        # Python 3.12
+#   docker compose run --rm py311 pytest -q   # Python 3.11 floor (also py313, py314, py315)
+# See CONTRIBUTING.md for the full list of quality gates.
+
+x-sdk: &sdk
+  volumes:
+    # The whole monorepo: tests load ../specifications/test-fixtures.
+    - ..:/repo
+    # Saved login of `python -m tradesmart login` (live tests) and the App Key / Secret it saved
+    # (credentials.json, owner-only, not encrypted): a Docker volume, never the repo. Remove the
+    # token with `docker compose run --rm dev python -m tradesmart logout`; add --forget-keys to
+    # remove the saved keys too.
+    - tradesmart-login:/root/.config/tradesmart
+  working_dir: /repo/sdk-python
+  environment:
+    # Passed through from the host only when set there (live tests are opt-in).
+    - TRADESMART_LIVE_TESTS
+    - TRADESMART_LIVE_ORDER_TESTS
+    - TRADESMART_LIVE_ORDER_ACCOUNT
+    - TRADESMART_LIVE_ORDER_OUTSIDE_HOURS
+    - TRADESMART_LIVE_ORDER_FUNDED
+    - TRADESMART_LIVE_ORDER_FILLS
+    - TRADESMART_LIVE_ORDER_MAX_BALANCE
+    - TRADESMART_LIVE_ORDER_UAT_IGNORE_OPEN
+    - TRADESMART_LIVE_ORDER_UAT_MATRIX
+    - TRADESMART_UAT_RUN_ID
+    - TRADESMART_LIVE_MOCK_SESSION
+    - TRADESMART_LIVE_MOCK_CONFIRM
+    - TRADESMART_CLIENT_ID
+    - TRADESMART_ACCESS_TOKEN
+    - TRADESMART_APP_KEY
+    - TRADESMART_SECRET_KEY
+    - TRADESMART_BASE_URL
+    - TRADESMART_ENV
+    - TRADESMART_ENV_BASE_URL
+    - TRADESMART_ENV_WS_URL
+    - TRADESMART_ENV_AUTHORIZE_URL
+    - TRADESMART_ENV_SCRIPT_MASTER_URL
+    - TRADESMART_ENV_APP_KEY
+    - TRADESMART_ENV_SECRET_KEY
+    - TRADESMART_TOKEN_FILE
+
+services:
+  dev:
+    <<: *sdk
+    build:
+      context: .
+      args:
+        PYTHON_VERSION: "3.12"
+    image: tradesmart-sdk-dev:py3.12
+
+  # Browser login from Docker with an automatic redirect:
+  #   docker compose run --rm --service-ports login --client-id <ID>
+  # The port is published on the host's loopback only (never 0.0.0.0); the redirect URL
+  # registered with TradeSmart stays http://127.0.0.1:8080/callback.
+  login:
+    <<: *sdk
+    build:
+      context: .
+      args:
+        PYTHON_VERSION: "3.12"
+    image: tradesmart-sdk-dev:py3.12
+    ports:
+      - "127.0.0.1:8080:8080"
+    entrypoint: ["python", "-m", "tradesmart", "login", "--listen-host", "0.0.0.0"]
+
+  # The other supported Pythons: py311 is the floor, py313-py315 the newer releases. Each runs the
+  # whole suite, e.g. `docker compose run --rm py311 pytest -q`.
+  py311:
+    <<: *sdk
+    build:
+      context: .
+      args:
+        PYTHON_VERSION: "3.11"
+    image: tradesmart-sdk-dev:py3.11
+
+  py313:
+    <<: *sdk
+    build:
+      context: .
+      args:
+        PYTHON_VERSION: "3.13"
+    image: tradesmart-sdk-dev:py3.13
+
+  py314:
+    <<: *sdk
+    build:
+      context: .
+      args:
+        PYTHON_VERSION: "3.14"
+    image: tradesmart-sdk-dev:py3.14
+
+  py315:
+    <<: *sdk
+    build:
+      context: .
+      args:
+        PYTHON_VERSION: "3.15"
+    image: tradesmart-sdk-dev:py3.15
+
+volumes:
+  tradesmart-login:

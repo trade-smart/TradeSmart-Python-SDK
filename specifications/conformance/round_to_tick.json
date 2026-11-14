@@ -1,0 +1,207 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "result": "100.05"
+      },
+      "input": {
+        "price": "100.05",
+        "tick_size": "0.05"
+      },
+      "name": "already_on_tick"
+    },
+    {
+      "expected": {
+        "result": "100.00"
+      },
+      "input": {
+        "price": "100.02",
+        "tick_size": "0.05"
+      },
+      "name": "rounds_down"
+    },
+    {
+      "expected": {
+        "result": "100.05"
+      },
+      "input": {
+        "price": "100.03",
+        "tick_size": "0.05"
+      },
+      "name": "rounds_up"
+    },
+    {
+      "expected": {
+        "result": "100.05"
+      },
+      "input": {
+        "price": "100.025",
+        "tick_size": "0.05"
+      },
+      "name": "half_way_rounds_up"
+    },
+    {
+      "expected": {
+        "result": "100.00"
+      },
+      "input": {
+        "price": "100",
+        "tick_size": "0.05"
+      },
+      "name": "result_has_the_tick_places"
+    },
+    {
+      "expected": {
+        "result": "100.0"
+      },
+      "input": {
+        "price": "100.04",
+        "tick_size": "0.10"
+      },
+      "name": "tick_trailing_zero_ignored"
+    },
+    {
+      "expected": {
+        "result": "1235"
+      },
+      "input": {
+        "price": "1234.5",
+        "tick_size": "1"
+      },
+      "name": "whole_number_tick"
+    },
+    {
+      "expected": {
+        "result": "1235"
+      },
+      "input": {
+        "price": "1232.5",
+        "tick_size": "5"
+      },
+      "name": "tick_of_five"
+    },
+    {
+      "expected": {
+        "result": "83.1225"
+      },
+      "input": {
+        "price": "83.12345",
+        "tick_size": "0.0025"
+      },
+      "name": "currency_tick"
+    },
+    {
+      "expected": {
+        "result": "-100.05"
+      },
+      "input": {
+        "price": "-100.025",
+        "tick_size": "0.05"
+      },
+      "name": "negative_price_half_way_rounds_away_from_zero"
+    },
+    {
+      "expected": {
+        "result": "0.00"
+      },
+      "input": {
+        "price": "0",
+        "tick_size": "0.05"
+      },
+      "name": "zero_price"
+    },
+    {
+      "expected": {
+        "result": "1586.05"
+      },
+      "input": {
+        "price": 1586.03445,
+        "tick_size": 0.05
+      },
+      "name": "json_number_inputs"
+    },
+    {
+      "expected": {
+        "result": "100"
+      },
+      "input": {
+        "price": 99.5,
+        "tick_size": 1
+      },
+      "name": "integer_tick_number"
+    },
+    {
+      "expected": {
+        "result": "100.05"
+      },
+      "input": {
+        "price": " 100.03 ",
+        "tick_size": " 0.05 "
+      },
+      "name": "padded_strings"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "price": "100",
+        "tick_size": "0"
+      },
+      "name": "zero_tick_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "price": "100",
+        "tick_size": "-0.05"
+      },
+      "name": "negative_tick_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "price": "abc",
+        "tick_size": "0.05"
+      },
+      "name": "non_numeric_price_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "price": "",
+        "tick_size": "0.05"
+      },
+      "name": "blank_price_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "price": "NaN",
+        "tick_size": "0.05"
+      },
+      "name": "nan_price_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "price": "100",
+        "tick_size": "Infinity"
+      },
+      "name": "infinite_tick_is_an_error"
+    }
+  ],
+  "description": "round_to_tick(price, tick_size): the nearest multiple of the tick, half-way rounding away from zero (ROUND_HALF_UP), written with the tick's decimal places (trailing zeros of the tick ignored). Inputs are strings or JSON numbers (numbers are read through their shortest decimal text). A tick <= 0 or a non-finite or non-numeric input is {\"error\": \"ValueError\"}. expected.result is compared as text.",
+  "source": "tradesmart.round_to_tick",
+  "tolerance": {}
+}

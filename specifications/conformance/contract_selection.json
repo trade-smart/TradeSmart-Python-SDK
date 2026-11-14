@@ -1,0 +1,2615 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "PE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26P24000",
+            "TradingSymbol": "NIFTY26NOV26P24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "BANKNIFTY",
+            "TickSize": "0.05",
+            "Token": "t-BANKNIFTY26NOV26FUT",
+            "TradingSymbol": "BANKNIFTY26NOV26FUT"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_call"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "PE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26P24000",
+        "tradingsymbol": "NIFTY26NOV26P24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "PE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26P24000",
+            "TradingSymbol": "NIFTY26NOV26P24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "BANKNIFTY",
+            "TickSize": "0.05",
+            "Token": "t-BANKNIFTY26NOV26FUT",
+            "TradingSymbol": "BANKNIFTY26NOV26FUT"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26P24000"
+      },
+      "name": "find_put"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "PE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26P24000",
+            "TradingSymbol": "NIFTY26NOV26P24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "BANKNIFTY",
+            "TickSize": "0.05",
+            "Token": "t-BANKNIFTY26NOV26FUT",
+            "TradingSymbol": "BANKNIFTY26NOV26FUT"
+          }
+        ],
+        "tradingsymbol": "nifty26nov26c24000"
+      },
+      "name": "find_is_case_insensitive"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "PE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26P24000",
+            "TradingSymbol": "NIFTY26NOV26P24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "BANKNIFTY",
+            "TickSize": "0.05",
+            "Token": "t-BANKNIFTY26NOV26FUT",
+            "TradingSymbol": "BANKNIFTY26NOV26FUT"
+          }
+        ],
+        "tradingsymbol": "  NIFTY26NOV26C24000  "
+      },
+      "name": "find_trims_the_wanted_symbol"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": " NIFTY26NOV26C24000 "
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_trims_the_row_symbol"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "PE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26P24000",
+            "TradingSymbol": "NIFTY26NOV26P24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "BANKNIFTY",
+            "TickSize": "0.05",
+            "Token": "t-BANKNIFTY26NOV26FUT",
+            "TradingSymbol": "BANKNIFTY26NOV26FUT"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C99999"
+      },
+      "name": "find_not_found"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "PE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26P24000",
+            "TradingSymbol": "NIFTY26NOV26P24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "BANKNIFTY",
+            "TickSize": "0.05",
+            "Token": "t-BANKNIFTY26NOV26FUT",
+            "TradingSymbol": "BANKNIFTY26NOV26FUT"
+          }
+        ],
+        "tradingsymbol": "   "
+      },
+      "name": "find_empty_tradingsymbol"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26FUT"
+      },
+      "name": "find_ignores_future_rows_with_that_name"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTSTK",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_optstk_prefix"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "optidx",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_instrument_prefix_is_case_insensitive"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "1",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "dup",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_first_matching_row_wins"
+    },
+    {
+      "expected": {
+        "exchange": "MCX",
+        "expiry": "2026-11-19",
+        "lot_size": 100,
+        "option_type": "CE",
+        "strike": "6500",
+        "symbol": "CRUDEOIL",
+        "tick_size": "0.1",
+        "token": "t-CRUDEOIL19NOV26C6500",
+        "tradingsymbol": "CRUDEOIL19NOV26C6500"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "MCX",
+            "Expiry": "19-NOV-2026",
+            "Instrument": "OPTFUT",
+            "LotSize": "100",
+            "OptionType": "CE",
+            "StrikePrice": "6500",
+            "Symbol": "CRUDEOIL",
+            "TickSize": "0.1",
+            "Token": "t-CRUDEOIL19NOV26C6500",
+            "TradingSymbol": "CRUDEOIL19NOV26C6500"
+          },
+          {
+            "Exchange": "MCX",
+            "Expiry": "19-NOV-2026",
+            "Instrument": "FUTCOM",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "CRUDEOIL",
+            "TickSize": "0.05",
+            "Token": "t-CRUDEOIL19NOV26FUT",
+            "TradingSymbol": "CRUDEOIL19NOV26FUT"
+          }
+        ],
+        "tradingsymbol": "CRUDEOIL19NOV26C6500"
+      },
+      "name": "find_mcx_option_on_future"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000.50",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000.50",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_decimal_strike"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000.00",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000.00",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_strike_keeps_trailing_zeros"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 75,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "75.5",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_fractional_lot_size_truncates"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": null,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": " ",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_blank_lot_size_is_null"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": null,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_missing_lot_size_is_null"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": null,
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_blank_tick_size_is_null"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": null,
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "abc",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_unparseable_tick_size_is_null"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-nov-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_lowercase_expiry_month"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "ce",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_lowercase_option_type"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "nfo",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_exchange_is_upper_cased"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "abc",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_invalid_lot_size_is_malformed"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "NaN",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_nan_lot_size_is_malformed"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "XX",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_malformed_option_type"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_missing_option_type"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_missing_expiry"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "2026-11-26",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_unparseable_expiry"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": " ",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_blank_symbol"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_missing_strike"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "abc",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_invalid_strike"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "NaN",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_nan_strike"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "XX",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_malformed_first_match_raises_even_if_a_later_row_is_valid"
+    },
+    {
+      "expected": {
+        "expiry": "2026-11-26",
+        "same_expiry": true,
+        "token": "t-NIFTY26NOV26FUT",
+        "tradingsymbol": "NIFTY26NOV26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "PE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26P24000",
+            "TradingSymbol": "NIFTY26NOV26P24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "BANKNIFTY",
+            "TickSize": "0.05",
+            "Token": "t-BANKNIFTY26NOV26FUT",
+            "TradingSymbol": "BANKNIFTY26NOV26FUT"
+          }
+        ]
+      },
+      "name": "select_same_expiry"
+    },
+    {
+      "expected": {
+        "expiry": "2026-12-31",
+        "same_expiry": false,
+        "token": "t-NIFTY31DEC26FUT",
+        "tradingsymbol": "NIFTY31DEC26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "BANKNIFTY",
+            "TickSize": "0.05",
+            "Token": "t-BANKNIFTY26NOV26FUT",
+            "TradingSymbol": "BANKNIFTY26NOV26FUT"
+          }
+        ]
+      },
+      "name": "select_later_when_no_same_expiry"
+    },
+    {
+      "expected": {
+        "expiry": "2026-12-31",
+        "same_expiry": false,
+        "token": "t-NIFTY31DEC26FUT",
+        "tradingsymbol": "NIFTY31DEC26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "28-JAN-2027",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY28JAN27FUT",
+            "TradingSymbol": "NIFTY28JAN27FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          }
+        ]
+      },
+      "name": "select_nearest_later_of_several"
+    },
+    {
+      "expected": {
+        "expiry": "2026-10-29",
+        "same_expiry": false,
+        "token": "t-NIFTY29OCT26FUT",
+        "tradingsymbol": "NIFTY29OCT26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "29-OCT-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY29OCT26FUT",
+            "TradingSymbol": "NIFTY29OCT26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "24-SEP-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY24SEP26FUT",
+            "TradingSymbol": "NIFTY24SEP26FUT"
+          }
+        ]
+      },
+      "name": "select_earlier_when_no_same_or_later"
+    },
+    {
+      "expected": {
+        "expiry": "2026-10-29",
+        "same_expiry": false,
+        "token": "t-NIFTY29OCT26FUT",
+        "tradingsymbol": "NIFTY29OCT26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "24-SEP-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY24SEP26FUT",
+            "TradingSymbol": "NIFTY24SEP26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "29-OCT-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY29OCT26FUT",
+            "TradingSymbol": "NIFTY29OCT26FUT"
+          }
+        ]
+      },
+      "name": "select_nearest_earlier_of_several"
+    },
+    {
+      "expected": {
+        "expiry": "2026-11-26",
+        "same_expiry": true,
+        "token": "t-NIFTY26NOV26FUT",
+        "tradingsymbol": "NIFTY26NOV26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "29-OCT-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY29OCT26FUT",
+            "TradingSymbol": "NIFTY29OCT26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "28-JAN-2027",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY28JAN27FUT",
+            "TradingSymbol": "NIFTY28JAN27FUT"
+          }
+        ]
+      },
+      "name": "select_same_beats_later_and_earlier"
+    },
+    {
+      "expected": {
+        "expiry": "2026-12-31",
+        "same_expiry": false,
+        "token": "t-NIFTY31DEC26FUT",
+        "tradingsymbol": "NIFTY31DEC26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "29-OCT-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY29OCT26FUT",
+            "TradingSymbol": "NIFTY29OCT26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          }
+        ]
+      },
+      "name": "select_later_beats_earlier"
+    },
+    {
+      "expected": {
+        "expiry": "2026-11-26",
+        "same_expiry": true,
+        "token": "t-NIFTY26NOV26FUT",
+        "tradingsymbol": "NIFTY26NOV26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "dup",
+            "TradingSymbol": "DUP"
+          }
+        ]
+      },
+      "name": "select_first_row_wins_among_same_expiry"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "BANKNIFTY",
+            "TickSize": "0.05",
+            "Token": "t-BANKNIFTY26NOV26FUT",
+            "TradingSymbol": "BANKNIFTY26NOV26FUT"
+          }
+        ]
+      },
+      "name": "select_ignores_other_symbols"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "PE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26P24000",
+            "TradingSymbol": "NIFTY26NOV26P24000"
+          }
+        ]
+      },
+      "name": "select_ignores_option_rows"
+    },
+    {
+      "expected": {
+        "expiry": "2026-12-31",
+        "same_expiry": false,
+        "token": "t-NIFTY31DEC26FUT",
+        "tradingsymbol": "NIFTY31DEC26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "BFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          }
+        ]
+      },
+      "name": "select_cross_exchange_future_is_ignored"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "BFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          }
+        ]
+      },
+      "name": "select_only_other_exchange_is_not_found"
+    },
+    {
+      "expected": {
+        "expiry": "2026-11-26",
+        "same_expiry": true,
+        "token": "t-NIFTY26NOV26FUT",
+        "tradingsymbol": "NIFTY26NOV26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "nfo",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "nifty",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          }
+        ]
+      },
+      "name": "select_symbol_and_exchange_are_case_insensitive"
+    },
+    {
+      "expected": {
+        "expiry": "2026-12-31",
+        "same_expiry": false,
+        "token": "t-NIFTY31DEC26FUT",
+        "tradingsymbol": "NIFTY31DEC26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "soon",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          }
+        ]
+      },
+      "name": "select_skips_future_with_unparseable_expiry"
+    },
+    {
+      "expected": {
+        "expiry": "2026-12-31",
+        "same_expiry": false,
+        "token": "t-NIFTY31DEC26FUT",
+        "tradingsymbol": "NIFTY31DEC26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          }
+        ]
+      },
+      "name": "select_skips_future_with_missing_expiry"
+    },
+    {
+      "expected": {
+        "expiry": "2026-12-31",
+        "same_expiry": false,
+        "token": "t-NIFTY31DEC26FUT",
+        "tradingsymbol": "NIFTY31DEC26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": " "
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          }
+        ]
+      },
+      "name": "select_skips_future_with_blank_tradingsymbol"
+    },
+    {
+      "expected": {
+        "expiry": "2026-12-31",
+        "same_expiry": false,
+        "token": "t-NIFTY31DEC26FUT",
+        "tradingsymbol": "NIFTY31DEC26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          }
+        ]
+      },
+      "name": "select_skips_future_with_missing_tradingsymbol"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "soon",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          }
+        ]
+      },
+      "name": "select_all_futures_malformed_is_not_found"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": "NIFTY",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": []
+      },
+      "name": "select_no_rows_is_not_found"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-26",
+          "symbol": " ",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "PE",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26P24000",
+            "TradingSymbol": "NIFTY26NOV26P24000"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26FUT",
+            "TradingSymbol": "NIFTY26NOV26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "31-DEC-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY31DEC26FUT",
+            "TradingSymbol": "NIFTY31DEC26FUT"
+          },
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "BANKNIFTY",
+            "TickSize": "0.05",
+            "Token": "t-BANKNIFTY26NOV26FUT",
+            "TradingSymbol": "BANKNIFTY26NOV26FUT"
+          }
+        ]
+      },
+      "name": "select_blank_option_symbol_is_an_error"
+    },
+    {
+      "expected": {
+        "expiry": "2026-11-19",
+        "same_expiry": true,
+        "token": "t-CRUDEOIL19NOV26FUT",
+        "tradingsymbol": "CRUDEOIL19NOV26FUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "MCX",
+          "expiry": "2026-11-19",
+          "symbol": "CRUDEOIL",
+          "tradingsymbol": "CRUDEOIL19NOV26C6500"
+        },
+        "rows": [
+          {
+            "Exchange": "MCX",
+            "Expiry": "19-NOV-2026",
+            "Instrument": "OPTFUT",
+            "LotSize": "100",
+            "OptionType": "CE",
+            "StrikePrice": "6500",
+            "Symbol": "CRUDEOIL",
+            "TickSize": "0.1",
+            "Token": "t-CRUDEOIL19NOV26C6500",
+            "TradingSymbol": "CRUDEOIL19NOV26C6500"
+          },
+          {
+            "Exchange": "MCX",
+            "Expiry": "19-NOV-2026",
+            "Instrument": "FUTCOM",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "CRUDEOIL",
+            "TickSize": "0.05",
+            "Token": "t-CRUDEOIL19NOV26FUT",
+            "TradingSymbol": "CRUDEOIL19NOV26FUT"
+          }
+        ]
+      },
+      "name": "select_mcx_same_expiry"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "NFO",
+          "expiry": "2026-11-19",
+          "symbol": "CRUDEOIL",
+          "tradingsymbol": "NIFTY26NOV26C24000"
+        },
+        "rows": [
+          {
+            "Exchange": "MCX",
+            "Expiry": "19-NOV-2026",
+            "Instrument": "FUTCOM",
+            "LotSize": "65",
+            "OptionType": "",
+            "StrikePrice": "0",
+            "Symbol": "CRUDEOIL",
+            "TickSize": "0.05",
+            "Token": "t-CRUDEOIL19NOV26FUT",
+            "TradingSymbol": "CRUDEOIL19NOV26FUT"
+          }
+        ]
+      },
+      "name": "select_mcx_future_on_another_exchange_is_ignored"
+    },
+    {
+      "expected": {
+        "exchange": "BFO",
+        "expiry": "2026-11-19",
+        "lot_size": 20,
+        "option_type": "CE",
+        "strike": "85200",
+        "symbol": "BSXOPT",
+        "tick_size": "0.05",
+        "token": "t-SENSEX26N1985200CE",
+        "tradingsymbol": "SENSEX26N1985200CE"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "BFO",
+            "Expiry": "19-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "20",
+            "OptionType": "CE",
+            "Strike": "85200",
+            "Symbol": "BSXOPT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26N1985200CE",
+            "TradingSymbol": "SENSEX26N1985200CE"
+          },
+          {
+            "Exchange": "BFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "20",
+            "OptionType": "",
+            "Strike": "0",
+            "Symbol": "BSXFUT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26NOVFUT",
+            "TradingSymbol": "SENSEX26NOVFUT"
+          }
+        ],
+        "tradingsymbol": "SENSEX26N1985200CE"
+      },
+      "name": "find_bfo_strike_column"
+    },
+    {
+      "expected": {
+        "exchange": "NFO",
+        "expiry": "2026-11-26",
+        "lot_size": 65,
+        "option_type": "CE",
+        "strike": "24000",
+        "symbol": "NIFTY",
+        "tick_size": "0.05",
+        "token": "t-NIFTY26NOV26C24000",
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "65",
+            "OptionType": "CE",
+            "Strike": "25000",
+            "StrikePrice": "24000",
+            "Symbol": "NIFTY",
+            "TickSize": "0.05",
+            "Token": "t-NIFTY26NOV26C24000",
+            "TradingSymbol": "NIFTY26NOV26C24000"
+          }
+        ],
+        "tradingsymbol": "NIFTY26NOV26C24000"
+      },
+      "name": "find_strikeprice_column_wins"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "BFO",
+            "Expiry": "19-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "20",
+            "OptionType": "CE",
+            "Symbol": "BSXOPT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26N1985200CE",
+            "TradingSymbol": "SENSEX26N1985200CE"
+          }
+        ],
+        "tradingsymbol": "SENSEX26N1985200CE"
+      },
+      "name": "find_no_strike_column_is_malformed"
+    },
+    {
+      "expected": {
+        "expiry": "2026-11-26",
+        "same_expiry": false,
+        "token": "t-SENSEX26NOVFUT",
+        "tradingsymbol": "SENSEX26NOVFUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "BFO",
+          "expiry": "2026-11-19",
+          "symbol": "BSXOPT",
+          "tradingsymbol": "SENSEX26N1985200CE"
+        },
+        "rows": [
+          {
+            "Exchange": "BFO",
+            "Expiry": "19-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "20",
+            "OptionType": "CE",
+            "Strike": "85200",
+            "Symbol": "BSXOPT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26N1985200CE",
+            "TradingSymbol": "SENSEX26N1985200CE"
+          },
+          {
+            "Exchange": "BFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "20",
+            "OptionType": "",
+            "Strike": "0",
+            "Symbol": "SX50FUT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX5026NOVFUT",
+            "TradingSymbol": "SENSEX5026NOVFUT"
+          },
+          {
+            "Exchange": "BFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "20",
+            "OptionType": "",
+            "Strike": "0",
+            "Symbol": "BSXFUT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26NOVFUT",
+            "TradingSymbol": "SENSEX26NOVFUT"
+          }
+        ]
+      },
+      "name": "select_bfo_opt_falls_back_to_fut"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "BFO",
+          "expiry": "2026-11-19",
+          "symbol": "SX50OPT",
+          "tradingsymbol": "SENSEX26N1985200CE"
+        },
+        "rows": [
+          {
+            "Exchange": "BFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "20",
+            "OptionType": "",
+            "Strike": "0",
+            "Symbol": "BSXFUT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26NOVFUT",
+            "TradingSymbol": "SENSEX26NOVFUT"
+          }
+        ]
+      },
+      "name": "select_bfo_family_is_kept"
+    },
+    {
+      "expected": {
+        "expiry": "2026-11-26",
+        "same_expiry": false,
+        "token": "t-SENSEX5026NOVFUT",
+        "tradingsymbol": "BSXOPT-FUTROW"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "BFO",
+          "expiry": "2026-11-19",
+          "symbol": "BSXOPT",
+          "tradingsymbol": "SENSEX26N1985200CE"
+        },
+        "rows": [
+          {
+            "Exchange": "BFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "20",
+            "OptionType": "",
+            "Strike": "0",
+            "Symbol": "BSXFUT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26NOVFUT",
+            "TradingSymbol": "SENSEX26NOVFUT"
+          },
+          {
+            "Exchange": "BFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "20",
+            "OptionType": "",
+            "Strike": "0",
+            "Symbol": "BSXOPT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX5026NOVFUT",
+            "TradingSymbol": "BSXOPT-FUTROW"
+          }
+        ]
+      },
+      "name": "select_own_symbol_beats_fallback"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "BFO",
+          "expiry": "2026-11-19",
+          "symbol": "BSXOPT",
+          "tradingsymbol": "SENSEX26N1985200CE"
+        },
+        "rows": [
+          {
+            "Exchange": "NFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "20",
+            "OptionType": "",
+            "Strike": "0",
+            "Symbol": "BSXFUT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26NOVFUT",
+            "TradingSymbol": "SENSEX26NOVFUT"
+          }
+        ]
+      },
+      "name": "select_fallback_other_exchange_is_ignored"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "BFO",
+          "expiry": "2026-11-19",
+          "symbol": "OPT",
+          "tradingsymbol": "SENSEX26N1985200CE"
+        },
+        "rows": [
+          {
+            "Exchange": "BFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "20",
+            "OptionType": "",
+            "Strike": "0",
+            "Symbol": "FUT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26NOVFUT",
+            "TradingSymbol": "SENSEX26NOVFUT"
+          }
+        ]
+      },
+      "name": "select_symbol_opt_alone_is_not_found"
+    },
+    {
+      "expected": {
+        "expiry": "2026-11-26",
+        "same_expiry": false,
+        "token": "t-SENSEX26NOVFUT",
+        "tradingsymbol": "SENSEX26NOVFUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "BFO",
+          "expiry": "2026-11-19",
+          "symbol": " bsxopt ",
+          "tradingsymbol": "SENSEX26N1985200CE"
+        },
+        "rows": [
+          {
+            "Exchange": "BFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "20",
+            "OptionType": "",
+            "Strike": "0",
+            "Symbol": "BSXFUT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26NOVFUT",
+            "TradingSymbol": "SENSEX26NOVFUT"
+          }
+        ]
+      },
+      "name": "select_fallback_symbol_is_trimmed_and_upper_cased"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "find_option",
+        "rows": [
+          {
+            "Exchange": "BFO",
+            "Expiry": "19-NOV-2026",
+            "Instrument": "OPTIDX",
+            "LotSize": "20",
+            "OptionType": "CE",
+            "Strike": "85200",
+            "StrikePrice": "",
+            "Symbol": "BSXOPT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26N1985200CE",
+            "TradingSymbol": "SENSEX26N1985200CE"
+          }
+        ],
+        "tradingsymbol": "SENSEX26N1985200CE"
+      },
+      "name": "find_blank_strikeprice_with_strike_is_malformed"
+    },
+    {
+      "expected": {
+        "expiry": "2026-11-26",
+        "same_expiry": false,
+        "token": "t-SENSEX26NOVFUT",
+        "tradingsymbol": "SENSEX26NOVFUT"
+      },
+      "input": {
+        "function": "select_future",
+        "option": {
+          "exchange": "BFO",
+          "expiry": "2026-11-19",
+          "symbol": "BSXOPT",
+          "tradingsymbol": "SENSEX26N1985200CE"
+        },
+        "rows": [
+          {
+            "Exchange": "BFO",
+            "Expiry": "garbage",
+            "Instrument": "FUTIDX",
+            "LotSize": "20",
+            "OptionType": "",
+            "Strike": "0",
+            "Symbol": "BSXOPT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26NOVFUT",
+            "TradingSymbol": "BAD"
+          },
+          {
+            "Exchange": "BFO",
+            "Expiry": "26-NOV-2026",
+            "Instrument": "FUTIDX",
+            "LotSize": "20",
+            "OptionType": "",
+            "Strike": "0",
+            "Symbol": "BSXFUT",
+            "TickSize": "0.05",
+            "Token": "t-SENSEX26NOVFUT",
+            "TradingSymbol": "SENSEX26NOVFUT"
+          }
+        ]
+      },
+      "name": "select_fallback_when_own_rows_are_unusable"
+    }
+  ],
+  "description": "Script-master rows (all values strings) to option / underlying-future selection. input.function is find_option (rows, tradingsymbol) or select_future (rows, option {exchange, tradingsymbol, symbol, expiry}). Expected is the selected contract (dates YYYY-MM-DD, strike and tick_size as Decimal strings, null for absent) or {\"error\": \"ValueError\"}.",
+  "source": "tradesmart._option_contracts.find_option / select_future",
+  "tolerance": {}
+}

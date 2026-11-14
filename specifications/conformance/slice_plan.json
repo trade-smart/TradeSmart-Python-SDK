@@ -1,0 +1,648 @@
+{
+  "cases": [
+    {
+      "expected": [
+        1755,
+        1755,
+        455
+      ],
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 3965
+      },
+      "name": "nifty_two_full_slices_and_a_remainder"
+    },
+    {
+      "expected": [
+        1755
+      ],
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 1755
+      },
+      "name": "nifty_exactly_one_full_slice"
+    },
+    {
+      "expected": [
+        65
+      ],
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 65
+      },
+      "name": "nifty_one_lot_is_one_slice"
+    },
+    {
+      "expected": [
+        130
+      ],
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 130
+      },
+      "name": "nifty_two_lots_is_one_slice"
+    },
+    {
+      "expected": [
+        20
+      ],
+      "input": {
+        "exchange": "BFO",
+        "freeze_quantity": 1000,
+        "lot_size": 20,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 20
+      },
+      "name": "sensex_option_one_lot_is_one_slice"
+    },
+    {
+      "expected": [
+        300
+      ],
+      "input": {
+        "exchange": "MCX",
+        "freeze_quantity": 2500,
+        "lot_size": 100,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 300
+      },
+      "name": "mcx_three_lots_is_one_slice"
+    },
+    {
+      "expected": [
+        130
+      ],
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": 650,
+        "max_slices": 25,
+        "quantity": 130
+      },
+      "name": "below_max_slice_quantity_is_one_slice"
+    },
+    {
+      "expected": [
+        1000,
+        1000
+      ],
+      "input": {
+        "exchange": "BFO",
+        "freeze_quantity": 1000,
+        "lot_size": 20,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 2000
+      },
+      "name": "sensex_option_slice_equals_the_freeze_quantity"
+    },
+    {
+      "expected": [
+        500,
+        100
+      ],
+      "input": {
+        "exchange": "BFO",
+        "freeze_quantity": 500,
+        "lot_size": 20,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 600
+      },
+      "name": "sensex_future"
+    },
+    {
+      "expected": [
+        2500,
+        2500,
+        1000
+      ],
+      "input": {
+        "exchange": "MCX",
+        "freeze_quantity": 2500,
+        "lot_size": 100,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 6000
+      },
+      "name": "mcx_crudeoil_in_units"
+    },
+    {
+      "expected": [
+        1
+      ],
+      "input": {
+        "exchange": "MCX",
+        "freeze_quantity": 1,
+        "lot_size": 1,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 1
+      },
+      "name": "mcx_gold_one_lot_is_one_slice"
+    },
+    {
+      "expected": [
+        1,
+        1,
+        1
+      ],
+      "input": {
+        "exchange": "MCX",
+        "freeze_quantity": 1,
+        "lot_size": 1,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 3
+      },
+      "name": "mcx_gold_three_lots_one_lot_a_slice"
+    },
+    {
+      "expected": [
+        400,
+        400,
+        200
+      ],
+      "input": {
+        "exchange": "MCX",
+        "freeze_quantity": 2500,
+        "lot_size": 100,
+        "max_slice_quantity": 400,
+        "max_slices": 25,
+        "quantity": 1000
+      },
+      "name": "mcx_max_slice_quantity_in_units"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "MCX",
+        "freeze_quantity": 2500,
+        "lot_size": 100,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 150
+      },
+      "name": "mcx_quantity_not_a_whole_number_of_lots_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "MCX",
+        "freeze_quantity": 2500,
+        "lot_size": 100,
+        "max_slice_quantity": 7,
+        "max_slices": 25,
+        "quantity": 1000
+      },
+      "name": "mcx_max_slice_quantity_not_a_whole_number_of_lots_is_an_error"
+    },
+    {
+      "expected": [
+        1
+      ],
+      "input": {
+        "exchange": "NSE",
+        "freeze_quantity": 350854,
+        "lot_size": 1,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 1
+      },
+      "name": "itc_cash_one_share"
+    },
+    {
+      "expected": [
+        1755
+      ],
+      "input": {
+        "exchange": "nfo",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 1755
+      },
+      "name": "exchange_in_any_case"
+    },
+    {
+      "expected": [
+        650,
+        650,
+        455
+      ],
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": 650,
+        "max_slices": 25,
+        "quantity": 1755
+      },
+      "name": "max_slice_quantity_lowers_the_slice"
+    },
+    {
+      "expected": [
+        1755,
+        65
+      ],
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": 1820,
+        "max_slices": 25,
+        "quantity": 1820
+      },
+      "name": "max_slice_quantity_above_the_freeze_limit_is_ignored"
+    },
+    {
+      "expected": [
+        130,
+        130
+      ],
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": null,
+        "lot_size": 65,
+        "max_slice_quantity": 130,
+        "max_slices": 25,
+        "quantity": 260
+      },
+      "name": "freeze_unknown_with_max_slice_quantity"
+    },
+    {
+      "expected": [
+        130,
+        130,
+        65
+      ],
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 0,
+        "lot_size": 65,
+        "max_slice_quantity": 130,
+        "max_slices": 25,
+        "quantity": 325
+      },
+      "name": "freeze_zero_with_max_slice_quantity"
+    },
+    {
+      "expected": [
+        130,
+        130,
+        65
+      ],
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": -5,
+        "lot_size": 65,
+        "max_slice_quantity": 130,
+        "max_slices": 25,
+        "quantity": 325
+      },
+      "name": "freeze_negative_with_max_slice_quantity"
+    },
+    {
+      "expected": [
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755
+      ],
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 43875
+      },
+      "name": "exactly_max_slices"
+    },
+    {
+      "expected": [
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755,
+        1755
+      ],
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 26,
+        "quantity": 45630
+      },
+      "name": "max_slices_raised"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 0
+      },
+      "name": "quantity_zero_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": -65
+      },
+      "name": "quantity_negative_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 1.5
+      },
+      "name": "quantity_fraction_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": true
+      },
+      "name": "quantity_boolean_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 100
+      },
+      "name": "quantity_not_a_whole_number_of_lots_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 4000
+      },
+      "name": "nifty_4000_is_not_a_whole_number_of_lots"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": null,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 65
+      },
+      "name": "freeze_unknown_without_max_slice_quantity_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 0,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 65
+      },
+      "name": "freeze_zero_without_max_slice_quantity_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": -5,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 65
+      },
+      "name": "freeze_negative_without_max_slice_quantity_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 50,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 65
+      },
+      "name": "freeze_below_one_lot_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "MCX",
+        "freeze_quantity": 50,
+        "lot_size": 100,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 100
+      },
+      "name": "mcx_freeze_below_one_lot_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": 700,
+        "max_slices": 25,
+        "quantity": 1755
+      },
+      "name": "max_slice_quantity_not_a_whole_number_of_lots_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": 0,
+        "max_slices": 25,
+        "quantity": 65
+      },
+      "name": "max_slice_quantity_zero_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 0,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 65
+      },
+      "name": "lot_size_zero_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 25,
+        "quantity": 45630
+      },
+      "name": "more_slices_than_the_default_25_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": 0,
+        "quantity": 65
+      },
+      "name": "max_slices_zero_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "freeze_quantity": 1801,
+        "lot_size": 65,
+        "max_slice_quantity": null,
+        "max_slices": true,
+        "quantity": 65
+      },
+      "name": "max_slices_boolean_is_an_error"
+    }
+  ],
+  "description": "Splitting a sliced order into slices (place_sliced_order, before anything is sent). input.quantity, max_slice_quantity, lot_size, freeze_quantity (GetSecurityInfo frzqty) and the slices are all in trade units on every exchange, MCX included. The largest slice is floor(frzqty / lot) * lot units (a slice may equal frzqty); max_slice_quantity (null: none) lowers it and must be a whole number of lots; a freeze_quantity of null, 0 or negative is unknown, and max_slice_quantity is then required (a frzqty that is not an integer fails the GetSecurityInfo read before planning). expected is the list of slices (as many full slices as fit, then the remainder), or {\"error\": \"ValueError\"} when an argument is invalid (quantity, lot_size, max_slices or max_slice_quantity not an integer >= 1, booleans refused; quantity not a whole number of lots), the largest slice is below one lot, the freeze quantity is unknown without max_slice_quantity, or more than max_slices slices are needed.",
+  "source": "tradesmart._slicing.plan_slices",
+  "tolerance": {}
+}

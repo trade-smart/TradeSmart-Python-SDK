@@ -1,0 +1,417 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "forward": 23965.196527011634
+      },
+      "input": {
+        "function": "carry_adjusted_forward",
+        "future_price": 24200.0,
+        "future_years": 0.2,
+        "option_years": 0.05,
+        "rate": 0.065
+      },
+      "name": "later_future_is_discounted_back"
+    },
+    {
+      "expected": {
+        "forward": 24200.0
+      },
+      "input": {
+        "function": "carry_adjusted_forward",
+        "future_price": 24200.0,
+        "future_years": 0.1,
+        "option_years": 0.1,
+        "rate": 0.065
+      },
+      "name": "same_years_gives_the_future_price"
+    },
+    {
+      "expected": {
+        "forward": 24437.104003712793
+      },
+      "input": {
+        "function": "carry_adjusted_forward",
+        "future_price": 24200.0,
+        "future_years": 0.05,
+        "option_years": 0.2,
+        "rate": 0.065
+      },
+      "name": "earlier_future_is_grown_forward"
+    },
+    {
+      "expected": {
+        "forward": 24200.0
+      },
+      "input": {
+        "function": "carry_adjusted_forward",
+        "future_price": 24200.0,
+        "future_years": 0.5,
+        "option_years": 0.1,
+        "rate": 0.0
+      },
+      "name": "zero_rate_gives_the_future_price"
+    },
+    {
+      "expected": {
+        "forward": 24394.376469203416
+      },
+      "input": {
+        "function": "carry_adjusted_forward",
+        "future_price": 24200.0,
+        "future_years": 0.5,
+        "option_years": 0.1,
+        "rate": -0.02
+      },
+      "name": "negative_rate"
+    },
+    {
+      "expected": {
+        "forward": 90.48374180359595
+      },
+      "input": {
+        "function": "carry_adjusted_forward",
+        "future_price": 100.0,
+        "future_years": 1.0,
+        "option_years": 0.0,
+        "rate": 0.1
+      },
+      "name": "one_year_apart"
+    },
+    {
+      "expected": {
+        "forward": 38.67410234545012
+      },
+      "input": {
+        "function": "carry_adjusted_forward",
+        "future_price": 100.0,
+        "future_years": 2.0,
+        "option_years": 0.1,
+        "rate": 0.5
+      },
+      "name": "high_rate_long_gap"
+    },
+    {
+      "expected": {
+        "forward": 24049.63347835285,
+        "same_expiry_future": false
+      },
+      "input": {
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-12-31",
+        "future_price": 24200.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-26",
+        "rate": 0.065
+      },
+      "name": "nfo_later_expiry_future_carries_back"
+    },
+    {
+      "expected": {
+        "forward": 24200.0,
+        "same_expiry_future": true
+      },
+      "input": {
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-11-26",
+        "future_price": 24200.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-26",
+        "rate": 0.065
+      },
+      "name": "nfo_same_expiry_future_is_used_as_is"
+    },
+    {
+      "expected": {
+        "forward": 24230.185933899164,
+        "same_expiry_future": false
+      },
+      "input": {
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-11-19",
+        "future_price": 24200.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-26",
+        "rate": 0.065
+      },
+      "name": "nfo_earlier_expiry_future_carries_forward"
+    },
+    {
+      "expected": {
+        "forward": 24049.63347835285,
+        "same_expiry_future": false
+      },
+      "input": {
+        "exchange": "BFO",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-12-31",
+        "future_price": 24200.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-26",
+        "rate": 0.065
+      },
+      "name": "bfo_later_expiry_future_carries_back"
+    },
+    {
+      "expected": {
+        "forward": 87.98143617652637,
+        "same_expiry_future": false
+      },
+      "input": {
+        "exchange": "CDS",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-12-29",
+        "future_price": 88.5,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-26",
+        "rate": 0.065
+      },
+      "name": "cds_later_expiry_future_carries_back"
+    },
+    {
+      "expected": {
+        "forward": 6500.0,
+        "same_expiry_future": false
+      },
+      "input": {
+        "exchange": "MCX",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-12-19",
+        "future_price": 6500.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-19",
+        "rate": 0.065
+      },
+      "name": "mcx_later_expiry_future_has_no_carry"
+    },
+    {
+      "expected": {
+        "forward": 6500.0,
+        "same_expiry_future": true
+      },
+      "input": {
+        "exchange": "MCX",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-11-19",
+        "future_price": 6500.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-19",
+        "rate": 0.065
+      },
+      "name": "mcx_same_expiry_future"
+    },
+    {
+      "expected": {
+        "forward": 6500.0,
+        "same_expiry_future": false
+      },
+      "input": {
+        "exchange": "MCX",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-10-19",
+        "future_price": 6500.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-19",
+        "rate": 0.065
+      },
+      "name": "mcx_earlier_expiry_future_has_no_carry"
+    },
+    {
+      "expected": {
+        "forward": 6500.0,
+        "same_expiry_future": false
+      },
+      "input": {
+        "exchange": " mcx ",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-12-19",
+        "future_price": 6500.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-19",
+        "rate": 0.065
+      },
+      "name": "mcx_exchange_is_case_and_space_insensitive"
+    },
+    {
+      "expected": {
+        "forward": 24200.0,
+        "same_expiry_future": false
+      },
+      "input": {
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-12-31",
+        "future_price": 24200.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-26",
+        "rate": 0.0
+      },
+      "name": "nfo_later_expiry_future_zero_rate"
+    },
+    {
+      "expected": {
+        "forward": 24011.974253700137
+      },
+      "input": {
+        "dividend_yield": 0.013,
+        "function": "carry_adjusted_forward",
+        "future_price": 24200.0,
+        "future_years": 0.2,
+        "option_years": 0.05,
+        "rate": 0.065
+      },
+      "name": "dividend_yield_reduces_the_carry"
+    },
+    {
+      "expected": {
+        "forward": 24200.0
+      },
+      "input": {
+        "dividend_yield": 0.065,
+        "function": "carry_adjusted_forward",
+        "future_price": 24200.0,
+        "future_years": 0.2,
+        "option_years": 0.05,
+        "rate": 0.065
+      },
+      "name": "dividend_yield_equal_to_rate_is_no_carry"
+    },
+    {
+      "expected": {
+        "forward": 88.76589864854887
+      },
+      "input": {
+        "dividend_yield": 0.045,
+        "function": "carry_adjusted_forward",
+        "future_price": 88.5,
+        "future_years": 0.05,
+        "option_years": 0.2,
+        "rate": 0.065
+      },
+      "name": "foreign_rate_earlier_future_is_grown_forward"
+    },
+    {
+      "expected": {
+        "forward": 101.20722888660778
+      },
+      "input": {
+        "dividend_yield": 0.05,
+        "function": "carry_adjusted_forward",
+        "future_price": 100.0,
+        "future_years": 0.5,
+        "option_years": 0.1,
+        "rate": 0.02
+      },
+      "name": "dividend_yield_above_rate_reverses_the_carry"
+    },
+    {
+      "expected": {
+        "forward": 24079.6318521742,
+        "same_expiry_future": false
+      },
+      "input": {
+        "dividend_yield": 0.013,
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-12-31",
+        "future_price": 24200.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-26",
+        "rate": 0.065
+      },
+      "name": "nfo_index_option_dividend_yield_carries_back"
+    },
+    {
+      "expected": {
+        "forward": 88.34011719787773,
+        "same_expiry_future": false
+      },
+      "input": {
+        "dividend_yield": 0.045,
+        "exchange": "CDS",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-12-29",
+        "future_price": 88.5,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-26",
+        "rate": 0.065
+      },
+      "name": "cds_foreign_rate_as_dividend_yield_carries_back"
+    },
+    {
+      "expected": {
+        "forward": 24200.0,
+        "same_expiry_future": false
+      },
+      "input": {
+        "dividend_yield": 0.065,
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-12-31",
+        "future_price": 24200.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-26",
+        "rate": 0.065
+      },
+      "name": "nfo_dividend_yield_equal_to_rate_gives_the_future_price"
+    },
+    {
+      "expected": {
+        "forward": 6500.0,
+        "same_expiry_future": false
+      },
+      "input": {
+        "dividend_yield": 0.03,
+        "exchange": "MCX",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-12-19",
+        "future_price": 6500.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-19",
+        "rate": 0.065
+      },
+      "name": "mcx_dividend_yield_has_no_effect"
+    },
+    {
+      "expected": {
+        "forward": 24200.0,
+        "same_expiry_future": true
+      },
+      "input": {
+        "dividend_yield": 0.03,
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-11-26",
+        "future_price": 24200.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-26",
+        "rate": 0.065
+      },
+      "name": "nfo_same_expiry_future_dividend_yield_has_no_effect"
+    }
+  ],
+  "description": "input.function is carry_adjusted_forward (expected {\"forward\"}: F * exp(-(r - q) * (Tf - To))) or option_forward (the Black-76 forward used by option_greeks for a future of another expiry: carried on NFO/BFO/CDS/BCD, used as is on MCX or for a same-expiry future, whatever q). q is the optional input.dividend_yield (absent means 0): the index dividend yield, or the foreign interest rate for currency options. now is an ISO instant in IST.",
+  "source": "tradesmart._option_contracts.carry_adjusted_forward / option_greeks_result",
+  "tolerance": {
+    "abs": 1e-09,
+    "rel": 1e-12
+  }
+}

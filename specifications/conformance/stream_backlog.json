@@ -1,0 +1,930 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "delivered": [
+          {
+            "e": "NSE",
+            "lp": "1",
+            "t": "tf",
+            "tk": "22"
+          },
+          {
+            "e": "NSE",
+            "lp": "2",
+            "t": "tf",
+            "tk": "22"
+          },
+          {
+            "e": "NSE",
+            "lp": "3",
+            "t": "tf",
+            "tk": "22"
+          }
+        ],
+        "merged": 0,
+        "warnings": []
+      },
+      "input": {
+        "limit": 5,
+        "ops": [
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "2",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "3",
+              "t": "tf",
+              "tk": "22"
+            }
+          }
+        ]
+      },
+      "name": "below_the_limit_nothing_merges"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "e": "NSE",
+            "lp": "1",
+            "t": "tf",
+            "tk": "22",
+            "v": "10"
+          },
+          {
+            "e": "NSE",
+            "lp": "3",
+            "t": "tf",
+            "tk": "22",
+            "v": "30"
+          }
+        ],
+        "merged": 2,
+        "warnings": [
+          "merging_started",
+          "caught_up"
+        ]
+      },
+      "input": {
+        "limit": 2,
+        "ops": [
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "22",
+              "v": "10"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "2",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "3",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "t": "tf",
+              "tk": "22",
+              "v": "30"
+            }
+          }
+        ]
+      },
+      "name": "rule_a_merges_into_the_newest_feed_of_the_same_type"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "e": "NSE",
+            "lp": "2",
+            "t": "tf",
+            "tk": "22",
+            "v": "20"
+          },
+          {
+            "bp1": "0.5",
+            "e": "NSE",
+            "lp": "2",
+            "t": "df",
+            "tk": "22",
+            "v": "20"
+          }
+        ],
+        "merged": 1,
+        "warnings": [
+          "merging_started",
+          "caught_up"
+        ]
+      },
+      "input": {
+        "limit": 2,
+        "ops": [
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "bp1": "0.5",
+              "e": "NSE",
+              "lp": "1.5",
+              "t": "df",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "2",
+              "t": "tf",
+              "tk": "22",
+              "v": "20"
+            }
+          }
+        ]
+      },
+      "name": "rule_b_merges_into_the_second_newest_and_copies_shared_fields"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "e": "NSE",
+            "lp": "2",
+            "oi": "900",
+            "pc": "1.2",
+            "t": "tf",
+            "tk": "22"
+          },
+          {
+            "bp1": "0.5",
+            "e": "NSE",
+            "lp": "2",
+            "oi": "900",
+            "pc": "1.2",
+            "t": "df",
+            "tk": "22"
+          }
+        ],
+        "merged": 1,
+        "warnings": [
+          "merging_started",
+          "caught_up"
+        ]
+      },
+      "input": {
+        "limit": 2,
+        "ops": [
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "bp1": "0.5",
+              "e": "NSE",
+              "t": "df",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "2",
+              "oi": "900",
+              "pc": "1.2",
+              "t": "tf",
+              "tk": "22"
+            }
+          }
+        ]
+      },
+      "name": "rule_b_copies_only_fields_the_other_type_can_carry"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "bp1": "1",
+            "e": "NSE",
+            "t": "df",
+            "tk": "22"
+          },
+          {
+            "bp1": "4",
+            "e": "NSE",
+            "t": "df",
+            "tk": "22"
+          },
+          {
+            "bp1": "4",
+            "e": "NSE",
+            "lp": "3",
+            "t": "tf",
+            "tk": "22"
+          }
+        ],
+        "merged": 1,
+        "warnings": [
+          "merging_started",
+          "caught_up"
+        ]
+      },
+      "input": {
+        "limit": 3,
+        "ops": [
+          {
+            "put": {
+              "bp1": "1",
+              "e": "NSE",
+              "t": "df",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "bp1": "2",
+              "e": "NSE",
+              "t": "df",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "3",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "bp1": "4",
+              "e": "NSE",
+              "t": "df",
+              "tk": "22"
+            }
+          }
+        ]
+      },
+      "name": "rule_b_depth_feed_merges_past_a_touchline_feed"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "e": "NSE",
+            "lp": "1",
+            "t": "tf",
+            "tk": "22"
+          },
+          {
+            "e": "NSE",
+            "lp": "1.5",
+            "s": "Ok",
+            "t": "tk",
+            "tk": "22"
+          },
+          {
+            "bp1": "2",
+            "e": "NSE",
+            "t": "df",
+            "tk": "22"
+          },
+          {
+            "e": "NSE",
+            "lp": "3",
+            "t": "tf",
+            "tk": "22"
+          }
+        ],
+        "merged": 0,
+        "warnings": []
+      },
+      "input": {
+        "limit": 1,
+        "ops": [
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1.5",
+              "s": "Ok",
+              "t": "tk",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "bp1": "2",
+              "e": "NSE",
+              "t": "df",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "3",
+              "t": "tf",
+              "tk": "22"
+            }
+          }
+        ]
+      },
+      "name": "no_merge_when_the_second_newest_is_not_a_feed_of_the_same_type"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "e": "NSE",
+            "lp": "1",
+            "t": "tf",
+            "tk": "22"
+          },
+          {
+            "e": "NSE",
+            "lp": "1.5",
+            "s": "Ok",
+            "t": "tk",
+            "tk": "22"
+          },
+          {
+            "e": "NSE",
+            "lp": "2",
+            "t": "tf",
+            "tk": "22"
+          }
+        ],
+        "merged": 0,
+        "warnings": []
+      },
+      "input": {
+        "limit": 1,
+        "ops": [
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1.5",
+              "s": "Ok",
+              "t": "tk",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "2",
+              "t": "tf",
+              "tk": "22"
+            }
+          }
+        ]
+      },
+      "name": "no_merge_across_an_ack"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "bp1": "1",
+            "e": "NSE",
+            "t": "df",
+            "tk": "22"
+          },
+          {
+            "bp1": "1.5",
+            "e": "NSE",
+            "s": "Ok",
+            "t": "dk",
+            "tk": "22"
+          },
+          {
+            "bp1": "2",
+            "e": "NSE",
+            "t": "df",
+            "tk": "22"
+          }
+        ],
+        "merged": 0,
+        "warnings": []
+      },
+      "input": {
+        "limit": 1,
+        "ops": [
+          {
+            "put": {
+              "bp1": "1",
+              "e": "NSE",
+              "t": "df",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "bp1": "1.5",
+              "e": "NSE",
+              "s": "Ok",
+              "t": "dk",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "bp1": "2",
+              "e": "NSE",
+              "t": "df",
+              "tk": "22"
+            }
+          }
+        ]
+      },
+      "name": "no_merge_across_a_depth_ack"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "e": "NSE",
+            "lp": "1",
+            "t": "tf",
+            "tk": "22"
+          },
+          {
+            "e": "NSE",
+            "t": "zz",
+            "tk": "22"
+          },
+          {
+            "e": "NSE",
+            "lp": "2",
+            "t": "tf",
+            "tk": "22"
+          }
+        ],
+        "merged": 0,
+        "warnings": []
+      },
+      "input": {
+        "limit": 1,
+        "ops": [
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "t": "zz",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "2",
+              "t": "tf",
+              "tk": "22"
+            }
+          }
+        ]
+      },
+      "name": "no_merge_across_an_unknown_message_of_the_instrument"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "e": "NSE",
+            "lp": "2",
+            "t": "tf",
+            "tk": "22"
+          },
+          {
+            "norenordno": "1",
+            "status": "OPEN",
+            "t": "om"
+          },
+          {
+            "norenordno": "1",
+            "status": "OPEN",
+            "t": "om"
+          }
+        ],
+        "merged": 1,
+        "warnings": [
+          "merging_started",
+          "caught_up"
+        ]
+      },
+      "input": {
+        "limit": 1,
+        "ops": [
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "norenordno": "1",
+              "status": "OPEN",
+              "t": "om"
+            }
+          },
+          {
+            "put": {
+              "norenordno": "1",
+              "status": "OPEN",
+              "t": "om"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "2",
+              "t": "tf",
+              "tk": "22"
+            }
+          }
+        ]
+      },
+      "name": "order_updates_are_never_merged_and_do_not_block_instrument_merging"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "e": "NSE",
+            "lp": "2",
+            "t": "tf",
+            "tk": "22"
+          },
+          {
+            "e": "NSE",
+            "lp": "20",
+            "t": "tf",
+            "tk": "23"
+          }
+        ],
+        "merged": 2,
+        "warnings": [
+          "merging_started",
+          "caught_up"
+        ]
+      },
+      "input": {
+        "limit": 2,
+        "ops": [
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "10",
+              "t": "tf",
+              "tk": "23"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "2",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "20",
+              "t": "tf",
+              "tk": "23"
+            }
+          }
+        ]
+      },
+      "name": "instruments_merge_separately"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "e": "NSE",
+            "lp": "2",
+            "t": "tf",
+            "tk": "22"
+          },
+          {
+            "e": "BSE",
+            "lp": "5",
+            "t": "tf",
+            "tk": "22"
+          }
+        ],
+        "merged": 1,
+        "warnings": [
+          "merging_started",
+          "caught_up"
+        ]
+      },
+      "input": {
+        "limit": 1,
+        "ops": [
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "BSE",
+              "lp": "5",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "2",
+              "t": "tf",
+              "tk": "22"
+            }
+          }
+        ]
+      },
+      "name": "same_token_on_another_exchange_is_another_instrument"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "lp": "1",
+            "t": "tf"
+          },
+          {
+            "lp": "2",
+            "t": "tf"
+          }
+        ],
+        "merged": 0,
+        "warnings": []
+      },
+      "input": {
+        "limit": 1,
+        "ops": [
+          {
+            "put": {
+              "lp": "1",
+              "t": "tf"
+            }
+          },
+          {
+            "put": {
+              "lp": "2",
+              "t": "tf"
+            }
+          }
+        ]
+      },
+      "name": "feed_without_exchange_and_token_is_never_merged"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "e": "NSE",
+            "lp": "2",
+            "t": "tf",
+            "tk": "22"
+          },
+          {
+            "e": "NSE",
+            "lp": "4",
+            "t": "tf",
+            "tk": "22"
+          }
+        ],
+        "merged": 2,
+        "warnings": [
+          "merging_started",
+          "caught_up",
+          "merging_started",
+          "caught_up"
+        ]
+      },
+      "input": {
+        "limit": 1,
+        "ops": [
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "2",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "take": 1
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "3",
+              "t": "tf",
+              "tk": "22"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "4",
+              "t": "tf",
+              "tk": "22"
+            }
+          }
+        ]
+      },
+      "name": "taken_entries_are_not_merge_targets"
+    },
+    {
+      "expected": {
+        "delivered": [
+          {
+            "e": "NSE",
+            "lp": "2",
+            "t": "tf",
+            "tk": "1"
+          },
+          {
+            "e": "NSE",
+            "lp": "1",
+            "t": "tf",
+            "tk": "2"
+          },
+          {
+            "e": "NSE",
+            "lp": "1",
+            "t": "tf",
+            "tk": "3"
+          },
+          {
+            "e": "NSE",
+            "lp": "1",
+            "t": "tf",
+            "tk": "4"
+          },
+          {
+            "e": "NSE",
+            "lp": "2",
+            "t": "tf",
+            "tk": "4"
+          }
+        ],
+        "merged": 1,
+        "warnings": [
+          "merging_started",
+          "caught_up"
+        ]
+      },
+      "input": {
+        "limit": 4,
+        "ops": [
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "1"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "2"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "3"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "1",
+              "t": "tf",
+              "tk": "4"
+            }
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "2",
+              "t": "tf",
+              "tk": "1"
+            }
+          },
+          {
+            "take": 3
+          },
+          {
+            "put": {
+              "e": "NSE",
+              "lp": "2",
+              "t": "tf",
+              "tk": "4"
+            }
+          }
+        ]
+      },
+      "name": "warnings_when_merging_starts_and_when_caught_up"
+    }
+  ],
+  "description": "The stream's delivery buffer under backpressure. input.limit is stream_backlog_limit; input.ops put a wire message (as received) or take n messages (as the consumer would); the rest is drained at the end. expected.delivered are the wire payloads in delivery order (a merged entry carries the merged fields), merged the number of messages merged into an earlier entry, warnings the backlog WARNINGs in order (merging_started when the first merge happens, caught_up when the backlog falls below half the limit). While >= limit messages wait, a tf / df of an instrument (e, tk) is merged into its newest waiting entry when that is a feed of the same type (rule a), or into its second-newest when that is a feed of the same type and the newest a feed of the other type, copying the fields the newest's type can carry into the newest too (rule b); otherwise it is appended. Acks, order / position updates and unknown messages are never merged, and nothing merges across an entry of the same instrument.",
+  "source": "tradesmart.stream.delivery.DeliveryBuffer",
+  "tolerance": {}
+}

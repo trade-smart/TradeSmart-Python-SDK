@@ -1,0 +1,1495 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 5.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.0
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 6.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 105.0,
+        "years": 0.0
+      },
+      "name": "expired_itm_call"
+    },
+    {
+      "expected": {
+        "delta": 0.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 0.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.0
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 0.5,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 95.0,
+        "years": 0.0
+      },
+      "name": "expired_otm_call"
+    },
+    {
+      "expected": {
+        "delta": -1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 5.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.0
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 6.0,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 95.0,
+        "years": 0.0
+      },
+      "name": "expired_itm_put"
+    },
+    {
+      "expected": {
+        "delta": 0.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 0.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.0
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 0.5,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 105.0,
+        "years": 0.0
+      },
+      "name": "expired_otm_put"
+    },
+    {
+      "expected": {
+        "delta": 0.5,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 0.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.0
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 1.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.0
+      },
+      "name": "expired_atm_call_delta_half"
+    },
+    {
+      "expected": {
+        "delta": -0.5,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 0.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.0
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 1.0,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.0
+      },
+      "name": "expired_atm_put_delta_minus_half"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 5.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": -0.2
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 1.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 105.0,
+        "years": -0.2
+      },
+      "name": "expired_negative_years"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 5.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.0
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 50.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 105.0,
+        "years": 0.0
+      },
+      "name": "expired_price_is_intrinsic_not_the_given_price"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 5.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.0
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": null,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 105.0,
+        "years": 0.0
+      },
+      "name": "expired_without_option_price"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 5.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.0
+      },
+      "input": {
+        "dividend_yield": 0.02,
+        "model": "bsm",
+        "option_price": 6.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 105.0,
+        "years": 0.0
+      },
+      "name": "expired_bsm"
+    },
+    {
+      "expected": {
+        "delta": null,
+        "gamma": null,
+        "iv": null,
+        "price": null,
+        "rho": null,
+        "status": "no_price",
+        "theta": null,
+        "vega": null,
+        "years_to_expiry": 0.0
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 6.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": null,
+        "years": 0.0
+      },
+      "name": "expired_without_underlying_is_no_price"
+    },
+    {
+      "expected": {
+        "delta": 0.5001743816594386,
+        "gamma": 4.547272257931836,
+        "iv": 0.20113433216012014,
+        "price": 0.035,
+        "rho": -6.659056316589914e-09,
+        "status": "near_expiry",
+        "theta": -2.519993605488422,
+        "vega": 0.0017401304580467302,
+        "years_to_expiry": 1.902587519025875e-05
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 0.035,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 1.902587519025875e-05
+      },
+      "name": "near_expiry_ten_minutes"
+    },
+    {
+      "expected": {
+        "delta": 0.5002981511639966,
+        "gamma": 2.6525617681421445,
+        "iv": 0.1994044819075693,
+        "price": 0.06,
+        "rho": -3.413242009132145e-08,
+        "status": "near_expiry",
+        "theta": -1.4448050962366328,
+        "vega": 0.0030089588817762344,
+        "years_to_expiry": 5.688736681887366e-05
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 0.06,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 5.688736681887366e-05
+      },
+      "name": "near_expiry_just_under_thirty_minutes"
+    },
+    {
+      "expected": {
+        "delta": 0.5002981449806101,
+        "gamma": 2.65256170253438,
+        "iv": 0.19907186615307643,
+        "price": 0.06,
+        "rho": -3.424657534246705e-08,
+        "status": "ok",
+        "theta": -1.4399890436328615,
+        "vega": 0.0030139863482288847,
+        "years_to_expiry": 5.7077625570776254e-05
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 0.06,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 5.7077625570776254e-05
+      },
+      "name": "not_near_expiry_exactly_thirty_minutes"
+    },
+    {
+      "expected": {
+        "delta": -0.4993495156242266,
+        "gamma": 4.5404894861973295,
+        "iv": 0.20143475745414346,
+        "price": 0.035,
+        "rho": -9.507220616899287e-06,
+        "status": "near_expiry",
+        "theta": -2.5162327008778598,
+        "vega": 0.001740130133895067,
+        "years_to_expiry": 1.902587519025875e-05
+      },
+      "input": {
+        "dividend_yield": 0.01,
+        "model": "bsm",
+        "option_price": 0.035,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 1.902587519025875e-05
+      },
+      "name": "near_expiry_bsm_put"
+    },
+    {
+      "expected": {
+        "delta": 0.5000549381659095,
+        "gamma": 14.46862742821931,
+        "iv": 0.1998988762494999,
+        "price": 0.011,
+        "rho": -2.0928462709289925e-10,
+        "status": "near_expiry",
+        "theta": -7.91999799091906,
+        "vega": 0.0005502782275064179,
+        "years_to_expiry": 9.512937595129376e-07
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 0.011,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 9.512937595129376e-07
+      },
+      "name": "one_minute_floor_half_a_minute_left"
+    },
+    {
+      "expected": {
+        "delta": 0.5000549381659095,
+        "gamma": 14.46862742821931,
+        "iv": 0.1998988762494999,
+        "price": 0.011,
+        "rho": -2.0928462709289925e-10,
+        "status": "near_expiry",
+        "theta": -7.91999799091906,
+        "vega": 0.0005502782275064179,
+        "years_to_expiry": 1.902587519025875e-06
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 0.011,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 1.902587519025875e-06
+      },
+      "name": "one_minute_floor_exactly_one_minute_left"
+    },
+    {
+      "expected": {
+        "delta": 0.5000549381659095,
+        "gamma": 14.46862742821931,
+        "iv": 0.1998988762494999,
+        "price": 0.011,
+        "rho": -2.0928462709289925e-10,
+        "status": "near_expiry",
+        "theta": -7.91999799091906,
+        "vega": 0.0005502782275064179,
+        "years_to_expiry": 3.1709791983764586e-08
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 0.011,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 3.1709791983764586e-08
+      },
+      "name": "one_minute_floor_one_second_left"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 4.919406594883441,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 4.919406594883441,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 105.0,
+        "years": 0.25
+      },
+      "name": "price_equal_to_discounted_intrinsic_call"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 4.419406594883441,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 4.419406594883441,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 105.0,
+        "years": 0.25
+      },
+      "name": "price_below_discounted_intrinsic_call"
+    },
+    {
+      "expected": {
+        "delta": -1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 4.919406594883441,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 4.919406594883441,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 95.0,
+        "years": 0.25
+      },
+      "name": "price_equal_to_discounted_intrinsic_put"
+    },
+    {
+      "expected": {
+        "delta": -1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 4.419406594883441,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 4.419406594883441,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 95.0,
+        "years": 0.25
+      },
+      "name": "price_below_discounted_intrinsic_put"
+    },
+    {
+      "expected": {
+        "delta": 8.985817069609671e-05,
+        "gamma": 7.55596324046997e-05,
+        "iv": 0.11833312412967739,
+        "price": 0.0001,
+        "rho": -2.5000000000743397e-07,
+        "status": "ok",
+        "theta": -9.25816767529804e-06,
+        "vega": 0.00014305931776861,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 0.0001,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 80.0,
+        "years": 0.25
+      },
+      "name": "tiny_price_far_otm_call_has_an_iv"
+    },
+    {
+      "expected": {
+        "delta": 0.5,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 1e-12,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 1e-12,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "price_below_the_cheapest_model_price_atm_has_no_iv"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 4.94430659488344,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 4.94430659488344,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.05,
+        "underlying": 105.0,
+        "years": 0.25
+      },
+      "name": "half_tick_rule_price_within_half_a_tick_of_intrinsic"
+    },
+    {
+      "expected": {
+        "delta": 0.9589617465748891,
+        "gamma": 0.022035363686007683,
+        "iv": 0.05025193016409113,
+        "price": 4.944506594883441,
+        "rho": -0.012361266487208589,
+        "status": "ok",
+        "theta": 4.013744949910953e-05,
+        "vega": 0.030520495292282315,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 4.944506594883441,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.05,
+        "underlying": 105.0,
+        "years": 0.25
+      },
+      "name": "half_tick_rule_price_just_beyond_half_a_tick"
+    },
+    {
+      "expected": {
+        "delta": 0.9429923633535742,
+        "gamma": 0.029340260803321385,
+        "iv": 0.056776247762238094,
+        "price": 4.9694065948834405,
+        "rho": -0.01242351648720863,
+        "status": "ok",
+        "theta": -0.0005434478423279516,
+        "vega": 0.04591443708119522,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 4.9694065948834405,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.05,
+        "underlying": 105.0,
+        "years": 0.25
+      },
+      "name": "half_tick_rule_price_beyond_half_a_tick_is_ok"
+    },
+    {
+      "expected": {
+        "delta": 0.9591081933867551,
+        "gamma": 0.021955507779202604,
+        "iv": 0.050186238586062554,
+        "price": 4.94430659488344,
+        "rho": -0.012360766487208573,
+        "status": "ok",
+        "theta": 4.5335201341235844e-05,
+        "vega": 0.030370136193323724,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 4.94430659488344,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 105.0,
+        "years": 0.25
+      },
+      "name": "half_tick_rule_not_applied_without_a_tick"
+    },
+    {
+      "expected": {
+        "delta": 0.9591081933867551,
+        "gamma": 0.021955507779202604,
+        "iv": 0.050186238586062554,
+        "price": 4.94430659488344,
+        "rho": -0.012360766487208573,
+        "status": "ok",
+        "theta": 4.5335201341235844e-05,
+        "vega": 0.030370136193323724,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 4.94430659488344,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": -1.0,
+        "underlying": 105.0,
+        "years": 0.25
+      },
+      "name": "half_tick_rule_negative_tick_is_ignored"
+    },
+    {
+      "expected": {
+        "delta": -1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 4.94430659488344,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 4.94430659488344,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.05,
+        "underlying": 95.0,
+        "years": 0.25
+      },
+      "name": "half_tick_rule_put"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 6.098178417562901,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.02,
+        "model": "bsm",
+        "option_price": 6.098178417562901,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.05,
+        "underlying": 105.0,
+        "years": 0.25
+      },
+      "name": "half_tick_rule_bsm_uses_the_dividend_discounted_spot"
+    },
+    {
+      "expected": {
+        "delta": 0.5,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 120.0,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 120.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "price_above_the_forward_has_no_iv"
+    },
+    {
+      "expected": {
+        "delta": null,
+        "gamma": null,
+        "iv": null,
+        "price": null,
+        "rho": null,
+        "status": "no_price",
+        "theta": null,
+        "vega": null,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": null,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "no_price_none"
+    },
+    {
+      "expected": {
+        "delta": null,
+        "gamma": null,
+        "iv": null,
+        "price": null,
+        "rho": null,
+        "status": "no_price",
+        "theta": null,
+        "vega": null,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 0.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "no_price_zero"
+    },
+    {
+      "expected": {
+        "delta": null,
+        "gamma": null,
+        "iv": null,
+        "price": null,
+        "rho": null,
+        "status": "no_price",
+        "theta": null,
+        "vega": null,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": -2.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "no_price_negative"
+    },
+    {
+      "expected": {
+        "delta": null,
+        "gamma": null,
+        "iv": null,
+        "price": null,
+        "rho": null,
+        "status": "no_price",
+        "theta": null,
+        "vega": null,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": null,
+        "years": 0.25
+      },
+      "name": "no_price_underlying_none"
+    },
+    {
+      "expected": {
+        "delta": null,
+        "gamma": null,
+        "iv": null,
+        "price": null,
+        "rho": null,
+        "status": "no_price",
+        "theta": null,
+        "vega": null,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 0.0,
+        "years": 0.25
+      },
+      "name": "no_price_underlying_zero"
+    },
+    {
+      "expected": {
+        "delta": null,
+        "gamma": null,
+        "iv": null,
+        "price": null,
+        "rho": null,
+        "status": "no_price",
+        "theta": null,
+        "vega": null,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": -5.0,
+        "years": 0.25
+      },
+      "name": "no_price_underlying_negative"
+    },
+    {
+      "expected": {
+        "delta": null,
+        "gamma": null,
+        "iv": null,
+        "price": null,
+        "rho": null,
+        "status": "no_price",
+        "theta": null,
+        "vega": null,
+        "years_to_expiry": -1.0
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": null,
+        "years": -1.0
+      },
+      "name": "no_price_checked_before_expiry_for_the_underlying"
+    },
+    {
+      "expected": {
+        "delta": 0.5069406594883438,
+        "gamma": 0.05130518718887926,
+        "iv": 0.15289885022896121,
+        "price": 3.0,
+        "rho": -0.007500000000000018,
+        "status": "ok",
+        "theta": -0.0158961049642906,
+        "vega": 0.1961126032990318,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "ok_atm_call"
+    },
+    {
+      "expected": {
+        "delta": -0.22795042038591104,
+        "gamma": 0.041365741675712955,
+        "iv": 0.23030885407544063,
+        "price": 1.0,
+        "rho": -0.0009999999999999966,
+        "status": "ok",
+        "theta": -0.02987847438893336,
+        "vega": 0.0952689656331415,
+        "years_to_expiry": 0.1
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 1.0,
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 95.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.1
+      },
+      "name": "ok_otm_put"
+    },
+    {
+      "expected": {
+        "delta": 0.5659457091225367,
+        "gamma": 0.045189823724387124,
+        "iv": 0.17306459617019815,
+        "price": 4.0,
+        "rho": 0.1314864272806342,
+        "status": "ok",
+        "theta": -0.02480613104112159,
+        "vega": 0.19551896484658746,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.02,
+        "model": "bsm",
+        "option_price": 4.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "ok_bsm_call_with_yield"
+    },
+    {
+      "expected": {
+        "delta": 0.5162515638028976,
+        "gamma": 0.05326757136054237,
+        "iv": 0.15005736100671713,
+        "price": 3.0,
+        "rho": -0.0075,
+        "status": "ok",
+        "theta": -0.01651283801826417,
+        "vega": 0.19982977963999937,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": -0.01,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "ok_negative_rate"
+    },
+    {
+      "expected": {
+        "delta": 0.515,
+        "gamma": 0.05300164887571311,
+        "iv": 0.15043315064502347,
+        "price": 3.0,
+        "rho": -0.0075,
+        "status": "ok",
+        "theta": -0.01643060758033919,
+        "vega": 0.1993301257438697,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.0,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "ok_zero_rate"
+    },
+    {
+      "expected": {
+        "delta": 0.5,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 1e+300,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 1e+300,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 1e+308,
+        "tick_size": 0.0,
+        "underlying": 1e+308,
+        "years": 0.25
+      },
+      "name": "absurd_huge_underlying_and_strike"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 1e-300,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 1e-300,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 1e-300,
+        "tick_size": 0.0,
+        "underlying": 1e-290,
+        "years": 0.25
+      },
+      "name": "absurd_tiny_strike_and_underlying"
+    },
+    {
+      "expected": {
+        "delta": 0.5,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 1e+300,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 1e+300,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "absurd_huge_price_has_no_iv"
+    },
+    {
+      "expected": {
+        "delta": 0.5,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 50.0,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 1000000.0
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 50.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 1000000.0
+      },
+      "name": "absurd_very_large_years"
+    },
+    {
+      "expected": {
+        "delta": 0.4969406594883437,
+        "gamma": 1.5404889129298808e-14,
+        "iv": 0.05095525286035276,
+        "price": 10000000000000.0,
+        "rho": -25000000000.0,
+        "status": "ok",
+        "theta": -53010734724.1833,
+        "vega": 1962400052172.8008,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 10000000000000.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 1000000000000000.0,
+        "tick_size": 0.0,
+        "underlying": 1000000000000000.0,
+        "years": 0.25
+      },
+      "name": "absurd_huge_atm_future_with_a_normal_price"
+    },
+    {
+      "expected": {
+        "delta": 0.6869406594883437,
+        "gamma": 0.0033032081773403943,
+        "iv": 2.076860528967173,
+        "price": 39.0,
+        "rho": -0.09749999999999996,
+        "status": "ok",
+        "theta": -0.18823139531520608,
+        "vega": 0.17150756706199657,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 39.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "absurd_price_needing_a_very_high_volatility"
+    },
+    {
+      "expected": {
+        "delta": 0.4919504722847686,
+        "gamma": 785023713828.5383,
+        "iv": 0.0001,
+        "price": 1e-10,
+        "rho": -4.906398212456727e-16,
+        "status": "ok",
+        "theta": -1.0404252645530826e-15,
+        "vega": 1.9625592845713458e-11,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 1e-10,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 1e-08,
+        "tick_size": 0.0,
+        "underlying": 1e-08,
+        "years": 0.25
+      },
+      "name": "absurd_micro_underlying_atm"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 1e-300,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 1e-300,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 1.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "absurd_tiny_price_deep_otm"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 1000000001.0,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 1000000001.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 1000000100.0,
+        "years": 0.25
+      },
+      "name": "absurd_deep_itm_with_a_time_value_price"
+    },
+    {
+      "expected": {
+        "delta": 0.5,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 3.0,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 50.0,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "absurd_huge_rate"
+    },
+    {
+      "expected": {
+        "delta": 0.5,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 3.0,
+        "rho": 0.0,
+        "status": "price_at_or_below_intrinsic",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": -50.0,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "absurd_very_negative_rate"
+    },
+    {
+      "expected": {
+        "delta": 0.0,
+        "gamma": 0.0,
+        "iv": 0.0001,
+        "price": 1e-09,
+        "rho": -0.0,
+        "status": "ok",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": 0.25
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 1e-09,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 1000000000000.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "absurd_strike_far_above_underlying"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 0.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "error_zero_strike"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": -100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "error_negative_strike"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "XX",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "error_invalid_option_type"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "heston",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "error_invalid_model"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "XX",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": null,
+        "years": 0.25
+      },
+      "name": "error_option_type_is_checked_before_a_missing_underlying"
+    }
+  ],
+  "description": "greeks_from_price status rules: expired, near_expiry (< 30 minutes), price_at_or_below_intrinsic (including the half-tick rule), no_price, the one-minute floor on time to expiry, and absurd inputs. Every value is finite or null.",
+  "source": "tradesmart.greeks.greeks_from_price",
+  "tolerance": {
+    "abs": 1e-06,
+    "rel": 1e-06
+  }
+}

@@ -1,0 +1,460 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "max": 0.5,
+        "min": 0.25
+      },
+      "input": {
+        "attempt": 0,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": null
+      },
+      "name": "delay_attempt_0_default_backoff"
+    },
+    {
+      "expected": {
+        "max": 1.0,
+        "min": 0.5
+      },
+      "input": {
+        "attempt": 1,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": null
+      },
+      "name": "delay_attempt_1_default_backoff"
+    },
+    {
+      "expected": {
+        "max": 2.0,
+        "min": 1.0
+      },
+      "input": {
+        "attempt": 2,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": null
+      },
+      "name": "delay_attempt_2_default_backoff"
+    },
+    {
+      "expected": {
+        "max": 4.0,
+        "min": 2.0
+      },
+      "input": {
+        "attempt": 3,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": null
+      },
+      "name": "delay_attempt_3_default_backoff"
+    },
+    {
+      "expected": {
+        "max": 8.0,
+        "min": 4.0
+      },
+      "input": {
+        "attempt": 4,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": null
+      },
+      "name": "delay_attempt_4_default_backoff"
+    },
+    {
+      "expected": {
+        "max": 8.0,
+        "min": 4.0
+      },
+      "input": {
+        "attempt": 5,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": null
+      },
+      "name": "delay_attempt_5_default_backoff"
+    },
+    {
+      "expected": {
+        "max": 2.0,
+        "min": 2.0
+      },
+      "input": {
+        "attempt": 0,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": 2.0
+      },
+      "name": "delay_retry_after_is_used_without_jitter"
+    },
+    {
+      "expected": {
+        "max": 0.0,
+        "min": 0.0
+      },
+      "input": {
+        "attempt": 1,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": 0.0
+      },
+      "name": "delay_retry_after_zero"
+    },
+    {
+      "expected": {
+        "max": 0.25,
+        "min": 0.25
+      },
+      "input": {
+        "attempt": 0,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": 0.25
+      },
+      "name": "delay_retry_after_fraction"
+    },
+    {
+      "expected": {
+        "max": 8.0,
+        "min": 8.0
+      },
+      "input": {
+        "attempt": 0,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": 120.0
+      },
+      "name": "delay_retry_after_is_capped"
+    },
+    {
+      "expected": {
+        "max": 0.0,
+        "min": 0.0
+      },
+      "input": {
+        "attempt": 0,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": -5
+      },
+      "name": "delay_retry_after_negative_is_zero"
+    },
+    {
+      "expected": {
+        "max": 0.5,
+        "min": 0.25
+      },
+      "input": {
+        "attempt": 0,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": "NaN"
+      },
+      "name": "delay_retry_after_nan_is_ignored"
+    },
+    {
+      "expected": {
+        "max": 0.5,
+        "min": 0.25
+      },
+      "input": {
+        "attempt": 0,
+        "base": 0.5,
+        "cap": 8.0,
+        "function": "delay",
+        "retry_after": "Infinity"
+      },
+      "name": "delay_retry_after_infinity_is_ignored"
+    },
+    {
+      "expected": {
+        "max": 5.0,
+        "min": 2.5
+      },
+      "input": {
+        "attempt": 3,
+        "base": 1.0,
+        "cap": 5.0,
+        "function": "delay",
+        "retry_after": null
+      },
+      "name": "delay_custom_base_and_cap"
+    },
+    {
+      "expected": {
+        "retry": false
+      },
+      "input": {
+        "attempt": 0,
+        "error": "APIError",
+        "function": "should_retry",
+        "max_retries": 2,
+        "state_changing": false
+      },
+      "name": "should_retry_read_APIError"
+    },
+    {
+      "expected": {
+        "retry": false
+      },
+      "input": {
+        "attempt": 0,
+        "error": "AuthenticationError",
+        "function": "should_retry",
+        "max_retries": 2,
+        "state_changing": false
+      },
+      "name": "should_retry_read_AuthenticationError"
+    },
+    {
+      "expected": {
+        "retry": true
+      },
+      "input": {
+        "attempt": 0,
+        "error": "NetworkError",
+        "function": "should_retry",
+        "max_retries": 2,
+        "state_changing": false
+      },
+      "name": "should_retry_read_NetworkError"
+    },
+    {
+      "expected": {
+        "retry": false
+      },
+      "input": {
+        "attempt": 0,
+        "error": "NotFoundError",
+        "function": "should_retry",
+        "max_retries": 2,
+        "state_changing": false
+      },
+      "name": "should_retry_read_NotFoundError"
+    },
+    {
+      "expected": {
+        "retry": true
+      },
+      "input": {
+        "attempt": 0,
+        "error": "RateLimitError",
+        "function": "should_retry",
+        "max_retries": 2,
+        "state_changing": false
+      },
+      "name": "should_retry_read_RateLimitError"
+    },
+    {
+      "expected": {
+        "retry": true
+      },
+      "input": {
+        "attempt": 0,
+        "error": "RequestTimeoutError",
+        "function": "should_retry",
+        "max_retries": 2,
+        "state_changing": false
+      },
+      "name": "should_retry_read_RequestTimeoutError"
+    },
+    {
+      "expected": {
+        "retry": false
+      },
+      "input": {
+        "attempt": 0,
+        "error": "ResponseParseError",
+        "function": "should_retry",
+        "max_retries": 2,
+        "state_changing": false
+      },
+      "name": "should_retry_read_ResponseParseError"
+    },
+    {
+      "expected": {
+        "retry": true
+      },
+      "input": {
+        "attempt": 0,
+        "error": "ServerError",
+        "function": "should_retry",
+        "max_retries": 2,
+        "state_changing": false
+      },
+      "name": "should_retry_read_ServerError"
+    },
+    {
+      "expected": {
+        "retry": false
+      },
+      "input": {
+        "attempt": 0,
+        "error": "NetworkError",
+        "function": "should_retry",
+        "max_retries": 2,
+        "state_changing": true
+      },
+      "name": "should_retry_state_changing_never"
+    },
+    {
+      "expected": {
+        "retry": true
+      },
+      "input": {
+        "attempt": 1,
+        "error": "NetworkError",
+        "function": "should_retry",
+        "max_retries": 2,
+        "state_changing": false
+      },
+      "name": "should_retry_last_allowed_attempt"
+    },
+    {
+      "expected": {
+        "retry": false
+      },
+      "input": {
+        "attempt": 2,
+        "error": "NetworkError",
+        "function": "should_retry",
+        "max_retries": 2,
+        "state_changing": false
+      },
+      "name": "should_retry_attempts_exhausted"
+    },
+    {
+      "expected": {
+        "retry": false
+      },
+      "input": {
+        "attempt": 0,
+        "error": "NetworkError",
+        "function": "should_retry",
+        "max_retries": 0,
+        "state_changing": false
+      },
+      "name": "should_retry_max_retries_zero"
+    },
+    {
+      "expected": {
+        "retry_after": 3.0
+      },
+      "input": {
+        "function": "retry_after_header",
+        "header": "3",
+        "http_status": 429
+      },
+      "name": "retry_after_header_seconds"
+    },
+    {
+      "expected": {
+        "retry_after": 1.5
+      },
+      "input": {
+        "function": "retry_after_header",
+        "header": "1.5",
+        "http_status": 429
+      },
+      "name": "retry_after_header_fraction"
+    },
+    {
+      "expected": {
+        "retry_after": 2.0
+      },
+      "input": {
+        "function": "retry_after_header",
+        "header": " 2 ",
+        "http_status": 429
+      },
+      "name": "retry_after_header_padded"
+    },
+    {
+      "expected": {
+        "retry_after": null
+      },
+      "input": {
+        "function": "retry_after_header",
+        "header": "Wed, 21 Oct 2026 07:28:00 GMT",
+        "http_status": 429
+      },
+      "name": "retry_after_header_http_date_is_ignored"
+    },
+    {
+      "expected": {
+        "retry_after": null
+      },
+      "input": {
+        "function": "retry_after_header",
+        "header": null,
+        "http_status": 429
+      },
+      "name": "retry_after_header_missing"
+    },
+    {
+      "expected": {
+        "retry_after": null
+      },
+      "input": {
+        "function": "retry_after_header",
+        "header": "3",
+        "http_status": 200
+      },
+      "name": "retry_after_header_ignored_without_429"
+    },
+    {
+      "expected": {
+        "retry_after": -5.0
+      },
+      "input": {
+        "function": "retry_after_header",
+        "header": "-5",
+        "http_status": 429
+      },
+      "name": "retry_after_header_negative_is_kept"
+    },
+    {
+      "expected": {
+        "retry_after": null
+      },
+      "input": {
+        "function": "retry_after_header",
+        "header": "nan",
+        "http_status": 429
+      },
+      "name": "retry_after_header_nan_is_ignored"
+    },
+    {
+      "expected": {
+        "retry_after": null
+      },
+      "input": {
+        "function": "retry_after_header",
+        "header": "inf",
+        "http_status": 429
+      },
+      "name": "retry_after_header_inf_is_ignored"
+    }
+  ],
+  "description": "Retries of reads. delay: attempt is 0-based (the delay before the 2nd call is attempt 0); without retry_after the delay is min(cap, base * 2^attempt) times a uniform random factor in [0.5, 1): expected.min is the factor 0.5, expected.max the exclusive upper bound; with a finite retry_after (seconds) it is max(0, min(cap, retry_after)) with no jitter (min = max); a non-finite retry_after (the strings NaN / Infinity in input) is ignored and the backoff applies. should_retry: true only for a read (state_changing false) whose error is NetworkError, RequestTimeoutError, RateLimitError or ServerError, while attempt < max_retries. retry_after_header: a finite numeric Retry-After header (seconds, sign kept) on an HTTP 429 RateLimitError sets retry_after; anything else (an HTTP date, nan, inf, another status) leaves null.",
+  "source": "tradesmart._transport.retry.RetryPolicy / tradesmart._transport.sync_http.apply_retry_after",
+  "tolerance": {
+    "abs": 1e-12
+  }
+}
