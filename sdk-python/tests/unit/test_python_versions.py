@@ -78,3 +78,10 @@ def test_github_workflow_tests_every_supported_version() -> None:
     matrix = re.search(r"python-version: \[([^\]]*)\]", workflow)
     assert matrix is not None
     assert [v.strip().strip('"') for v in matrix.group(1).split(",")] == SUPPORTED
+
+
+def test_github_workflow_tests_every_supported_operating_system() -> None:
+    # The SDK supports Linux, Windows and macOS (token file location and permissions differ).
+    workflow = (REPO / ".github" / "workflows" / "python-ci.yml").read_text(encoding="utf-8")
+    for os_label in ("ubuntu-latest", "windows-latest", "macos-latest"):
+        assert os_label in workflow, os_label

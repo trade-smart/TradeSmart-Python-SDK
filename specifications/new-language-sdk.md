@@ -16,6 +16,9 @@ The Python SDK (`sdk-python/`) is the reference implementation. For a new langua
   loads it. Some vectors drive the real client through an in-memory HTTP transport
   (`read_payloads`, `outcome_words`, `transport_failures`, `script_master_freshness`); their README
   notes say how.
+- Run the CI on Linux, Windows and macOS from the start, and keep the tests independent of the
+  operating system (home folder, platform-specific output, signals, floating-point tolerance,
+  helper threads): spec §14, "Operating systems". Docker on Linux alone hides these failures.
 - Keep a public `sdk-<lang>/.gitignore` of its own (paths anchored to that folder), so package
   builds never pick up the monorepo root's ignore file.
 - Follow the same safety rules: no retries on order calls (`PlaceOrder`, `PlaceMultiOrder`,

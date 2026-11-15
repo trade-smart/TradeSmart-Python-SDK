@@ -585,3 +585,13 @@ def test_ci_actions_run_on_a_supported_node() -> None:
     assert {name for name, _ in used} == set(floor)
     old = [f"{name}@v{major}" for name, major in used if int(major) < floor[name]]
     assert old == []
+
+
+def test_shared_specs_require_every_sdk_to_test_on_linux_windows_and_macos() -> None:
+    spec = (REPO_DIR / "specifications" / "sdk-behaviour.md").read_text(encoding="utf-8")
+    rows = [line for line in spec.splitlines() if line.startswith("| Operating systems |")]
+    assert len(rows) == 1, "sdk-behaviour.md lacks the Operating systems row"
+    for needle in ("Linux", "Windows", "macOS", "USERPROFILE", "relative tolerance", "thread"):
+        assert needle in rows[0], needle
+    guide = (REPO_DIR / "specifications" / "new-language-sdk.md").read_text(encoding="utf-8")
+    assert "Linux, Windows and macOS" in guide and "Operating systems" in guide
