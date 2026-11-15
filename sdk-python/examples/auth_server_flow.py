@@ -38,7 +38,7 @@ import webbrowser
 from collections.abc import Sequence
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-from socketserver import ThreadingMixIn
+from socketserver import TCPServer, ThreadingMixIn
 from typing import Any, cast
 from urllib.parse import parse_qs, urlparse
 
@@ -63,6 +63,13 @@ class _CallbackServer(ThreadingMixIn, HTTPServer):
         self.code_lock = threading.Lock()
         self.claimed = False  # the first valid code wins
         super().__init__(*args, **kwargs)
+
+    def server_bind(self) -> None:
+        """Bind without HTTPServer's reverse-DNS lookup of the host, which can stall for seconds."""
+        TCPServer.server_bind(self)
+        host, port = self.server_address[:2]
+        self.server_name = str(host)
+        self.server_port = int(port)
 
     def handle_error(self, request: Any, client_address: Any) -> None:
         """Stay silent: a browser closing its connection early is not worth a traceback."""

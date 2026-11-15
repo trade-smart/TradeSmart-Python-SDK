@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import asyncio
+import http.server
 import importlib
 import importlib.util
 import inspect
@@ -16,6 +17,7 @@ import threading
 import time
 import urllib.error
 import urllib.request
+from collections.abc import Callable
 from pathlib import Path
 from types import ModuleType
 
@@ -24,6 +26,7 @@ import pytest
 import respx
 
 import tradesmart
+import tradesmart._cli
 from tests._public_tree import BROKER_RE, FORBIDDEN_RE, ROOT_ONLY_SKIPPED, internal_references
 from tests.conftest import BASE, fixture
 from tradesmart.testing import OfflineBroker
@@ -1804,3 +1807,25 @@ def test_both_readmes_share_one_quick_start() -> None:
     assert snippet in root and snippet in sdk
     assert root.count("*illustrative*") >= 1
     assert "print(client.profile().user_id)" in root and "print(client.profile().user_id)" in sdk
+
+
+@pytest.mark.parametrize(
+    "server_class",
+    [
+        pytest.param(lambda: _load_example("auth_server_flow.py")._CallbackServer, id="example"),
+        pytest.param(lambda: tradesmart._cli._CallbackServer, id="cli"),
+    ],
+)
+def test_callback_servers_skip_the_reverse_dns_lookup(
+    server_class: Callable[[], type], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """HTTPServer resolves the host's full name on bind, which stalls for seconds on macOS."""
+    looked_up: list[str] = []
+    monkeypatch.setattr(socket, "getfqdn", lambda name="": looked_up.append(name) or name)
+    cls = server_class()
+    server = cls(("127.0.0.1", 0), http.server.BaseHTTPRequestHandler)
+    try:
+        assert looked_up == []
+        assert server.server_name == "127.0.0.1"
+    finally:
+        server.server_close()

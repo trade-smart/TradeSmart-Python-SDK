@@ -309,7 +309,9 @@ are described relative to the 0.2.0 preview. Default `User-Agent`: `tradesmart-p
 - `examples/auth_server_flow.py` refuses, saving nothing, a token whose `uid` or `actid` is not
   `TRADESMART_CLIENT_ID` (TradeSmart's OAuth has no `state`). Its callback server serves each
   connection in its own thread with a 10 s timeout, so an idle browser pre-connect cannot block
-  the login; it answers 404 outside `/callback` and keeps only the first code.
+  the login; it answers 404 outside `/callback` and keeps only the first code. Its server also
+  skips the reverse-DNS lookup of the host when it starts (as the login command does), which
+  could delay it by several seconds on macOS.
 - Docs: `SECURITY.md` gives the leaked-key procedure (remove the app on the API Dashboard, create
   a new one, update your environment variables or `.env`, log in again); *Your first order in 10
   minutes* builds one `first_order.py` (the second "whole script" is gone; the fuller version is
