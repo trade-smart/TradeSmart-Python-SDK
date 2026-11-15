@@ -76,7 +76,8 @@ def test_root_readme_is_a_short_python_landing_page() -> None:
     text = (REPO_DIR / "README.md").read_text(encoding="utf-8")
     assert len(text.splitlines()) <= 60
     assert "Planned" not in text and "| SDK |" not in text
-    assert "#subdirectory=sdk-python" in text and "python -m tradesmart login" in text
+    assert "pip install tradesmart" in text and "python -m tradesmart login" in text
+    assert "https://signup.tradesmartonline.in/?utm_source=PythonSDK" in text
     for link in (
         "sdk-python/docs/getting-started.md",
         "sdk-python/docs/README.md",

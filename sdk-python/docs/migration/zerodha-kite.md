@@ -19,7 +19,7 @@ instance. Every method shown on `TradeSmart` exists with the same parameters on
 2. Install the SDK (Python 3.11+):
 
    ```bash
-   pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"
+   pip install tradesmart
    ```
 
 3. Log in once per trading day (tokens are valid until 06:00 IST); the token is saved for your

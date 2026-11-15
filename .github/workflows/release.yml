@@ -1,0 +1,65 @@
+name: Release to PyPI
+
+# Publishing a GitHub Release "vX.Y.Z" builds that tag and uploads it to PyPI. A manual run does the
+# same for an existing tag. The upload waits for a reviewer to approve the "pypi" environment, and
+# uses PyPI Trusted Publishing: no PyPI token is stored in this repository.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish, for example v2.0.0"
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-pypi
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+    defaults:
+      run:
+        working-directory: sdk-python
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ env.TAG }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Check the tag matches the package version
+        run: |
+          version=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' src/tradesmart/_version.py)
+          if [ "v$version" != "$TAG" ]; then
+            echo "::error::Tag $TAG does not match the package version $version"
+            exit 1
+          fi
+      - run: pip install build twine
+      - run: python -m build
+      - run: twine check dist/*
+      - uses: actions/upload-artifact@v7
+        with:
+          name: python-dist
+          path: sdk-python/dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/tradesmart
+    permissions:
+      id-token: write # Trusted Publishing
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: python-dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

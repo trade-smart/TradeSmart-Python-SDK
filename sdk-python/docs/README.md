@@ -16,7 +16,7 @@ the [SDK reference](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/ma
    `http://127.0.0.1:8080/callback`. The dashboard shows an **App ID**:
    that is the **App Key** of this SDK. Details: [step 1 of the guide](getting-started.md#1-get-api-access).
 2. **Install:**
-   `pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"`
+   `pip install tradesmart`
 3. **Log in** (once a day; the token is valid until 06:00 IST): `python -m tradesmart login`
 4. **Call the API** with `TradeSmart.from_env()` — no keys in your code.
 5. **Place, check, modify and cancel** your first order.

@@ -86,21 +86,20 @@ one. The new app has a new App ID (App Key) and Secret Key. Update your environm
 
 ## 2. Install the SDK
 
-You need **Python 3.11 or newer** (3.11 – 3.15) and `git`. Use a virtual environment so the SDK
+You need **Python 3.11 or newer** (3.11 – 3.15). Use a virtual environment so the SDK
 and its three dependencies (`httpx`, `pydantic`, `websockets`) stay separate from other
 projects.
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate        # Windows PowerShell: .venv\Scripts\Activate.ps1
-pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"
+pip install tradesmart
 ```
 
-No `git`? Download the wheel file (`tradesmart-2.0.0-py3-none-any.whl`) from the repository's
-[GitHub Releases](https://github.com/trade-smart/TradeSmart-Python-SDK/releases) page and install it:
+The newest, not yet released code installs from GitHub (needs `git`):
 
 ```bash
-pip install tradesmart-2.0.0-py3-none-any.whl
+pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"
 ```
 
 Check it:

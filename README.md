@@ -9,12 +9,16 @@ orders, and stream live prices and order updates from your own Python code. Vers
 Python 3.11 to 3.15:
 
 ```bash
-pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"
+pip install tradesmart
 ```
 
 You need a TradeSmart account and an API app (App Key and Secret Key), which you create yourself,
 free, on the [TradeSmart web platform](https://web.tradesmartonline.in/api). Register your static
 IP, and `http://127.0.0.1:8080/callback` as the Redirect URL.
+
+No TradeSmart account yet? [Open one online][open-account].
+
+[open-account]: https://signup.tradesmartonline.in/?utm_source=PythonSDK&utm_medium=Organic&utm_campaign=SDK_Open_Demat&utm_content=readme&channel=Organic&platform=web
 
 ## Quick start
 

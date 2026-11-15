@@ -6,9 +6,7 @@ All notable changes to the `tradesmart` Python SDK are documented here. The form
 
 ## [2.0.0] — Unreleased
 
-**The first public release.** Install it from GitHub
-(`pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"`)
-or from the wheel attached to the GitHub Release; it is not on PyPI yet. Version numbers 0.1.0
+**The first public release**, on PyPI: `pip install tradesmart`. Version numbers 0.1.0
 and 0.2.0 were internal previews that were never published, so there is nothing to migrate
 from: 2.0.0 contains everything listed under them below plus the changes in this section, which
 are described relative to the 0.2.0 preview. Default `User-Agent`: `tradesmart-python/2.0.0`.

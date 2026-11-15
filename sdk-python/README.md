@@ -22,12 +22,27 @@ Python scripts or `asyncio` programs.
 - **Offline testing:** `OfflineBroker` runs your strategy against a local fake broker, with no account
   or network.
 
+## New to TradeSmart? Start trading from code in three steps
+
+1. **[Open a TradeSmart account online][open-account].** TradeSmart Fintech Securities Limited is a
+   SEBI-registered stockbroker (NSE, BSE, MCX).
+2. **Create your API app** on the TradeSmart web platform's API Dashboard: self-service, with no API
+   fee and no approval to wait for, for your own trading.
+3. **`pip install tradesmart`**, log in with one command, and place your first order. The
+   [getting-started guide](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/getting-started.md)
+   takes about 10 minutes.
+
+**[Open your TradeSmart account →][open-account]** Already a client? Go straight to
+[Get API access](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/getting-started.md#1-get-api-access).
+
+[open-account]: https://signup.tradesmartonline.in/?utm_source=PythonSDK&utm_medium=Organic&utm_campaign=SDK_Open_Demat&utm_content=pypi&channel=Organic&platform=web
+
 ## Install
 
-Python 3.11 to 3.15. Until the SDK is on PyPI, install it from GitHub (needs `git`):
+Python 3.11 to 3.15:
 
 ```bash
-pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"
+pip install tradesmart
 ```
 
 You also need a TradeSmart API app (free, self-service on the TradeSmart web platform's API
@@ -92,6 +107,12 @@ Guides for moving existing code:
 - Versions and deprecations: [Versioning and support](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/versioning.md);
   changes: [changelog](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/CHANGELOG.md).
 - Contributing: [CONTRIBUTING.md](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/CONTRIBUTING.md).
+
+## Risk notice
+
+Investments in the securities market are subject to market risks; read all the related documents
+carefully before investing. Automated and API trading can place orders quickly: test your strategy
+offline first and start with small quantities.
 
 ## Licence
 

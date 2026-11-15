@@ -15,6 +15,7 @@ import socket
 import stat
 import threading
 import time
+import tomllib
 import urllib.error
 import urllib.request
 from collections.abc import Callable
@@ -397,7 +398,7 @@ def test_getting_started_covers_the_first_order_path() -> None:
     for needle in (
         "http://127.0.0.1:8080/callback",
         "static IP",
-        "git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python",
+        "pip install tradesmart",
         "python -m tradesmart login",
         "--no-browser",
         "TradeSmart.from_env()",
@@ -1089,11 +1090,27 @@ def test_sdk_readme_uses_absolute_links() -> None:
 def test_sdk_readme_links_the_user_guide() -> None:
     text = (SDK_DIR / "README.md").read_text(encoding="utf-8")
     assert f"{GITHUB}blob/main/sdk-python/docs/getting-started.md" in text
-    assert (
-        "git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"
-        in text
-    )
+    assert "pip install tradesmart" in text
     assert "python -m tradesmart login" in text
+
+
+SIGNUP_URL = (
+    "https://signup.tradesmartonline.in/?utm_source=PythonSDK&utm_medium=Organic"
+    "&utm_campaign=SDK_Open_Demat&utm_content=pypi&channel=Organic&platform=web"
+)
+
+
+def test_sdk_readme_invites_new_clients() -> None:
+    """The README is the PyPI page: how to open a TradeSmart account, plus the risk notice."""
+    text = (SDK_DIR / "README.md").read_text(encoding="utf-8")
+    assert SIGNUP_URL in text
+    assert "subject to market risks" in text
+
+
+def test_pyproject_links_account_opening() -> None:
+    with (SDK_DIR / "pyproject.toml").open("rb") as handle:
+        urls = tomllib.load(handle)["project"]["urls"]
+    assert urls["Open an account"] == SIGNUP_URL
 
 
 @pytest.mark.parametrize("doc", _PUBLISHED_DOCS, ids=_doc_id)
