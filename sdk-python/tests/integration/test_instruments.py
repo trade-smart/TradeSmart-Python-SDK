@@ -133,8 +133,9 @@ def test_load_sniffs_pipe_delimiter_and_strips(tmp_path):
 
 @pytest.fixture
 def home(tmp_path, monkeypatch):
-    """Point the user's home (and so the default instrument cache) at a temp dir."""
+    """Point the user's home (and so the default instrument cache) at a temp dir, on every OS."""
     monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))  # Windows takes the home folder from here
     return tmp_path
 
 

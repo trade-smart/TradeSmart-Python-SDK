@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import math
 import re
 import sys
 from decimal import Decimal, InvalidOperation
@@ -171,6 +172,25 @@ def test_readme_lists_exactly_the_files() -> None:
 # --------------------------------------------------------------------------- file contents
 
 
+def _inputs_match(committed: Any, generated: Any) -> bool:
+    """Equal, except that two floats may differ in their last digits (rel. 1e-12).
+
+    Some inputs are computed by the generator (a round trip's option price), and their last bits
+    depend on the platform's maths library, so an exact comparison fails on other machines.
+    """
+    if isinstance(committed, float) and isinstance(generated, float):
+        return math.isclose(committed, generated, rel_tol=1e-12, abs_tol=0.0)
+    if isinstance(committed, dict) and isinstance(generated, dict):
+        return committed.keys() == generated.keys() and all(
+            _inputs_match(committed[k], generated[k]) for k in committed
+        )
+    if isinstance(committed, list) and isinstance(generated, list):
+        return len(committed) == len(generated) and all(
+            _inputs_match(c, g) for c, g in zip(committed, generated, strict=True)
+        )
+    return type(committed) is type(generated) and bool(committed == generated)
+
+
 @pytest.mark.parametrize("name", sorted(EXPECTED_FILES))
 def test_file_shape_and_up_to_date_with_the_generator(name: str) -> None:
     document = _read(name)
@@ -191,7 +211,7 @@ def test_file_shape_and_up_to_date_with_the_generator(name: str) -> None:
     assert document["tolerance"] == spec["tolerance"]
     generated = [{"name": n, "input": i} for n, i in spec["cases"]()]
     committed = [{"name": c["name"], "input": c["input"]} for c in cases]
-    assert committed == generated, f"{name} is stale: run scripts/gen_conformance.py"
+    assert _inputs_match(committed, generated), f"{name} is stale: run scripts/gen_conformance.py"
 
 
 @pytest.mark.parametrize(("name", "case"), _all_cases())
@@ -608,3 +628,14 @@ def test_typed_gtt_writes_log_the_al_id_and_name_pending_gtts(call: str) -> None
     unknown = _case("outcome_words.json", f"{call}_read_timeout_is_unknown")["expected"]
     assert unknown["error"] == "OrderStatusUnknownError" and unknown["requests"] == 1
     assert "pending_gtts()" in unknown["warning"]
+
+
+def test_inputs_match_ignores_last_digit_float_noise_only() -> None:
+    # Round-trip cases store a computed price; its last bits differ between maths libraries.
+    stored = {"option_price": 30.521395831033068, "model": "black76", "years": [0.5]}
+    assert _inputs_match(stored, {**stored, "option_price": 30.521395831033075})
+    assert not _inputs_match(stored, {**stored, "option_price": 30.5214})
+    assert not _inputs_match(stored, {**stored, "model": "bsm"})
+    assert not _inputs_match(stored, {**stored, "years": [0.25]})
+    assert not _inputs_match(stored, {k: v for k, v in stored.items() if k != "model"})
+    assert not _inputs_match({"strike": 90}, {"strike": 90.5})

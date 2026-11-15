@@ -147,7 +147,10 @@ def test_paste_code_path(
     answers: list[str],
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    # The hint below is the Linux/macOS form; Windows prints PowerShell/cmd (tested separately).
+    monkeypatch.setattr(_cli._token_store, "_os_name", lambda: "posix")
     answers.append("  test-code  ")
     target = tmp_path / "custom" / "token.json"
     with respx.mock(assert_all_mocked=True) as router:

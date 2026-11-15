@@ -594,6 +594,8 @@ def _ledger_verdicts(rig: Rig) -> list[dict[str, Any]]:
 def test_ctrl_c_mid_round_stops_placing_and_sends_nothing_more(rig: Rig, workers: int) -> None:
     if threading.current_thread() is not threading.main_thread():
         pytest.skip("SIGINT reaches the main thread only")
+    if not hasattr(signal, "pthread_kill"):
+        pytest.skip("no signal.pthread_kill on this OS (Windows): Ctrl+C cannot be simulated here")
     if signal.getsignal(signal.SIGINT) is not signal.default_int_handler:
         pytest.skip("SIGINT is handled elsewhere here: it would not raise KeyboardInterrupt")
     grid = [c for c in _grid() if c.outcome in (cases.REST, cases.TRIGGER_PENDING)][:6]
