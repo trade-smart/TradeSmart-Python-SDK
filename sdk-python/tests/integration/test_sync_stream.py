@@ -1,10 +1,12 @@
 import asyncio
+import contextlib
 import logging
 import threading
 import time
 from dataclasses import replace
 
 import pytest
+from websockets.exceptions import ConnectionClosed
 
 import tradesmart
 import tradesmart.stream
@@ -718,7 +720,9 @@ def test_callback_base_exception_closes_stream_and_is_reported(threaded_server, 
     with caplog.at_level(logging.ERROR, logger="tradesmart.stream"):
         s.start()
         s.subscribe_touchline(["NSE|22", "NSE|23"])  # a second message is queued behind
-        threaded_server.run(threaded_server.send({"t": "om", "norenordno": "1"}))
+        # The stream may already be closed by the SystemExit above: that is the point of the test.
+        with contextlib.suppress(ConnectionClosed):
+            threaded_server.run(threaded_server.send({"t": "om", "norenordno": "1"}))
         wait_until_sync(lambda: stopped(s), timeout=5)
     assert len(errors) == 1 and isinstance(errors[0], SystemExit)
     assert any("callback thread stopped" in r.getMessage() and r.exc_info for r in caplog.records)

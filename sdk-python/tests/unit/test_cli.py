@@ -103,7 +103,7 @@ def test_browser_callback_path(
         assert _cli.main(["login", "--port", str(port)]) == 0
     assert route.call_count == 1
     assert '"code":"test-code"' in route.calls.last.request.content.decode()
-    assert replies == [200]
+    assert _settled(replies, 1) == [200]
     saved = json.loads(_no_saved_login.read_text(encoding="utf-8"))
     assert saved["client_id"] == "TEST123"
     assert saved["access_token"] == "test-access-token"
@@ -138,7 +138,7 @@ def test_callback_ignores_other_paths_until_the_code_arrives(
     with respx.mock(assert_all_mocked=True) as router:
         _gen_acs_tok(router)
         assert _cli.main(["--port", str(port)]) == 0  # login is the default command
-    assert statuses == [404, 400, 200]
+    assert _settled(statuses, 3) == [404, 400, 200]
 
 
 def test_paste_code_path(
@@ -640,6 +640,18 @@ def test_python_dash_m_help_exits_0() -> None:
 _ALL_INTERFACES = "0.0.0.0"  # noqa: S104 - the container-side bind under test
 
 
+def _settled(results: list[int], count: int, timeout: float = 5.0) -> list[int]:
+    """``results`` once a helper thread has added ``count`` items (or after ``timeout``).
+
+    The login returns as soon as the callback server has the code, which can be before the
+    thread that sent the request has stored the reply: checking at once is a race.
+    """
+    deadline = time.monotonic() + timeout
+    while len(results) < count and time.monotonic() < deadline:
+        time.sleep(0.01)
+    return results
+
+
 def _redirect_after_open(port: int, replies: list[int]) -> Callable[[str], bool]:
     """A ``webbrowser.open`` stand-in that delivers the redirect over 127.0.0.1."""
 
@@ -678,7 +690,7 @@ def test_listen_host_binds_the_given_address(
         _gen_acs_tok(router)
         assert _cli.main(["login", "--port", str(port), "--listen-host", host]) == 0
     assert bound == [host]
-    assert replies == [200]
+    assert _settled(replies, 1) == [200]
     out = capsys.readouterr()
     assert f"http://127.0.0.1:{port}/callback" in out.out  # the redirect URL is always loopback
     assert _ALL_INTERFACES not in out.out
@@ -766,7 +778,7 @@ def test_without_a_browser_the_url_is_shown_and_the_redirect_is_awaited(
         "Open this URL in your browser and log in; this window continues by itself "
         "after the redirect." in text
     )
-    assert replies == [200]
+    assert _settled(replies, 1) == [200]
 
 
 _COMPOSE = Path(__file__).resolve().parents[2] / "compose.yaml"
@@ -869,7 +881,7 @@ def test_idle_connection_does_not_delay_the_real_redirect(
         for sock in idle:
             sock.close()
     assert time.monotonic() - started < 8
-    assert replies == [200]
+    assert _settled(replies, 1) == [200]
 
 
 def test_code_is_published_only_after_the_reply_is_written(
