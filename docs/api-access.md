@@ -6,6 +6,10 @@ the security rules that apply. This page does not depend on the programming lang
 Source: TradeSmart's official "App Creation" and "Authentication & Login Flow" documentation
 (https://apidocs.tradesmartonline.in/v2/).
 
+API access needs a TradeSmart trading account. No account yet? [Open one online][open-account].
+
+[open-account]: https://signup.tradesmartonline.in/?utm_source=PythonSDK&utm_medium=Organic&utm_campaign=SDK_Open_Demat&utm_content=api_access&channel=Organic&platform=web
+
 ## Credentials
 
 | Credential | Issued by | Used for | Secret? |
