@@ -19,6 +19,8 @@ The Python SDK (`sdk-python/`) is the reference implementation. For a new langua
 - Run the CI on Linux, Windows and macOS from the start, and keep the tests independent of the
   operating system (home folder, platform-specific output, signals, floating-point tolerance,
   helper threads): spec §14, "Operating systems". Docker on Linux alone hides these failures.
+  macOS may run only on release tags and manual runs (it costs ten times the minutes while the
+  repository is private), but must pass before every release.
 - Keep a public `sdk-<lang>/.gitignore` of its own (paths anchored to that folder), so package
   builds never pick up the monorepo root's ignore file.
 - Follow the same safety rules: no retries on order calls (`PlaceOrder`, `PlaceMultiOrder`,

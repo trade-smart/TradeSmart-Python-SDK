@@ -10,12 +10,14 @@ on:
       - ".github/**"
   push:
     branches: [main]
+    tags: ["v*"] # a release tag runs every job, macOS included (path filters do not apply to tags)
     paths:
       - "sdk-python/**"
       - "specifications/**"
       - "docs/**"
       - "*.md" # root README, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT: read by the link and docs tests
       - ".github/**"
+  workflow_dispatch: # manual run from the Actions tab, macOS included
 
 permissions:
   contents: read
@@ -53,13 +55,25 @@ jobs:
         include:
           - os: windows-latest
             python-version: "3.12"
-          - os: macos-latest
-            python-version: "3.12"
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: sdk-python/pyproject.toml
+      - run: pip install -e ".[dev]"
+      - run: pytest --cov=tradesmart
+
+  # macOS minutes cost 10x on a private repository: only on a release tag or a manual run.
+  test-macos:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
           cache: pip
           cache-dependency-path: sdk-python/pyproject.toml
       - run: pip install -e ".[dev]"
