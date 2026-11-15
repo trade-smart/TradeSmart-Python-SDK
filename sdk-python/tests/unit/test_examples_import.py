@@ -30,6 +30,7 @@ import tradesmart
 import tradesmart._cli
 from tests._public_tree import BROKER_RE, FORBIDDEN_RE, ROOT_ONLY_SKIPPED, internal_references
 from tests.conftest import BASE, fixture
+from tradesmart._links import signup_url
 from tradesmart.testing import OfflineBroker
 
 SDK_DIR = Path(__file__).resolve().parents[2]
@@ -1094,10 +1095,7 @@ def test_sdk_readme_links_the_user_guide() -> None:
     assert "python -m tradesmart login" in text
 
 
-SIGNUP_URL = (
-    "https://signup.tradesmartonline.in/?utm_source=PythonSDK&utm_medium=Organic"
-    "&utm_campaign=SDK_Open_Demat&utm_content=pypi&channel=Organic&platform=web"
-)
+SIGNUP_URL = signup_url("pypi")  # tests/unit/test_signup_link.py pins the exact URL
 
 
 def test_sdk_readme_invites_new_clients() -> None:
@@ -1110,7 +1108,7 @@ def test_sdk_readme_invites_new_clients() -> None:
 def test_pyproject_links_account_opening() -> None:
     with (SDK_DIR / "pyproject.toml").open("rb") as handle:
         urls = tomllib.load(handle)["project"]["urls"]
-    assert urls["Open an account"] == SIGNUP_URL
+    assert urls["Open an account"] == signup_url("pypi_sidebar")
 
 
 @pytest.mark.parametrize("doc", _PUBLISHED_DOCS, ids=_doc_id)

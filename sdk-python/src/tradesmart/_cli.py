@@ -30,6 +30,7 @@ from typing import Any, cast
 from urllib.parse import parse_qs, urlparse
 
 from tradesmart import _key_store, _token_store
+from tradesmart._links import signup_url
 from tradesmart.client import TradeSmart
 from tradesmart.errors import TradeSmartError
 from tradesmart.models.base import IST
@@ -426,9 +427,16 @@ def _login(args: argparse.Namespace) -> int:
     if problem is not None:
         _err(f"Cannot use the saved keys: {problem}")
         return EXIT_USAGE
+    first_login = not path.exists() and not keys_path.exists()
+
+    def ask_client_id(prompt: str) -> str:
+        if first_login:  # a newcomer may have no account yet; returning users are not told again
+            _say(f"No TradeSmart account yet? Open one at {signup_url('cli')}")
+        return _ask_visible(prompt)
+
     try:
         client_id = _setting(
-            args.client_id, "TRADESMART_CLIENT_ID", "client id", "--client-id", _ask_visible
+            args.client_id, "TRADESMART_CLIENT_ID", "client id", "--client-id", ask_client_id
         )
         keys = _resolve_keys(
             client_id,

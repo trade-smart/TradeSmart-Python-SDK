@@ -565,6 +565,10 @@ are described relative to the 0.2.0 preview. Default `User-Agent`: `tradesmart-p
 
 ### Documentation
 
+- **Open an account:** the README, the getting-started guide, the API-access page and the package's
+  project URLs link to TradeSmart's account signup, and `python -m tradesmart login` shows the link
+  once before it asks for a Client ID on a first login (no saved token or keys; not when
+  `--client-id` or `TRADESMART_CLIENT_ID` is given).
 - **Market orders are refused for API orders** (confirmed by TradeSmart): the Orders guide, README,
   migration guides and `examples/place_order.py` now say that TradeSmart rejects `MARKET` orders
   placed through the API (`OrderRejectedError`, "ALGO_CHK: MKT Order type not allowed for API

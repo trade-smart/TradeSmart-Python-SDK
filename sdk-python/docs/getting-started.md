@@ -18,10 +18,10 @@ Contents: [1. Get API access](#1-get-api-access) ·
 
 ## 1. Get API access
 
-You need a TradeSmart trading account and an **API application** that you create yourself on the
-TradeSmart web platform. For personal use this is **self-service, free and immediate**: there is
-no fee and no approval to wait for. It is a one-time step that you do in your browser, not in
-code.
+You need a TradeSmart trading account (no account yet?
+[open one online](https://signup.tradesmartonline.in/?utm_source=PythonSDK&utm_medium=Organic&utm_campaign=SDK_Open_Demat&utm_content=getting_started&channel=Organic&platform=web))
+and an **API application** that you create yourself on the TradeSmart web platform. For personal
+use this is **self-service, free and immediate**: a one-time step in your browser, no approval.
 
 - **Personal use**: tools for your own trading account; only you log in through the app. This
   is what this guide assumes.
