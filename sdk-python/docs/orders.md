@@ -126,7 +126,7 @@ TradeSmart relationship manager or support which sessions accept them.
 ### Margin before you order
 
 `client.order_margin(...)` takes the same order fields (`exchange`, `tradingsymbol`, `quantity`,
-`price`, `product`, `transaction_type`, `order_type`, optional `trigger_price`,
+`price`, `product`, `transaction_type`, `order_type`, optional `trigger_price`, `order_id`, `sno_number`,
 `book_loss_price`) and returns an `OrderMargin` (`cash`, `marginused`, `ordermargin`,
 `remarks`). It is a read: nothing is placed.
 

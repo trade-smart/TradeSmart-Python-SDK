@@ -5,7 +5,7 @@ This guide maps the Dhan Python SDK (`dhanhq` 2.3: `DhanContext`, `dhanhq`, `Dha
 snake_case methods on one client object, but they differ in three ways that affect almost every
 line you port: **errors are exceptions instead of status dicts**, **instruments are trading
 symbols instead of security ids**, and **constant values are different**. Full SDK reference:
-[`tradesmart` README](../../README.md).
+[SDK reference](../reference.md).
 
 In the tables, `dhan` is a `dhanhq` instance and `client` a `tradesmart.TradeSmart` instance.
 Every method shown on `TradeSmart` exists with the same parameters on `AsyncTradeSmart` as a
@@ -19,7 +19,7 @@ coroutine.
 2. Install the SDK (Python 3.11+):
 
    ```bash
-   pip install "tradesmart @ git+https://github.com/trade-smart/tradesmart-sdks.git#subdirectory=sdk-python"
+   pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"
    ```
 
 3. Log in once per trading day (tokens are valid until 06:00 IST); the token is saved for your

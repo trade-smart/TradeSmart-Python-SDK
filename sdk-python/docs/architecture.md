@@ -1,7 +1,7 @@
 # `tradesmart` Python SDK — architecture
 
 How the Python SDK in `sdk-python/` is structured, how a call flows through it, and which design
-decisions keep it safe. User-facing reference: `sdk-python/README.md`; development workflow:
+decisions keep it safe. User-facing reference: `sdk-python/docs/reference.md`; development workflow:
 `sdk-python/CONTRIBUTING.md`.
 
 ## Principles

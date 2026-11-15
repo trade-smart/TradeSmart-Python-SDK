@@ -435,7 +435,9 @@ async def test_outcome_line_names_the_alert_id(rig: Rig, caplog: pytest.LogCaptu
     lines = [r.getMessage() for r in caplog.records if r.name == "tradesmart.orders"]
     assert lines[0].startswith(f"PlaceGTTOrder accepted al_id={alert_id} in ")
     assert lines[1].startswith(f"CancelGTTOrder accepted al_id={alert_id} in ")
-    text = "\n".join(r.getMessage() for r in caplog.records)
+    # The fake broker's alert ids carry the date (on 15 Nov "261115" + "00000001" holds "1500"),
+    # so drop the id before checking that the price and other order details are not logged.
+    text = "\n".join(r.getMessage() for r in caplog.records).replace(alert_id, "<al_id>")
     assert "sdk-test-gtt" not in text and "1500" not in text and "ITC-EQ" not in text
 
 

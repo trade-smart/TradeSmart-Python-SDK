@@ -7,7 +7,7 @@ All notable changes to the `tradesmart` Python SDK are documented here. The form
 ## [2.0.0] — Unreleased
 
 **The first public release.** Install it from GitHub
-(`pip install "tradesmart @ git+https://github.com/trade-smart/tradesmart-sdks.git#subdirectory=sdk-python"`)
+(`pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"`)
 or from the wheel attached to the GitHub Release; it is not on PyPI yet. Version numbers 0.1.0
 and 0.2.0 were internal previews that were never published, so there is nothing to migrate
 from: 2.0.0 contains everything listed under them below plus the changes in this section, which
@@ -212,7 +212,7 @@ are described relative to the 0.2.0 preview. Default `User-Agent`: `tradesmart-p
   `buildup()` docstring states the two windows (price change since the previous close, OI change
   since today's open).
 - **Packaging:** removed the `License :: OSI Approved :: MIT License` classifier; the licence is
-  the PEP 639 `License-Expression: MIT` only (a classifier next to it is rejected by newer tools).
+  the PEP 639 licence expression only (a classifier next to it is rejected by newer tools).
 - **Login command:** `--token-file` is resolved to an absolute path, so the printed
   `TRADESMART_TOKEN_FILE` and `logout` hints work from any directory; the redirect server handles
   each connection in its own thread, so an idle browser pre-connect no longer delays the real

@@ -44,6 +44,7 @@ PYTHON_DOCS = [
     "troubleshooting.md",
     "versioning.md",
     "architecture.md",
+    "reference.md",
     "migration/README.md",
 ]
 SHARED_DOC_FILES = ["README.md", "api-access.md"]
@@ -64,16 +65,24 @@ def test_python_docs_live_in_sdk_python() -> None:
     assert leftover == []
 
 
-def test_root_readme_has_sdk_table() -> None:
+def test_root_readme_heading_is_the_product_name() -> None:
+    # The owner's chosen title, shown at the top of the GitHub repository page.
+    first_line = (REPO_DIR / "README.md").read_text(encoding="utf-8").splitlines()[0]
+    assert first_line == "# TradeSmart Python SDK"
+
+
+def test_root_readme_is_a_short_python_landing_page() -> None:
+    # One repository per language: no table of planned SDKs, and short enough to read at a glance.
     text = (REPO_DIR / "README.md").read_text(encoding="utf-8")
-    rows = [line for line in text.splitlines() if line.startswith("|")]
-    assert rows and re.match(r"\|\s*SDK\s*\|", rows[0]), "root README has no SDK table"
-    python = [row for row in rows if row.startswith("| Python")]
-    assert len(python) == 1
-    assert "](sdk-python/)" in python[0]
-    assert "](sdk-python/docs/README.md)" in python[0], "the Python row links the user guide"
-    assert "available" in python[0].lower()
-    assert any("planned" in row.lower() for row in rows if row is not python[0])
+    assert len(text.splitlines()) <= 60
+    assert "Planned" not in text and "| SDK |" not in text
+    assert "#subdirectory=sdk-python" in text and "python -m tradesmart login" in text
+    for link in (
+        "sdk-python/docs/getting-started.md",
+        "sdk-python/docs/README.md",
+        "sdk-python/docs/reference.md",
+    ):
+        assert f"]({link})" in text, link
 
 
 # --- language-neutral shared docs ---------------------------------------------------------------
@@ -102,7 +111,7 @@ def test_shared_docs_are_language_neutral() -> None:
 
 # --- public markdown links ----------------------------------------------------------------------
 
-REPO_URL = "https://github.com/trade-smart/tradesmart-sdks"
+REPO_URL = "https://github.com/trade-smart/TradeSmart-Python-SDK"
 _FENCE = re.compile(r"^\s*(```|~~~)")
 _INLINE_LINK = re.compile(
     r"!?\[(?:[^\]\\]|\\.)*\]\(\s*<?([^)\s>]+)>?(?:\s+[\"'(][^)]*[\"')])?\s*\)"
@@ -550,3 +559,29 @@ def test_shipped_code_rule_is_stricter_than_the_public_tree_rule() -> None:
 
 def test_open_item_ids_ignore_lint_codes() -> None:
     assert open_item_ids("x = 1  # noqa: E501, F401\nsee F19") == {"F19"}
+
+
+def test_public_files_link_the_real_github_repository() -> None:
+    # The repository is trade-smart/TradeSmart-Python-SDK; the earlier placeholder name gave broken
+    # links and a failing pip install command. Built from parts so this file does not match itself.
+    old = "trade-smart/" + "tradesmart-sdks"
+    hits = []
+    for path in sorted(REPO_DIR.rglob("*")):
+        rel = path.relative_to(REPO_DIR).as_posix()
+        if not path.is_file() or rel.split("/")[0] in {"internal", ".git"} or "/." in "/" + rel:
+            continue
+        if path.suffix not in {".md", ".toml", ".yml", ".yaml", ".py", ".txt", ""}:
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        hits += [rel for line in text.splitlines() if old in line.lower()]
+    assert hits == []
+
+
+def test_ci_actions_run_on_a_supported_node() -> None:
+    # GitHub deprecated Node 20 for actions; these are the first majors on Node 24.
+    text = (REPO_DIR / ".github/workflows/python-ci.yml").read_text(encoding="utf-8")
+    floor = {"actions/checkout": 5, "actions/setup-python": 6, "actions/upload-artifact": 5}
+    used = re.findall(r"uses:\s*(actions/[\w-]+)@v(\d+)", text)
+    assert {name for name, _ in used} == set(floor)
+    old = [f"{name}@v{major}" for name, major in used if int(major) < floor[name]]
+    assert old == []

@@ -46,8 +46,10 @@ GUIDE_PAGES = [
     "testing.md",
     "gtt.md",
     "account.md",
+    "reference.md",
 ]
 GUIDE = [GUIDE_DIR / page for page in GUIDE_PAGES]
+REFERENCE = GUIDE_DIR / "reference.md"
 MIGRATION = sorted((GUIDE_DIR / "migration").glob("*.md"))
 ARCHITECTURE = GUIDE_DIR / "architecture.md"
 # The shared, language-neutral docs at the repository root.
@@ -293,10 +295,10 @@ def test_readme_links_migration_folder() -> None:
     text = (SDK_DIR / "README.md").read_text(encoding="utf-8")
     assert "## Switching from another broker" in text
     assert (
-        "](https://github.com/trade-smart/tradesmart-sdks/tree/main/sdk-python/docs/migration)"
+        "](https://github.com/trade-smart/TradeSmart-Python-SDK/tree/main/sdk-python/docs/migration)"
         in text
     )
-    assert "## Low-latency setup" in text
+    assert "## Low-latency setup" in REFERENCE.read_text(encoding="utf-8")
 
 
 @pytest.mark.parametrize("doc", DOCS, ids=lambda p: p.name)
@@ -392,7 +394,7 @@ def test_getting_started_covers_the_first_order_path() -> None:
     for needle in (
         "http://127.0.0.1:8080/callback",
         "static IP",
-        "git+https://github.com/trade-smart/tradesmart-sdks.git#subdirectory=sdk-python",
+        "git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python",
         "python -m tradesmart login",
         "--no-browser",
         "TradeSmart.from_env()",
@@ -435,17 +437,17 @@ def _public_methods(cls: type) -> list[str]:
         ("AsyncTradeSmartStream", tradesmart.AsyncTradeSmartStream),
     ],
 )
-def test_readme_references_every_public_method(prefix: str, cls: type) -> None:
-    text = (SDK_DIR / "README.md").read_text(encoding="utf-8")
+def test_reference_lists_every_public_method(prefix: str, cls: type) -> None:
+    text = REFERENCE.read_text(encoding="utf-8")
     missing = [m for m in _public_methods(cls) if f"{prefix}.{m}" not in text]
-    assert not missing, f"README API reference lacks {prefix}.{missing}"
+    assert not missing, f"reference page lacks {prefix}.{missing}"
 
 
-def test_readme_references_instrument_helpers() -> None:
-    text = (SDK_DIR / "README.md").read_text(encoding="utf-8")
+def test_reference_lists_instrument_helpers() -> None:
+    text = REFERENCE.read_text(encoding="utf-8")
     for name in ("load", "find"):
         assert callable(getattr(tradesmart.instruments, name))
-        assert f"instruments.{name}" in text, f"README API reference lacks instruments.{name}"
+        assert f"instruments.{name}" in text, f"reference page lacks instruments.{name}"
 
 
 def test_async_client_mirrors_sync() -> None:
@@ -475,15 +477,15 @@ def _self_named(sig: inspect.Signature, own: str) -> inspect.Signature:
     return sig
 
 
-def test_readme_documents_every_config_field() -> None:
-    text = (SDK_DIR / "README.md").read_text(encoding="utf-8")
+def test_reference_documents_every_config_field() -> None:
+    text = REFERENCE.read_text(encoding="utf-8")
     fields = tradesmart.ClientConfig.__dataclass_fields__
     missing = [name for name in fields if f"`{name}`" not in text]
-    assert not missing, f"README configuration table lacks {missing}"
+    assert not missing, f"reference configuration table lacks {missing}"
 
 
-def test_readme_documents_every_exported_error() -> None:
-    text = (SDK_DIR / "README.md").read_text(encoding="utf-8")
+def test_reference_documents_every_exported_error() -> None:
+    text = REFERENCE.read_text(encoding="utf-8")
     errors = [
         name
         for name in tradesmart.__all__
@@ -491,7 +493,7 @@ def test_readme_documents_every_exported_error() -> None:
         and issubclass(getattr(tradesmart, name), tradesmart.TradeSmartError)
     ]
     missing = [name for name in errors if f"`{name}`" not in text]
-    assert not missing, f"README error table lacks {missing}"
+    assert not missing, f"reference error table lacks {missing}"
 
 
 def _auth_flow(monkeypatch: pytest.MonkeyPatch) -> ModuleType:
@@ -993,7 +995,7 @@ def test_getting_started_cancel_snippet(
 
 # -- publishable documentation -----------------------------------------------------------
 
-GITHUB = "https://github.com/trade-smart/tradesmart-sdks/"
+GITHUB = "https://github.com/trade-smart/TradeSmart-Python-SDK/"
 _GITHUB_FILE = re.compile(re.escape(GITHUB) + r"(?:blob|tree)/main/([^)#\s]*)(#[^)\s]*)?")
 _LINK = re.compile(r"(?<!!)\[[^\]]*\]\(([^)\s]+)\)")
 # Published by the repository-policy work that lands alongside this documentation.
@@ -1084,7 +1086,10 @@ def test_sdk_readme_uses_absolute_links() -> None:
 def test_sdk_readme_links_the_user_guide() -> None:
     text = (SDK_DIR / "README.md").read_text(encoding="utf-8")
     assert f"{GITHUB}blob/main/sdk-python/docs/getting-started.md" in text
-    assert "git+https://github.com/trade-smart/tradesmart-sdks.git#subdirectory=sdk-python" in text
+    assert (
+        "git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"
+        in text
+    )
     assert "python -m tradesmart login" in text
 
 
@@ -1387,8 +1392,8 @@ def test_loopback_redirect_url_is_stated_without_a_hedge(doc: Path) -> None:
         assert phrase not in text, f"{_doc_id(doc)} still hedges: {phrase!r}"
 
 
-def test_sdk_readme_does_not_deny_the_stream_from_env() -> None:
-    text = " ".join((SDK_DIR / "README.md").read_text(encoding="utf-8").split())
+def test_reference_does_not_deny_the_stream_from_env() -> None:
+    text = " ".join(REFERENCE.read_text(encoding="utf-8").split())
     assert "stream has no `from_env()`" not in text
 
 
@@ -1559,13 +1564,13 @@ def test_root_readme_names_the_forum_and_links_troubleshooting() -> None:
     assert "](sdk-python/docs/troubleshooting.md)" in text
 
 
-def test_sdk_readme_from_env_expiry_names_the_app_key_case() -> None:
-    text = _flat(SDK_DIR / "README.md")
+def test_reference_from_env_expiry_names_the_app_key_case() -> None:
+    text = _flat(REFERENCE)
     assert "when `TRADESMART_APP_KEY` is not set" in text
 
 
-def test_sdk_readme_states_mcx_api_orders_not_yet_enabled() -> None:
-    text = _flat(SDK_DIR / "README.md")
+def test_reference_states_mcx_api_orders_not_yet_enabled() -> None:
+    text = _flat(REFERENCE)
     limitations = text[text.index("## Known limitations") :]
     assert "CTCLID not assigned" in limitations and "not yet enabled" in limitations
     troubleshooting = _section(text, "## Troubleshooting", "## Testing your strategy")
@@ -1740,3 +1745,62 @@ def test_first_call_refuses_a_file_that_is_not_a_bare_token(
     assert not router.calls
     err = capsys.readouterr().err
     assert str(path) in err and "synthetic" not in err
+
+
+def test_sdk_readme_is_a_short_landing_page() -> None:
+    """The README is the overview; the full reference lives on its own guide page."""
+    text = (SDK_DIR / "README.md").read_text(encoding="utf-8")
+    assert len(text.splitlines()) <= 160
+    assert f"{GITHUB}blob/main/sdk-python/docs/reference.md" in text
+    for page in ("getting-started", "orders", "gtt", "streaming", "market-data", "troubleshooting"):
+        assert f"{GITHUB}blob/main/sdk-python/docs/{page}.md" in text, page
+
+
+def test_docs_name_no_old_repository_or_licence() -> None:
+    # The repository was renamed before release, and the licence moved from MIT to Apache-2.0.
+    for doc in (*GUIDE, SDK_DIR / "CHANGELOG.md", SDK_DIR / "README.md", REPO_DIR / "README.md"):
+        text = doc.read_text(encoding="utf-8")
+        assert "tradesmart-sdks.git" not in text, doc.name
+        assert "License-Expression: MIT" not in text, doc.name
+
+
+def test_order_margin_doc_lists_every_optional_parameter() -> None:
+    text = _flat(GUIDE_DIR / "orders.md")
+    section = text[text.index("### Margin before you order") :][:600]
+    for name in ("trigger_price", "book_loss_price", "order_id", "sno_number"):
+        assert f"`{name}`" in section, name
+
+
+def test_streaming_messages_table_lists_every_ack() -> None:
+    text = (GUIDE_DIR / "streaming.md").read_text(encoding="utf-8")
+    table = text[text.index("## Messages") :]
+    for name in ("ConnectAck", "HeartbeatAck"):
+        assert f"`{name}`" in table, name
+
+
+def test_shared_docs_index_has_no_planned_languages() -> None:
+    text = (REPO_DIR / "docs" / "README.md").read_text(encoding="utf-8")
+    assert "Planned" not in text and "sdk-python/README.md" not in text
+
+
+def test_versioning_page_states_the_dependency_ranges() -> None:
+    text = _flat(GUIDE_DIR / "versioning.md")
+    for spec in ("httpx>=0.27,<1", "pydantic>=2.6,<3", "websockets>=13,<18"):
+        assert f"`{spec}`" in text, spec
+
+
+def test_contributor_docs_point_at_the_reference_page() -> None:
+    for doc in (SDK_DIR / "CONTRIBUTING.md", ARCHITECTURE, REPO_DIR / "CONTRIBUTING.md"):
+        text = _flat(doc)
+        assert "README API reference" not in text and "appear in the README" not in text, doc
+        assert "User-facing reference: `sdk-python/README.md`" not in text, doc
+    assert "one SDK per language" not in _flat(REPO_DIR / "CONTRIBUTING.md")
+
+
+def test_both_readmes_share_one_quick_start() -> None:
+    root = (REPO_DIR / "README.md").read_text(encoding="utf-8")
+    sdk = (SDK_DIR / "README.md").read_text(encoding="utf-8")
+    snippet = "with TradeSmart.from_env() as client:"
+    assert snippet in root and snippet in sdk
+    assert root.count("*illustrative*") >= 1
+    assert "print(client.profile().user_id)" in root and "print(client.profile().user_id)" in sdk

@@ -7,7 +7,7 @@ ordinary Python scripts or `asyncio` programs.
 
 This guide is for traders and developers who want to automate trading on a TradeSmart account
 with Python. You do not need to read the SDK's source code: everything you need is here and in
-the [SDK reference](https://github.com/trade-smart/tradesmart-sdks/blob/main/sdk-python/README.md).
+the [SDK reference](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/reference.md).
 
 ## The 10-minute path
 
@@ -16,7 +16,7 @@ the [SDK reference](https://github.com/trade-smart/tradesmart-sdks/blob/main/sdk
    `http://127.0.0.1:8080/callback`. The dashboard shows an **App ID**:
    that is the **App Key** of this SDK. Details: [step 1 of the guide](getting-started.md#1-get-api-access).
 2. **Install:**
-   `pip install "tradesmart @ git+https://github.com/trade-smart/tradesmart-sdks.git#subdirectory=sdk-python"`
+   `pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"`
 3. **Log in** (once a day; the token is valid until 06:00 IST): `python -m tradesmart login`
 4. **Call the API** with `TradeSmart.from_env()` — no keys in your code.
 5. **Place, check, modify and cancel** your first order.
@@ -39,17 +39,17 @@ Step by step, with copy-paste code: **[Your first order in 10 minutes](getting-s
 | [Configuration](configuration.md) | Every `ClientConfig` setting, rate limits and retries, logging, low-latency set-up |
 | [Troubleshooting](troubleshooting.md) | Error messages and what to do about them |
 | [Versioning and support](versioning.md) | Version numbers, supported Python versions, deprecation policy, reporting bugs and security issues |
+| [Reference](reference.md) | Every method, model, enum, error and setting in one page, the login command in detail, and the known limitations |
 
 ## More
 
-- [SDK reference](https://github.com/trade-smart/tradesmart-sdks/blob/main/sdk-python/README.md):
-  every method, model, enum and error.
-- [Examples](https://github.com/trade-smart/tradesmart-sdks/tree/main/sdk-python/examples):
-  runnable scripts (login, first calls, a dry-run order lifecycle, market data, streams).
-- [Authentication](authentication.md) in the SDK, and [API access and login](../../docs/api-access.md)
-  for every SDK: the login flow, token lifetime and security rules.
+- [Examples](https://github.com/trade-smart/TradeSmart-Python-SDK/tree/main/sdk-python/examples):
+  runnable scripts (login, first calls, a dry-run order lifecycle, market data, streams, GTT,
+  sliced orders, offline testing).
+- [Authentication](authentication.md), and [API access and login](../../docs/api-access.md):
+  the login flow, token lifetime and security rules.
 - [Moving from another broker's SDK](migration/README.md).
-- [Changelog](https://github.com/trade-smart/tradesmart-sdks/blob/main/sdk-python/CHANGELOG.md).
+- [Changelog](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/CHANGELOG.md).
 
 > Trading involves real money. The SDK never retries an order and tells you when an order's
 > outcome is unknown; read [Orders](orders.md#recovery-tag-every-order-never-resend-blindly)

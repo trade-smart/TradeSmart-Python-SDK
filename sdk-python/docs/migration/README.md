@@ -13,7 +13,7 @@ small strategy.
 | Dhan (`dhanhq` 2.3, `DhanContext` / `dhanhq` / `MarketFeed` / `OrderUpdate`) | [dhan.md](dhan.md) |
 
 New to the SDK? Start with [Your first order in 10 minutes](../getting-started.md). The
-SDK reference itself is the [`tradesmart` README](../../README.md); read its
+[SDK reference](../reference.md) lists every method and error; read its
 "Placing orders" section before you send anything that changes state.
 
 ## Read this first

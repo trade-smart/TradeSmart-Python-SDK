@@ -8,7 +8,7 @@ Development runs in Docker; you only need `git` and Docker (with Compose) on you
 not create a host virtual environment.
 
 ```bash
-git clone https://github.com/trade-smart/tradesmart-sdks.git
+git clone https://github.com/trade-smart/TradeSmart-Python-SDK.git
 cd tradesmart-sdks/sdk-python
 docker compose build        # builds the dev images (Python 3.12, and 3.11, 3.13, 3.14, 3.15)
 ```
@@ -82,7 +82,7 @@ must compile, import only real names, not run on import and catch `TradeSmartErr
 Python snippet in the README and the user guide (`docs/`) must be labelled
 *illustrative*, import only real names and call only real client and stream methods with real
 keyword arguments; the guide's complete first-order script runs against a mocked API; every
-public method, `ClientConfig` field and exported error must appear in the README; relative links
+public method, `ClientConfig` field and exported error must appear in `docs/reference.md`; relative links
 and anchors in the docs must resolve; and the published docs (READMEs, CHANGELOG, user guide,
 `docs/architecture.md`, the shared `../docs/`, migration guides, examples) must not reference
 internal notes, local reference folders or test files.
@@ -95,7 +95,7 @@ Run it before and after changes on a hot path.
 
 - `TradeSmart` and `AsyncTradeSmart` expose the same **flat** methods (`client.place_order()`,
   `client.orders()`, …); add a new endpoint to both, with a `*_call()` builder in `endpoints/`,
-  and document it in the README API reference.
+  and document it in `docs/reference.md`.
 - Use the familiar parameter names (`order_type`, `validity`, `order_id`, `tag`, `from_date`,
   `to_date`); model attributes follow the same names. Enums send TradeSmart's wire codes and
   accept the common words.

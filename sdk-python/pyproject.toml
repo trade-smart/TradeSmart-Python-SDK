@@ -37,11 +37,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/trade-smart/tradesmart-sdks"
-Documentation = "https://github.com/trade-smart/tradesmart-sdks/tree/main/sdk-python/docs"
-Source = "https://github.com/trade-smart/tradesmart-sdks/tree/main/sdk-python"
-Issues = "https://github.com/trade-smart/tradesmart-sdks/issues"
-Changelog = "https://github.com/trade-smart/tradesmart-sdks/blob/main/sdk-python/CHANGELOG.md"
+Homepage = "https://github.com/trade-smart/TradeSmart-Python-SDK"
+Documentation = "https://github.com/trade-smart/TradeSmart-Python-SDK/tree/main/sdk-python/docs"
+Source = "https://github.com/trade-smart/TradeSmart-Python-SDK/tree/main/sdk-python"
+Issues = "https://github.com/trade-smart/TradeSmart-Python-SDK/issues"
+Changelog = "https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/CHANGELOG.md"
 
 [project.scripts]
 tradesmart = "tradesmart._cli:main"

@@ -93,11 +93,11 @@ projects.
 ```bash
 python -m venv .venv
 source .venv/bin/activate        # Windows PowerShell: .venv\Scripts\Activate.ps1
-pip install "tradesmart @ git+https://github.com/trade-smart/tradesmart-sdks.git#subdirectory=sdk-python"
+pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"
 ```
 
 No `git`? Download the wheel file (`tradesmart-2.0.0-py3-none-any.whl`) from the repository's
-[GitHub Releases](https://github.com/trade-smart/tradesmart-sdks/releases) page and install it:
+[GitHub Releases](https://github.com/trade-smart/TradeSmart-Python-SDK/releases) page and install it:
 
 ```bash
 pip install tradesmart-2.0.0-py3-none-any.whl
@@ -467,7 +467,7 @@ More answers: [Troubleshooting](troubleshooting.md).
 
 ## Next steps
 
-- [`examples/order_lifecycle.py`](https://github.com/trade-smart/tradesmart-sdks/blob/main/sdk-python/examples/order_lifecycle.py):
+- [`examples/order_lifecycle.py`](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/examples/order_lifecycle.py):
   a fuller `first_order.py` with a dry-run mode (`--live` checks your prices against a live
   quote before sending), which finds the order by its tag after an unknown outcome.
 - [Orders](orders.md): every order type, validation rules, the status lifecycle, recovery.
@@ -475,5 +475,5 @@ More answers: [Troubleshooting](troubleshooting.md).
 - [Market data](market-data.md): instruments, quotes, candles, option chains.
 - [Option Greeks and analytics](option-analytics.md): IV and Greeks, chain snapshot, PCR, max pain, buildup.
 - [Configuration](configuration.md): timeouts, rate limits, logging, low-latency set-up.
-- The [SDK reference](https://github.com/trade-smart/tradesmart-sdks/blob/main/sdk-python/README.md)
+- The [SDK reference](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/reference.md)
   lists every method, model and error.

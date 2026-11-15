@@ -109,7 +109,7 @@ def test_guide_index_links_the_testing_page() -> None:
 
 def test_sdk_readme_links_the_testing_page_and_example() -> None:
     text = (SDK_DIR / "README.md").read_text(encoding="utf-8")
-    github = "https://github.com/trade-smart/tradesmart-sdks/blob/main/"
+    github = "https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/"
     assert f"{github}sdk-python/docs/testing.md" in text
     assert f"{github}sdk-python/examples/offline_strategy_test.py" in text
 

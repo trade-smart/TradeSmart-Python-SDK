@@ -77,7 +77,7 @@ Secrets are masked in every SDK log line. See [Configuration](configuration.md#l
 ## Reporting a problem
 
 Open an issue on the
-[GitHub repository](https://github.com/trade-smart/tradesmart-sdks/issues) with the SDK version
+[GitHub repository](https://github.com/trade-smart/TradeSmart-Python-SDK/issues) with the SDK version
 (`python -c "import tradesmart; print(tradesmart.__version__)"`), your Python version, what you
 did and the full error message. **Never include tokens, keys, codes or account details.**
 Security problems: see [Versioning and support](versioning.md#reporting-bugs-and-security-issues).

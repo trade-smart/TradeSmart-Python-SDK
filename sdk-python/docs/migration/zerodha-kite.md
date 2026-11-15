@@ -5,7 +5,7 @@ This guide maps the Kite Connect Python client (`pykiteconnect` v4: `KiteConnect
 vocabulary is deliberately familiar (`place_order`, `tradingsymbol`, `transaction_type`,
 `order_type`, `product`, `validity`, `order_id`, …), but the SDK is **not** a drop-in
 replacement: symbols, return types and error handling differ. Full SDK reference:
-[`tradesmart` README](../../README.md).
+[SDK reference](../reference.md).
 
 In the tables, `kite` is a `KiteConnect` instance and `client` a `tradesmart.TradeSmart`
 instance. Every method shown on `TradeSmart` exists with the same parameters on
@@ -19,7 +19,7 @@ instance. Every method shown on `TradeSmart` exists with the same parameters on
 2. Install the SDK (Python 3.11+):
 
    ```bash
-   pip install "tradesmart @ git+https://github.com/trade-smart/tradesmart-sdks.git#subdirectory=sdk-python"
+   pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-SDK.git#subdirectory=sdk-python"
    ```
 
 3. Log in once per trading day (tokens are valid until 06:00 IST); the token is saved for your

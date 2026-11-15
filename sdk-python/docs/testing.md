@@ -36,7 +36,7 @@ def test_buys_on_the_dip():
 
 Most tests need nothing more. The sections below are for looking things up. A longer example
 with failure drills and the stream:
-[`examples/offline_strategy_test.py`](https://github.com/trade-smart/tradesmart-sdks/blob/main/sdk-python/examples/offline_strategy_test.py).
+[`examples/offline_strategy_test.py`](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/examples/offline_strategy_test.py).
 
 ## Set-up
 

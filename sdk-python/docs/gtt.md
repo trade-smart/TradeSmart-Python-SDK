@@ -207,7 +207,7 @@ Trigger values, prices, symbols and tags are never logged.
 `pending_gtts`, `triggered_gtts` and `gtt_alert_types` work against it, and a GTT fires only when
 your test calls `broker.trigger_gtt(alert_id)` (its order is placed with `parent_id` set). See
 [Testing your strategy offline](testing.md) and the runnable
-[`examples/gtt_alert.py`](https://github.com/trade-smart/tradesmart-sdks/blob/main/sdk-python/examples/gtt_alert.py)
+[`examples/gtt_alert.py`](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/examples/gtt_alert.py)
 (place, list, modify, fire; an unknown outcome found by its tag; a GTT refused because it would
 fire at once).
 

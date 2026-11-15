@@ -5,7 +5,7 @@
 Please report security problems privately. Do not open a public issue or pull request.
 
 - Use GitHub private vulnerability reporting: open the **Security** tab of
-  [trade-smart/tradesmart-sdks](https://github.com/trade-smart/tradesmart-sdks) and choose
+  [trade-smart/TradeSmart-Python-SDK](https://github.com/trade-smart/TradeSmart-Python-SDK) and choose
   **Report a vulnerability**.
 - Or email TradeSmart at `support@tradesmartonline.in`.
 

@@ -226,6 +226,7 @@ cancelled, so keep it short or let it be cancelled safely.
 | `DepthAck` / `DepthFeed` | depth subscribe / update | five levels `bp1..5`, `bq1..5`, `sp1..5`, `sq1..5`, `uc`/`lc` |
 | `OrderUpdate` | every order event | `order_id`, `status`, `reporttype`, `price`, `quantity`, `filled_quantity`, `average_price`, `reject_reason`, `tag` |
 | `PositionAck` / `PositionUpdate` | position subscribe / update | `net_quantity`, `realized_pnl`, `product`, buy/sell averages |
+| `ConnectAck` / `HeartbeatAck` | the connect reply / a heartbeat reply | `status` (`Ok` / `Not_Ok`) / `ft` (server time) |
 | `UnsubscribeAck`, `UnknownMessage` | unsubscribes; anything unreadable (`raw` keeps it) | |
 
 Update messages (`TouchlineFeed`, `DepthFeed`) carry only the fields that changed; the others

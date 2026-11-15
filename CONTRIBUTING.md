@@ -1,15 +1,12 @@
 # Contributing
 
-Thanks for helping improve the TradeSmart SDKs. This repository holds one SDK per language, each
-self-contained in its own `sdk-<language>/` folder with its own docs and its own contributing guide
-with setup, test, and style instructions:
+Thanks for helping improve the TradeSmart Python SDK. The SDK lives in `sdk-python/`; its
+contributing guide has the setup, test and style instructions:
+[sdk-python/CONTRIBUTING.md](sdk-python/CONTRIBUTING.md).
 
-- Python: [sdk-python/CONTRIBUTING.md](sdk-python/CONTRIBUTING.md)
-
-Material shared by every SDK lives at the root: language-neutral documentation in
-[`docs/`](docs/README.md) and the behaviour contract, conformance vectors and test fixtures in
-[`specifications/`](specifications/). A change there affects every SDK, so keep it free of
-language-specific code.
+Language-neutral material lives at the root: documentation in [`docs/`](docs/README.md) and the
+behaviour contract, conformance vectors and test fixtures in [`specifications/`](specifications/).
+SDKs for other languages use the same contract, so keep it free of Python-specific code.
 
 ## Pull requests
 
