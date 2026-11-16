@@ -1,0 +1,65 @@
+name: PyPI install check
+
+# Installs the published tradesmart package from PyPI, the way a user would, and imports it. There is
+# deliberately no checkout: the local source can never stand in for the copy on PyPI. Run it by hand
+# after a release (Actions tab, "Run workflow"; leave the version empty for the latest). It also runs
+# when this file changes. macOS is left out (its minutes cost 10x); the release CI covers macOS.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to install, for example 2.0.0 (empty = latest)"
+        required: false
+        default: ""
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/install-check.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.11", "3.12", "3.13", "3.14", "3.15"]
+        include:
+          - os: windows-latest
+            python-version: "3.12"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install from PyPI
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          spec="tradesmart"
+          if [ -n "$VERSION" ]; then spec="tradesmart==$VERSION"; fi
+          python -m pip install --upgrade pip
+          python -m pip install --no-cache-dir "$spec"
+          python -m pip check
+      - name: Import it and build a client
+        run: |
+          python - <<'EOF'
+          import importlib.metadata
+          import tradesmart
+          from tradesmart import AsyncTradeSmart, TradeSmart, TradeSmartStream
+
+          location = tradesmart.__file__.replace("\\", "/")
+          print("tradesmart", importlib.metadata.version("tradesmart"), "from", location)
+          assert "site-packages" in location, location
+          client = TradeSmart(client_id="DEMO", app_key="key", secret_key="secret")
+          assert client.login_url().startswith("https://"), "login URL"
+          client.close()
+          print("import and client OK:", TradeSmart.__name__, AsyncTradeSmart.__name__, TradeSmartStream.__name__)
+          EOF
+      - name: Command line
+        run: python -m tradesmart --help

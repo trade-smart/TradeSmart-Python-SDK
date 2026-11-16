@@ -4,7 +4,7 @@ All notable changes to the `tradesmart` Python SDK are documented here. The form
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
-## [2.0.0] — Unreleased
+## [2.0.0] — 2026-11-15
 
 **The first public release**, on PyPI: `pip install tradesmart`. Version numbers 0.1.0
 and 0.2.0 were internal previews that were never published, so there is nothing to migrate
