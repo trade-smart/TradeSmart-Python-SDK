@@ -596,3 +596,13 @@ def test_shared_specs_require_every_sdk_to_test_on_linux_windows_and_macos() -> 
         assert needle in rows[0], needle
     guide = (REPO_DIR / "specifications" / "new-language-sdk.md").read_text(encoding="utf-8")
     assert "Linux, Windows and macOS" in guide and "Operating systems" in guide
+
+
+def test_public_commits_carry_only_the_tradesmart_author() -> None:
+    # Owner 2026-11-16: no co-author lines naming tools or assistants in any public repository.
+    guide = (REPO_DIR / "specifications" / "new-language-sdk.md").read_text(encoding="utf-8")
+    assert "only the TradeSmart author" in guide and "Co-Authored-By" in guide
+    internal_rules = REPO_DIR / "CLAUDE.md"  # not exported: checked in the internal repository only
+    if internal_rules.exists():
+        rules = internal_rules.read_text(encoding="utf-8")
+        assert "Co-Authored-By: Claude" in rules and "every GitHub repository" in rules

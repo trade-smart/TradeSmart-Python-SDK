@@ -41,3 +41,5 @@ The Python SDK (`sdk-python/`) is the reference implementation. For a new langua
   test account check and an order cap; mocks by default. Funded mode (spec §14, optional) only with
   its own opt-ins, the balance ceiling and every money limit there.
 - No publishing, no push, and no other broker names outside the migration guides.
+- Commits that reach a public repository carry only the TradeSmart author: no `Co-Authored-By`
+  or other lines naming tools or assistants, in the commit message or anywhere else.
