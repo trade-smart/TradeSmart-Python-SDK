@@ -87,16 +87,12 @@ def test_github_workflow_tests_every_supported_operating_system() -> None:
         assert os_label in workflow, os_label
 
 
-def test_macos_ci_runs_only_on_release_tags_or_by_hand() -> None:
-    # Owner 2026-11-15: macOS minutes cost 10x on a private repo, so the macOS job is off on
-    # ordinary pushes and pull requests; it runs on a release tag (v*) or a manual run.
+def test_macos_ci_runs_on_every_push_and_pull_request() -> None:
+    # Owner 2026-11-17: the repository is public, so GitHub-hosted runners (macOS included) cost
+    # nothing; macOS is back in the test matrix and no job is gated to tags or manual runs.
     workflow = (REPO / ".github" / "workflows" / "python-ci.yml").read_text(encoding="utf-8")
-    assert "workflow_dispatch:" in workflow
-    assert re.search(r"tags: \[\"v\*\"\]", workflow)
     jobs = re.split(r"\n  (?=[a-z][a-z-]*:\n)", workflow.split("\njobs:\n", 1)[1])
-    macos = [job for job in jobs if "macos-latest" in job]
-    assert len(macos) == 1 and macos[0].startswith("test-macos:"), "one test-macos job"
-    gate = re.search(r"\n    if: (.+)\n", macos[0])
-    assert gate is not None, "the macOS job has no if: gate"
-    assert "github.event_name == 'workflow_dispatch'" in gate.group(1)
-    assert "startsWith(github.ref, 'refs/tags/v')" in gate.group(1)
+    assert not any(job.startswith("test-macos:") for job in jobs), "no separate macOS job"
+    assert not any(re.search(r"\n    if: ", job) for job in jobs), "no job is gated"
+    test = next(job for job in jobs if job.startswith("test:"))
+    assert re.search(r"- os: macos-latest\n\s+python-version: \"3\.12\"", test)

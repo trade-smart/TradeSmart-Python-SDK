@@ -596,6 +596,9 @@ def test_shared_specs_require_every_sdk_to_test_on_linux_windows_and_macos() -> 
         assert needle in rows[0], needle
     guide = (REPO_DIR / "specifications" / "new-language-sdk.md").read_text(encoding="utf-8")
     assert "Linux, Windows and macOS" in guide and "Operating systems" in guide
+    # Owner 2026-11-17: a public repository runs macOS on every push and pull request.
+    for text in (rows[0], guide):
+        assert "public repository runs macOS on every push and pull request" in text
 
 
 def test_public_commits_carry_only_the_tradesmart_author() -> None:

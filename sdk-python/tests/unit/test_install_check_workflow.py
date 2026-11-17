@@ -46,7 +46,7 @@ def test_covers_every_supported_python_and_windows_but_not_macos() -> None:
     ci = (WORKFLOWS / "python-ci.yml").read_text(encoding="utf-8")
     assert _versions(text) == _versions(ci)
     assert "windows-latest" in text
-    assert "macos" not in text, "macOS minutes cost 10x: release tags and manual CI runs only"
+    assert "macos" not in text, "macOS is covered by the Python CI on every push"
 
 
 def test_read_only_and_no_secrets() -> None:

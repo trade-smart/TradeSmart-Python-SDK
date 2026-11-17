@@ -3,7 +3,7 @@ name: PyPI install check
 # Installs the published tradesmart package from PyPI, the way a user would, and imports it. There is
 # deliberately no checkout: the local source can never stand in for the copy on PyPI. Run it by hand
 # after a release (Actions tab, "Run workflow"; leave the version empty for the latest). It also runs
-# when this file changes. macOS is left out (its minutes cost 10x); the release CI covers macOS.
+# when this file changes. macOS is left out; the Python CI tests macOS on every push.
 on:
   workflow_dispatch:
     inputs:

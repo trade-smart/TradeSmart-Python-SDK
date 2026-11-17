@@ -19,8 +19,9 @@ The Python SDK (`sdk-python/`) is the reference implementation. For a new langua
 - Run the CI on Linux, Windows and macOS from the start, and keep the tests independent of the
   operating system (home folder, platform-specific output, signals, floating-point tolerance,
   helper threads): spec §14, "Operating systems". Docker on Linux alone hides these failures.
-  macOS may run only on release tags and manual runs (it costs ten times the minutes while the
-  repository is private), but must pass before every release.
+  A public repository runs macOS on every push and pull request (free there); while the
+  repository is private, macOS may run only on release tags and manual runs (it costs ten times
+  the minutes), but must pass before every release.
 - Link newcomers to account opening, like Python: the README (the package registry page), the
   getting-started guide's "Get API access" step and the package metadata's project URLs carry
   `https://signup.tradesmartonline.in/?utm_source=<Lang>SDK&utm_medium=Organic&utm_campaign=SDK_Open_Demat&utm_content=<place>&channel=Organic&platform=web`
