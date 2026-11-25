@@ -19,13 +19,22 @@ import pytest
 from tests.live_orders import gtt, safety
 from tests.live_orders import test_gtt_live as live
 from tests.live_orders.safety import CheckTheAccount, OrderBudget, OrderSession, Recorder
+from tradesmart import OcoLeg
 from tradesmart.models.gtt import TriggeredGtt
 from tradesmart.models.market import Quote
 from tradesmart.models.orders import Order
 from tradesmart.testing import OfflineBroker, drills
 
 TOKEN = "1660"
-WRITES = ("PlaceGTTOrder", "ModifyGTTOrder", "CancelGTTOrder")
+WRITES = (
+    "PlaceGTTOrder",
+    "ModifyGTTOrder",
+    "CancelGTTOrder",
+    "PlaceOCOOrder",
+    "ModifyOCOOrder",
+    "CancelOCOOrder",
+)
+OCO_WRITES = ["PlaceOCOOrder", "ModifyOCOOrder", "CancelOCOOrder"]
 
 
 @dataclass
@@ -41,6 +50,15 @@ class Rig:
             live.test_far_gtt_buy_is_placed_read_back_modified_once_and_cancelled(
                 self.session, record
             )
+        finally:
+            self.session.test_budget = None
+        return record
+
+    def run_oco(self, record: dict[str, Any] | None = None) -> dict[str, Any]:
+        record = {"test": "oco"} if record is None else record
+        self.session.test_budget = OrderBudget(gtt.GTT_CALLS)  # the test sets its own
+        try:
+            live.test_oco_lifecycle(self.session, record)
         finally:
             self.session.test_budget = None
         return record
@@ -421,3 +439,240 @@ def test_an_interruption_after_the_place_prints_and_records_an_alert(
     assert "CHECK THE ACCOUNT" in capsys.readouterr().err
     assert "CHECK THE ACCOUNT" in record["gtt"]["alert"]
     assert "KeyboardInterrupt" in record["gtt"]["alert"]
+
+
+# -- OCO (Task 9): the same gates, 4 writes on UAT, 3 on production --------------------------
+
+
+def _triggers(payload: dict[str, Any]) -> dict[str, Decimal]:
+    return {item["var_name"]: Decimal(str(item["d"])) for item in payload["oivariable"]}
+
+
+def test_the_oco_is_placed_read_back_modified_cancelled_and_probed_on_uat(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    for rig in _make_rig(monkeypatch, tmp_path, uat=True):
+        record = rig.run_oco()
+        # the 4th write: a modify on the cancelled id
+        assert rig.writes() == [*OCO_WRITES, "ModifyOCOOrder"]
+        (placed,) = rig.requests("PlaceOCOOrder")
+        assert _triggers(placed) == {"x": Decimal("440.00"), "y": Decimal("360.00")}
+        leg = placed["place_order_params"]
+        assert (leg["trantype"], leg["prctyp"], leg["prd"], leg["qty"]) == ("B", "LMT", "C", "1")
+        assert placed["tsym"] == "ITC-EQ" and placed["place_order_params_leg2"]["prctyp"] == "LMT"
+        first, probe = rig.requests("ModifyOCOOrder")
+        assert _triggers(first) == {"x": Decimal("460.00"), "y": Decimal("360.00")}
+        assert probe["al_id"] == first["al_id"]
+        assert rig.session.budget.used == 4
+        assert record["oco"]["probe_after_cancel"]["outcome"] == "rejected"
+        assert record["oco"]["left_pending"] == []
+        assert rig.session.client.pending_gtts() == []
+
+
+def test_the_oco_on_production_is_three_writes_without_the_probe(prod_rig: Rig) -> None:
+    record = prod_rig.run_oco()
+    assert prod_rig.writes() == OCO_WRITES
+    assert prod_rig.session.budget.used == 3
+    assert "probe_after_cancel" not in record["oco"]
+
+
+def test_the_oco_on_production_refuses_unless_the_run_has_all_three_writes(prod_rig: Rig) -> None:
+    prod_rig.session.budget.used = 1
+    with pytest.raises(pytest.skip.Exception, match="-k oco"):
+        prod_rig.run_oco()
+    assert prod_rig.writes() == [] and prod_rig.session.budget.used == 1
+
+
+def test_the_oco_records_whether_the_tag_comes_back_and_the_cancelled_row(rig: Rig) -> None:
+    record = rig.run_oco()
+    assert record["oco"]["tag_in_pending_row"] is False  # the offline rows carry no leg remarks
+    (cancel,) = rig.requests("CancelOCOOrder")
+    assert record["oco"]["triggered_cancelled"] == [cancel["al_id"]]
+    assert "fired" not in record["oco"]
+
+
+def test_an_oco_left_pending_is_check_the_account(rig: Rig) -> None:
+    rig.broker.fail_next("CancelOCOOrder", drills.reject("Oi delete failed"))
+    with pytest.raises(CheckTheAccount, match="CHECK THE ACCOUNT"):
+        rig.run_oco()
+    assert rig.writes() == OCO_WRITES  # never retried, no probe
+    assert len(rig.session.client.pending_gtts()) == 1
+
+
+def test_a_missing_fresh_quote_skips_the_oco_before_sending(rig: Rig) -> None:
+    _quotes_after_the_first(rig, {"ti": "0.05"})  # no lp
+    with pytest.raises(pytest.skip.Exception, match="no fresh last price"):
+        rig.run_oco()
+    assert rig.writes() == [] and rig.session.budget.used == 0
+
+
+def test_the_oco_is_refused_in_funded_mode(prod_rig: Rig) -> None:
+    prod_rig.session.funded = True
+    with pytest.raises(pytest.skip.Exception, match="never in funded mode"):
+        prod_rig.run_oco()
+    assert prod_rig.writes() == []
+
+
+def test_the_oco_record_redacts_the_ip_address_and_the_account_id(rig: Rig) -> None:
+    record = rig.run_oco()
+    record["oco"]["pending_probe"] = {"ipaddr": "10.1.2.3", "actid": rig.broker.client_id}
+    rig.session.recorder.write(record)
+    text = rig.session.recorder.path.read_text(encoding="utf-8")
+    assert "10.1.2.3" not in text and rig.broker.client_id not in text
+
+
+# -- OCO review fix round 1: an unknown place, and a probe that is not rejected --------------
+
+
+def _rows_carry_the_tag(rig: Rig) -> None:
+    """``pending_gtts()`` shows the placed OCO with the run's tag on the row."""
+    client = rig.session.client
+    real = client.pending_gtts
+
+    def pending() -> list[Any]:
+        rows = real()
+        placed = rig.requests("PlaceOCOOrder")
+        if not placed:
+            return rows
+        tag = placed[0]["place_order_params"]["remarks"]
+        return [r.model_copy(update={"tag": tag}) for r in rows]
+
+    client.pending_gtts = pending  # type: ignore[method-assign]
+
+
+def test_an_unknown_oco_place_found_by_tag_is_cancelled_once_and_never_resent(rig: Rig) -> None:
+    rig.broker.fail_next("PlaceOCOOrder", drills.timeout_after_send())
+    _rows_carry_the_tag(rig)
+    with pytest.raises(AssertionError, match="unknown"):
+        rig.run_oco()
+    assert len(rig.requests("PlaceOCOOrder")) == 1  # never retried
+    assert rig.writes() == ["PlaceOCOOrder", "CancelOCOOrder"]  # one cancel, no modify, no probe
+    assert rig.broker.client().pending_gtts() == []
+
+
+def _hide_ocos_after_the_place(rig: Rig) -> None:
+    """``pending_gtts()`` lists no OCO once the place was sent (the list lags or drops it)."""
+    client = rig.session.client
+    real = client.pending_gtts
+
+    def pending() -> list[Any]:
+        rows = real()
+        return [r for r in rows if not r.is_oco] if rig.requests("PlaceOCOOrder") else rows
+
+    client.pending_gtts = pending  # type: ignore[method-assign]
+
+
+def test_an_unknown_oco_place_not_found_is_check_the_account_and_never_resent(rig: Rig) -> None:
+    rig.broker.fail_next("PlaceOCOOrder", drills.timeout_after_send())
+    _hide_ocos_after_the_place(rig)
+    with pytest.raises(CheckTheAccount, match="never seen in pending_gtts"):
+        rig.run_oco()
+    assert len(rig.requests("PlaceOCOOrder")) == 1  # never retried
+    assert rig.writes() == ["PlaceOCOOrder"]  # no id to cancel by
+
+
+def _answer_the_probe_with_another_new_oco(rig: Rig) -> list[str]:
+    """The UAT server accepts the modify on the cancelled id, answers an alert id of a NEW OCO
+    that carries another tag (so only the returned id can find it); returns that id."""
+    client = rig.session.client
+    real_modify = client.modify_oco
+    real_place = client.place_oco
+    new_ids: list[str] = []
+
+    def modify(alert_id: str, **kwargs: Any) -> str:
+        if not rig.requests("CancelOCOOrder"):
+            return real_modify(alert_id, **kwargs)
+        kwargs["tag"] = "unrelated-tag"
+        new_id = real_place(**kwargs)
+        new_ids.append(new_id)
+        return new_id
+
+    client.modify_oco = modify  # type: ignore[method-assign]
+    return new_ids
+
+
+def test_a_probe_answered_with_another_alert_id_that_is_pending_is_check_the_account(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    for rig in _make_rig(monkeypatch, tmp_path, uat=True):
+        new_ids = _answer_the_probe_with_another_new_oco(rig)
+        with pytest.raises(CheckTheAccount, match="CHECK THE ACCOUNT") as caught:
+            rig.run_oco()
+        assert len(new_ids) == 1 and new_ids[0] in str(caught.value)
+        # one write for the probe, nothing sent to clean up: the new OCO is still pending
+        assert rig.writes().count("CancelOCOOrder") == 1
+        assert [r.alert_id for r in rig.session.client.pending_gtts()] == new_ids
+
+
+# -- OCO rows carry no top-level tag (remarks ""): found by the leg tag or by symbol + triggers --
+
+
+def _found_by(record: dict[str, Any], key: str) -> list[str]:
+    return sorted(set(record["oco"]["found_by"][key].values()))
+
+
+def test_an_unknown_oco_place_without_an_id_is_found_by_symbol_and_triggers(rig: Rig) -> None:
+    # the offline rows are as observed: no top-level remarks and no leg remarks
+    rig.broker.fail_next("PlaceOCOOrder", drills.timeout_after_send())
+    record: dict[str, Any] = {"test": "oco"}
+    with pytest.raises(AssertionError, match="unknown"):
+        rig.run_oco(record)
+    assert record["oco"]["place"]["outcome"] == "unknown"
+    assert len(rig.requests("PlaceOCOOrder")) == 1  # never retried
+    assert rig.writes() == ["PlaceOCOOrder", "CancelOCOOrder"]  # cancelled once, no modify
+    assert _found_by(record, "after_place") == ["symbol_and_triggers"]
+    assert rig.broker.client().pending_gtts() == []
+
+
+def test_an_unknown_oco_place_found_by_the_tag_in_a_leg_is_cancelled_once(rig: Rig) -> None:
+    rig.broker.fail_next("PlaceOCOOrder", drills.timeout_after_send())
+    client = rig.session.client
+    real = client.pending_gtts
+
+    def pending() -> list[Any]:
+        placed = rig.requests("PlaceOCOOrder")
+        if not placed:
+            return real()
+        tag = placed[0]["place_order_params"]["remarks"]
+        out = []
+        for row in real():
+            assert not (row.tag or "").strip()  # never a top-level tag on an OCO row
+            leg = row.oco_first.model_copy(update={"tag": tag}) if row.oco_first else None
+            # other triggers on the row: only the leg tag can find it
+            out.append(row.model_copy(update={"oco_first": leg, "oco_triggers": []}))
+        return out
+
+    client.pending_gtts = pending  # type: ignore[method-assign]
+    record: dict[str, Any] = {"test": "oco"}
+    with pytest.raises(AssertionError, match="unknown"):
+        rig.run_oco(record)
+    assert rig.writes() == ["PlaceOCOOrder", "CancelOCOOrder"]
+    assert _found_by(record, "after_place") == ["leg_tag"]
+    assert rig.broker.client().pending_gtts() == []
+
+
+def test_an_accepted_oco_is_found_by_its_alert_id(rig: Rig) -> None:
+    record = rig.run_oco()
+    assert _found_by(record, "after_place") == ["alert_id"]
+
+
+def test_an_oco_pending_before_the_place_is_never_taken_for_this_run(rig: Rig) -> None:
+    # another OCO on the same instrument, with the same two triggers the run will send
+    other = rig.broker.client().place_oco(
+        exchange="NSE",
+        tradingsymbol="ITC-EQ",
+        transaction_type="BUY",
+        quantity=1,
+        product="CNC",
+        stop_loss=OcoLeg(trigger_value="440.00", price="360.00"),
+        target=OcoLeg(trigger_value="360.00", price="360.00"),
+        tag="someone-else",
+        alert_validity="DAY",
+    )
+    rig.broker.fail_next("PlaceOCOOrder", drills.timeout_after_send())
+    record: dict[str, Any] = {"test": "oco"}
+    with pytest.raises(AssertionError, match="unknown"):
+        rig.run_oco(record)
+    cancels = [r["al_id"] for r in rig.requests("CancelOCOOrder")]
+    assert other not in cancels and len(cancels) == 1  # only this run's OCO
+    assert [r.alert_id for r in rig.broker.client().pending_gtts()] == [other]

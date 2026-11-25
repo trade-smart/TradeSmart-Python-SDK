@@ -11,7 +11,9 @@ sequence through ``Placed.modify`` (``calls.modify``: one call per intent, never
   DAY -> IOC (record: the exchange may cancel the order);
 - SL-LMT: price +1 tick, -1 tick; quantity +1 lot, -1 lot; trigger +1 tick; price and trigger
   +1 tick; product (refusal); tag (record); SL-LMT -> LMT (a far BUY from a fresh quote);
-  validity DAY -> IOC (record);
+  validity DAY -> IOC (record); a stop entry the book shows as a LIMIT (UAT, 18 Nov 2026)
+  skips the trigger, price-trigger and to-lmt steps (recorded ``uat_stop_open`` on UAT, a
+  failure elsewhere);
 - then one cancel (confirmed final; one CancelOrder per order per session), then a modify of
   the cancelled order: a definitive refusal is expected and its words are recorded.
 
@@ -720,6 +722,23 @@ AFTER_CANCEL_IGNORED_NOTE = "modify_after_cancel_ignored"
 AFTER_CANCEL_UNVERIFIED_NOTE = "modify_after_cancel_unverified"
 
 
+# Steps that need a stop order (a trigger): skipped when the stop entry was booked as a LIMIT.
+STOP_ONLY_STEPS = frozenset({"trigger", "price-trigger", "to-lmt"})
+
+
+def _stored_as_limit(placed: Placed, state: State) -> str | None:
+    """Why the stop steps cannot run when a stop entry rests as a LIMIT in the book (UAT, live
+    18 Nov 2026: placed ``SL-LMT``, booked ``LMT`` / ``OPEN`` with its trigger kept, N9 (e));
+    ``None`` for a stop that stayed a stop and for a LIMIT entry. On UAT the engine records the
+    case ``uat_stop_open``; elsewhere the case fails with this reason."""
+    if placed.case.prctyp != "SL-LMT" or state.order_type == "SL-LMT":
+        return None
+    return (
+        f"the stop order is stored as a LIMIT ({describe(placed.row)}), not a stop: "
+        f"no trigger to modify ({batch.UAT_STOP_OPEN})"
+    )
+
+
 @dataclass
 class ModifySequence:
     """The ``after_settle`` hook of one M2 case (see the module docstring). ``steps`` overrides
@@ -738,8 +757,17 @@ class ModifySequence:
         steps = self.steps
         if steps is None:
             steps = LMT_STEPS if placed.case.prctyp == "LMT" else SL_STEPS
+        stored = _stored_as_limit(placed, ctx.state)
+        if stored is not None and not placed.run.session.uat:
+            ctx.failures.append(stored)  # off UAT a stop must stay a stop; on UAT: uat_stop_open
         try:
             for step in steps:
+                if stored is not None and step.name in STOP_ONLY_STEPS:
+                    ctx.steps.append(
+                        {"step": step.name, "expect": step.expect, "result": SKIPPED,
+                         "reason": stored}
+                    )  # fmt: skip
+                    continue
                 _modify_step(ctx, step)
             final = _cancel_step(ctx)
             if final and self.after_cancel:

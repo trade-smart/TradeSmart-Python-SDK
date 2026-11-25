@@ -38,7 +38,7 @@ def test_request_place_gtt_ok_is_unknown(client: TradeSmart) -> None:
 
 @respx.mock
 def test_request_cancel_gtt_without_al_id_is_unknown(client: TradeSmart) -> None:
-    respx.post(f"{BASE}/CancelGTTOrder").respond(200, json={"stat": "Oi delete success"})
+    respx.post(f"{BASE}/CancelGTTOrder").respond(200, json={"stat": "OI deleted"})
     with pytest.raises(OrderStatusUnknownError):
         client.request("cancelgttorder", {"al_id": "1"}, state_changing=False)
 
@@ -49,7 +49,7 @@ def test_request_cancel_gtt_without_al_id_is_unknown(client: TradeSmart) -> None
         ("PlaceGTTOrder", "OI created"),
         ("PlaceGTTOrder", "oi CREATED"),
         ("ModifyGTTOrder", "OI REPLACED"),
-        ("CancelGTTOrder", "oi delete SUCCESS"),
+        ("CancelGTTOrder", "oi DELETED"),
     ],
 )
 @respx.mock
@@ -63,7 +63,7 @@ def test_request_gtt_word_ignores_letter_case(client: TradeSmart, endpoint: str,
 @pytest.mark.parametrize(
     ("endpoint", "stat"),
     [
-        ("CancelGTTOrder", "OI deleted"),
+        ("CancelGTTOrder", "Oi delete success"),
         ("PlaceGTTOrder", "Oi  created"),
         ("PlaceGTTOrder", " Oi created"),
     ],
@@ -83,7 +83,9 @@ async def test_async_request_gtt_word_ignores_letter_case(async_client: AsyncTra
     ack = {"stat": "OI created", "al_id": "26111300000001"}
     respx.post(f"{BASE}/PlaceGTTOrder").respond(200, json=ack)
     assert await async_client.request("PlaceGTTOrder", {}, state_changing=False) == ack
-    respx.post(f"{BASE}/CancelGTTOrder").respond(200, json={"stat": "OI deleted", "al_id": "1"})
+    respx.post(f"{BASE}/CancelGTTOrder").respond(
+        200, json={"stat": "Oi delete success", "al_id": "1"}
+    )
     with pytest.raises(OrderStatusUnknownError):
         await async_client.request("CancelGTTOrder", {}, state_changing=False)
     await async_client.aclose()
@@ -232,3 +234,74 @@ async def test_async_request_list_body_on_a_write_is_unknown_even_with_expect_li
 def test_request_place_multi_order_list_is_still_returned(client: TradeSmart) -> None:
     respx.post(f"{BASE}/PlaceMultiOrder").respond(200, json=[])
     assert client.request("placemultiorder", {}, state_changing=False, expect="list") == []
+
+
+@pytest.mark.parametrize("endpoint", ["CancelGTTOrder", "ModifyGTTOrder"])
+@respx.mock
+def test_request_invalid_oi_is_a_rejection_sent_once(client: TradeSmart, endpoint: str) -> None:
+    route = respx.post(f"{BASE}/{endpoint}").respond(200, json={"stat": "Invalid Oi"})
+    with pytest.raises(OrderRejectedError):
+        client.request(endpoint, {"al_id": "1"}, state_changing=False)
+    assert route.call_count == 1
+
+
+@pytest.mark.parametrize("endpoint", ["CancelOCOOrder", "ModifyOCOOrder"])
+@respx.mock
+async def test_async_request_invalid_oi_is_a_rejection_sent_once(
+    async_client: AsyncTradeSmart, endpoint: str
+) -> None:
+    route = respx.post(f"{BASE}/{endpoint}").respond(200, json={"stat": "Invalid Oi"})
+    with pytest.raises(OrderRejectedError):
+        await async_client.request(endpoint, {"al_id": "1"}, state_changing=False)
+    assert route.call_count == 1
+    await async_client.aclose()
+
+
+@respx.mock
+def test_request_accepts_nested_payload(client: TradeSmart) -> None:
+    route = respx.post(f"{BASE}/GetQuotes").respond(200, json={"stat": "Ok"})
+    client.request("GetQuotes", {"x": [{"y": "1"}], "z": {"n": 2}}, state_changing=False)
+    body = route.calls[0].request.content.decode()
+    assert '"x":[{"y":"1"}],"z":{"n":"2"}' in body
+
+
+def _cyclic_dict() -> dict[str, Any]:
+    loop: dict[str, Any] = {}
+    loop["me"] = loop
+    return loop
+
+
+def _cyclic_list() -> list[Any]:
+    loop: list[Any] = []
+    loop.append(loop)
+    return loop
+
+
+def _deep(levels: int) -> dict[str, Any]:
+    value: dict[str, Any] = {"leaf": "1"}
+    for _ in range(levels):
+        value = {"k": value}
+    return value
+
+
+@pytest.mark.parametrize(
+    "value", [_cyclic_dict(), _cyclic_list(), _deep(150)], ids=["dict", "list", "deep"]
+)
+@respx.mock
+def test_request_cyclic_or_too_deep_payload_is_a_type_error_nothing_sent(
+    client: TradeSmart, value: Any
+) -> None:
+    route = respx.post(f"{BASE}/GetQuotes").respond(200, json={"stat": "Ok"})
+    with pytest.raises(TypeError) as info:
+        client.request("GetQuotes", {"top": value}, state_changing=False)
+    assert str(info.value) == "payload value for 'top': nested too deeply (or cyclic)"
+    assert route.call_count == 0
+
+
+def test_request_deep_but_allowed_payload_is_built() -> None:
+    from tradesmart._client_core import build_raw_call
+
+    call = build_raw_call(
+        "U1", "GetQuotes", {"top": _deep(90)}, state_changing=False, expect="object"
+    )
+    assert "top" in call.payload

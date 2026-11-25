@@ -1,0 +1,798 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "alert_id": "26111800000001",
+        "is_oco": true,
+        "oco_first": {
+          "price": "1440.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_second": {
+          "price": "1160.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_triggers": [
+          {
+            "trigger_value": "1430.00",
+            "var_name": "x"
+          },
+          {
+            "trigger_value": "1170.00",
+            "var_name": "y"
+          }
+        ],
+        "stop_loss": {
+          "leg": "first",
+          "trigger_value": "1430.00"
+        },
+        "target": {
+          "leg": "second",
+          "trigger_value": "1170.00"
+        }
+      },
+      "input": {
+        "list": "pending",
+        "row": {
+          "C": "0",
+          "ai_t": "LMT_BOS_O",
+          "al_id": "26111800000001",
+          "brkname": "TESTBRK",
+          "cname": "TEST NAME",
+          "d": "1430.00",
+          "exch": "NSE",
+          "ls": "1",
+          "norentm": "09:31:12 18-11-2026",
+          "oivariable": [
+            {
+              "d": "1430.00",
+              "var_name": "x"
+            },
+            {
+              "d": "1170.00",
+              "var_name": "y"
+            }
+          ],
+          "ordersource": "API",
+          "place_order_params": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1440.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "s_prdt_ali": "CNC",
+            "trantype": "B"
+          },
+          "place_order_params_leg2": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1160.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "trantype": "B"
+          },
+          "pp": "2",
+          "prc": "1440.00",
+          "prctyp": "LMT",
+          "prd": "C",
+          "qty": 1,
+          "remarks": "",
+          "stat": "Ok",
+          "ti": "0.05",
+          "token": "2885",
+          "trantype": "B",
+          "tsym": "RELIANCE-EQ",
+          "upd_tm": "09:31:12 18-11-2026",
+          "validity": "GTT"
+        }
+      },
+      "name": "pending_buy_stop_loss_in_x"
+    },
+    {
+      "expected": {
+        "alert_id": "26111800000002",
+        "is_oco": true,
+        "oco_first": {
+          "price": "1420.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_second": {
+          "price": "1160.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_triggers": [
+          {
+            "trigger_value": "1430.00",
+            "var_name": "x"
+          },
+          {
+            "trigger_value": "1170.00",
+            "var_name": "y"
+          }
+        ],
+        "stop_loss": {
+          "leg": "second",
+          "trigger_value": "1170.00"
+        },
+        "target": {
+          "leg": "first",
+          "trigger_value": "1430.00"
+        }
+      },
+      "input": {
+        "list": "pending",
+        "row": {
+          "C": "0",
+          "ai_t": "LMT_SOB_O",
+          "al_id": "26111800000002",
+          "brkname": "TESTBRK",
+          "cname": "TEST NAME",
+          "d": "1430.00",
+          "exch": "NSE",
+          "ls": "1",
+          "norentm": "09:31:12 18-11-2026",
+          "oivariable": [
+            {
+              "d": "1430.00",
+              "var_name": "x"
+            },
+            {
+              "d": "1170.00",
+              "var_name": "y"
+            }
+          ],
+          "ordersource": "API",
+          "place_order_params": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1420.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "s_prdt_ali": "CNC",
+            "trantype": "S"
+          },
+          "place_order_params_leg2": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1160.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "trantype": "S"
+          },
+          "pp": "2",
+          "prc": "1420.00",
+          "prctyp": "LMT",
+          "prd": "C",
+          "qty": 1,
+          "remarks": "",
+          "stat": "Ok",
+          "ti": "0.05",
+          "token": "2885",
+          "trantype": "S",
+          "tsym": "RELIANCE-EQ",
+          "upd_tm": "09:31:12 18-11-2026",
+          "validity": "GTT"
+        }
+      },
+      "name": "pending_sell_target_in_x"
+    },
+    {
+      "expected": {
+        "alert_id": "26111800000003",
+        "is_oco": true,
+        "oco_first": {
+          "price": "1440.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_second": {
+          "price": "1160.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_triggers": [
+          {
+            "trigger_value": "1430.00",
+            "var_name": "x"
+          },
+          {
+            "trigger_value": "1170.00",
+            "var_name": "y"
+          }
+        ],
+        "stop_loss": {
+          "leg": "first",
+          "trigger_value": "1430.00"
+        },
+        "target": {
+          "leg": "second",
+          "trigger_value": "1170.00"
+        }
+      },
+      "input": {
+        "list": "triggered",
+        "row": {
+          "C": "0",
+          "ai_t": "LMT_BOS_O",
+          "al_id": "26111800000003",
+          "brkname": "TESTBRK",
+          "d": "1430.00",
+          "email_flag": "0",
+          "exch": "NSE",
+          "ls": "1",
+          "norentm": "09:31:12 18-11-2026",
+          "oivariable": [
+            {
+              "d": "1430.00",
+              "var_name": "x"
+            },
+            {
+              "d": "1170.00",
+              "var_name": "y"
+            }
+          ],
+          "ordersource": "API",
+          "place_order_params": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1440.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "s_prdt_ali": "CNC",
+            "trantype": "B"
+          },
+          "place_order_params_leg2": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1160.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "trantype": "B"
+          },
+          "pp": "2",
+          "prc": "1440.00",
+          "prctyp": "LMT",
+          "prd": "C",
+          "push_flag": "0",
+          "qty": 1,
+          "remarks": "",
+          "sms_flag": "0",
+          "stat": "CANCELLED",
+          "ti": "0.05",
+          "token": "2885",
+          "trantype": "B",
+          "tsym": "RELIANCE-EQ",
+          "upd_tm": "09:47:03 18-11-2026",
+          "validity": "GTT"
+        }
+      },
+      "name": "triggered_cancelled_buy"
+    },
+    {
+      "expected": {
+        "alert_id": "26111800000001",
+        "is_oco": true,
+        "oco_first": null,
+        "oco_second": {
+          "price": "1160.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_triggers": [
+          {
+            "trigger_value": "1430.00",
+            "var_name": "x"
+          },
+          {
+            "trigger_value": "1170.00",
+            "var_name": "y"
+          }
+        ],
+        "stop_loss": null,
+        "target": null
+      },
+      "input": {
+        "list": "pending",
+        "row": {
+          "C": "0",
+          "ai_t": "LMT_BOS_O",
+          "al_id": "26111800000001",
+          "brkname": "TESTBRK",
+          "cname": "TEST NAME",
+          "d": "1430.00",
+          "exch": "NSE",
+          "ls": "1",
+          "norentm": "09:31:12 18-11-2026",
+          "oivariable": [
+            {
+              "d": "1430.00",
+              "var_name": "x"
+            },
+            {
+              "d": "1170.00",
+              "var_name": "y"
+            }
+          ],
+          "ordersource": "API",
+          "place_order_params": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1440.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": "abc",
+            "s_prdt_ali": "CNC",
+            "trantype": "B"
+          },
+          "place_order_params_leg2": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1160.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "trantype": "B"
+          },
+          "pp": "2",
+          "prc": "1440.00",
+          "prctyp": "LMT",
+          "prd": "C",
+          "qty": 1,
+          "remarks": "",
+          "stat": "Ok",
+          "ti": "0.05",
+          "token": "2885",
+          "trantype": "B",
+          "tsym": "RELIANCE-EQ",
+          "upd_tm": "09:31:12 18-11-2026",
+          "validity": "GTT"
+        }
+      },
+      "name": "first_leg_quantity_not_a_number_nulls_the_leg"
+    },
+    {
+      "expected": {
+        "alert_id": "26111800000002",
+        "is_oco": true,
+        "oco_first": {
+          "price": "1420.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_second": null,
+        "oco_triggers": [
+          {
+            "trigger_value": "1430.00",
+            "var_name": "x"
+          },
+          {
+            "trigger_value": "1170.00",
+            "var_name": "y"
+          }
+        ],
+        "stop_loss": null,
+        "target": null
+      },
+      "input": {
+        "list": "pending",
+        "row": {
+          "C": "0",
+          "ai_t": "LMT_SOB_O",
+          "al_id": "26111800000002",
+          "brkname": "TESTBRK",
+          "cname": "TEST NAME",
+          "d": "1430.00",
+          "exch": "NSE",
+          "ls": "1",
+          "norentm": "09:31:12 18-11-2026",
+          "oivariable": [
+            {
+              "d": "1430.00",
+              "var_name": "x"
+            },
+            {
+              "d": "1170.00",
+              "var_name": "y"
+            }
+          ],
+          "ordersource": "API",
+          "place_order_params": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1420.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "s_prdt_ali": "CNC",
+            "trantype": "S"
+          },
+          "place_order_params_leg2": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "x",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "trantype": "S"
+          },
+          "pp": "2",
+          "prc": "1420.00",
+          "prctyp": "LMT",
+          "prd": "C",
+          "qty": 1,
+          "remarks": "",
+          "stat": "Ok",
+          "ti": "0.05",
+          "token": "2885",
+          "trantype": "S",
+          "tsym": "RELIANCE-EQ",
+          "upd_tm": "09:31:12 18-11-2026",
+          "validity": "GTT"
+        }
+      },
+      "name": "second_leg_price_not_a_number_nulls_the_leg"
+    },
+    {
+      "expected": {
+        "alert_id": "26111800000001",
+        "is_oco": true,
+        "oco_first": {
+          "price": "1440.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_second": {
+          "price": "1160.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_triggers": null,
+        "stop_loss": null,
+        "target": null
+      },
+      "input": {
+        "list": "pending",
+        "row": {
+          "C": "0",
+          "ai_t": "LMT_BOS_O",
+          "al_id": "26111800000001",
+          "brkname": "TESTBRK",
+          "cname": "TEST NAME",
+          "d": "1430.00",
+          "exch": "NSE",
+          "ls": "1",
+          "norentm": "09:31:12 18-11-2026",
+          "oivariable": [
+            {
+              "d": "1430.00",
+              "var_name": "x"
+            },
+            {
+              "d": "zz",
+              "var_name": "y"
+            }
+          ],
+          "ordersource": "API",
+          "place_order_params": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1440.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "s_prdt_ali": "CNC",
+            "trantype": "B"
+          },
+          "place_order_params_leg2": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1160.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "trantype": "B"
+          },
+          "pp": "2",
+          "prc": "1440.00",
+          "prctyp": "LMT",
+          "prd": "C",
+          "qty": 1,
+          "remarks": "",
+          "stat": "Ok",
+          "ti": "0.05",
+          "token": "2885",
+          "trantype": "B",
+          "tsym": "RELIANCE-EQ",
+          "upd_tm": "09:31:12 18-11-2026",
+          "validity": "GTT"
+        }
+      },
+      "name": "trigger_value_not_a_number_nulls_the_triggers"
+    },
+    {
+      "expected": {
+        "alert_id": "26111800000003",
+        "is_oco": true,
+        "oco_first": {
+          "price": "1440.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_second": null,
+        "oco_triggers": [
+          {
+            "trigger_value": "1430.00",
+            "var_name": "x"
+          },
+          {
+            "trigger_value": "1170.00",
+            "var_name": "y"
+          }
+        ],
+        "stop_loss": null,
+        "target": null
+      },
+      "input": {
+        "list": "triggered",
+        "row": {
+          "C": "0",
+          "ai_t": "LMT_BOS_O",
+          "al_id": "26111800000003",
+          "brkname": "TESTBRK",
+          "d": "1430.00",
+          "email_flag": "0",
+          "exch": "NSE",
+          "ls": "1",
+          "norentm": "09:31:12 18-11-2026",
+          "oivariable": [
+            {
+              "d": "1430.00",
+              "var_name": "x"
+            },
+            {
+              "d": "1170.00",
+              "var_name": "y"
+            }
+          ],
+          "ordersource": "API",
+          "place_order_params": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1440.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "s_prdt_ali": "CNC",
+            "trantype": "B"
+          },
+          "place_order_params_leg2": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1160.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": "abc",
+            "trantype": "B"
+          },
+          "pp": "2",
+          "prc": "1440.00",
+          "prctyp": "LMT",
+          "prd": "C",
+          "push_flag": "0",
+          "qty": 1,
+          "remarks": "",
+          "sms_flag": "0",
+          "stat": "CANCELLED",
+          "ti": "0.05",
+          "token": "2885",
+          "trantype": "B",
+          "tsym": "RELIANCE-EQ",
+          "upd_tm": "09:47:03 18-11-2026",
+          "validity": "GTT"
+        }
+      },
+      "name": "triggered_leg_quantity_not_a_number_nulls_the_leg"
+    },
+    {
+      "expected": {
+        "alert_id": "26111800000003",
+        "is_oco": true,
+        "oco_first": {
+          "price": "1440.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_second": {
+          "price": "1160.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_triggers": null,
+        "stop_loss": null,
+        "target": null
+      },
+      "input": {
+        "list": "triggered",
+        "row": {
+          "C": "0",
+          "ai_t": "LMT_BOS_O",
+          "al_id": "26111800000003",
+          "brkname": "TESTBRK",
+          "d": "1430.00",
+          "email_flag": "0",
+          "exch": "NSE",
+          "ls": "1",
+          "norentm": "09:31:12 18-11-2026",
+          "oivariable": [
+            {
+              "d": "zz",
+              "var_name": "x"
+            },
+            {
+              "d": "1170.00",
+              "var_name": "y"
+            }
+          ],
+          "ordersource": "API",
+          "place_order_params": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1440.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "s_prdt_ali": "CNC",
+            "trantype": "B"
+          },
+          "place_order_params_leg2": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1160.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "trantype": "B"
+          },
+          "pp": "2",
+          "prc": "1440.00",
+          "prctyp": "LMT",
+          "prd": "C",
+          "push_flag": "0",
+          "qty": 1,
+          "remarks": "",
+          "sms_flag": "0",
+          "stat": "CANCELLED",
+          "ti": "0.05",
+          "token": "2885",
+          "trantype": "B",
+          "tsym": "RELIANCE-EQ",
+          "upd_tm": "09:47:03 18-11-2026",
+          "validity": "GTT"
+        }
+      },
+      "name": "triggered_trigger_value_not_a_number_nulls_the_triggers"
+    },
+    {
+      "expected": {
+        "alert_id": "26111800000001",
+        "is_oco": true,
+        "oco_first": null,
+        "oco_second": {
+          "price": "1160.00",
+          "quantity": 1,
+          "trigger_price": null
+        },
+        "oco_triggers": [
+          {
+            "trigger_value": "1430.00",
+            "var_name": "x"
+          },
+          {
+            "trigger_value": "1170.00",
+            "var_name": "y"
+          }
+        ],
+        "stop_loss": null,
+        "target": null
+      },
+      "input": {
+        "list": "pending",
+        "row": {
+          "C": "0",
+          "ai_t": "LMT_BOS_O",
+          "al_id": "26111800000001",
+          "brkname": "TESTBRK",
+          "cname": "TEST NAME",
+          "d": "1430.00",
+          "exch": "NSE",
+          "ls": "1",
+          "norentm": "09:31:12 18-11-2026",
+          "oivariable": [
+            {
+              "d": "1430.00",
+              "var_name": "x"
+            },
+            {
+              "d": "1170.00",
+              "var_name": "y"
+            }
+          ],
+          "ordersource": "API",
+          "place_order_params": "abc",
+          "place_order_params_leg2": {
+            "C": "0",
+            "actid": "TESTUID",
+            "ipaddr": "0.0.0.0",
+            "ordersource": "API",
+            "prc": "1160.00",
+            "prctyp": "LMT",
+            "prd": "C",
+            "qty": 1,
+            "trantype": "B"
+          },
+          "pp": "2",
+          "prc": "1440.00",
+          "prctyp": "LMT",
+          "prd": "C",
+          "qty": 1,
+          "remarks": "",
+          "stat": "Ok",
+          "ti": "0.05",
+          "token": "2885",
+          "trantype": "B",
+          "tsym": "RELIANCE-EQ",
+          "upd_tm": "09:31:12 18-11-2026",
+          "validity": "GTT"
+        }
+      },
+      "name": "leg_not_an_object_nulls_the_leg"
+    }
+  ],
+  "description": "One OCO row of GetPendingGTTOrder (input.list 'pending', a Gtt) or GetTrgOi ('triggered', a TriggeredGtt), input.row the wire object, parsed as a list item. expected: alert_id, is_oco, oco_first and oco_second (the legs place_order_params / place_order_params_leg2 as {quantity, price, trigger_price}, or null), oco_triggers (the oivariable items as {var_name, trigger_value}, or null), stop_loss and target ({leg: 'first' or 'second', trigger_value}, or null). A nested record that fails to parse (a leg value, a leg that is not an object, a trigger value) is null AS A WHOLE, not field by field: the leg (or the whole trigger list) is null, so both sides are null, and the row itself still parses (sdk-behaviour.md 2.9). Decimal values are compared as decimal numbers ('1430.00' equals '1430').",
+  "source": "tradesmart.models.gtt.Gtt / TriggeredGtt.from_wire, oco_first, oco_second, oco_triggers, stop_loss, target",
+  "tolerance": {
+    "decimal_abs": "0"
+  }
+}

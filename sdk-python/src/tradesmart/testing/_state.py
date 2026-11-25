@@ -48,6 +48,10 @@ _GTT_FIELDS = (
     "qty",
     "prc",
 )
+# The required fields of PlaceOCOOrder / ModifyOCOOrder besides uid, and of each leg.
+_OCO_FIELDS = ("exch", "tsym", "ai_t", "validity")
+_OCO_LEG_FIELDS = ("trantype", "prctyp", "prd", "ret", "qty", "prc")
+_OCO_TYPES = ("LMT_BOS_O", "LMT_SOB_O")
 # The order fields a triggered GTT places (its order book row also gets "add_ord_id").
 _GTT_ORDER_FIELDS = (
     "exch",
@@ -587,7 +591,7 @@ class BrokerState:
         fields = self._gtt_fields(payload)
         with self.lock:
             gtt = self._pending_gtt(alert_id)
-            if gtt is None:
+            if gtt is None or gtt.get("oco"):
                 return False, "GTT not found to Modify"
             if fields["ai_t"] != gtt["ai_t"]:  # documented: the alert type can't be modified
                 return False, "ai_t cannot be modified"
@@ -599,7 +603,7 @@ class BrokerState:
         """Apply a ``CancelGTTOrder``: ``(True, alert id)`` or ``(False, reason)``."""
         with self.lock:
             gtt = self._pending_gtt(alert_id)
-            if gtt is None:
+            if gtt is None or gtt.get("oco"):
                 return False, "GTT not found to Cancel"
             self.gtts.remove(gtt)
         return True, alert_id
@@ -611,6 +615,10 @@ class BrokerState:
             gtt = self._pending_gtt(alert_id)
             if gtt is None:
                 raise ValueError(f"no pending GTT with alert id {alert_id!r}")
+            if gtt.get("oco"):
+                raise ValueError(
+                    "OCO triggering is not simulated: no fired OCO has been observed yet"
+                )
             order_payload = {k: gtt[k] for k in _GTT_ORDER_FIELDS if k in gtt}
             order_payload.update({"uid": self.client_id, "actid": self.client_id})
             order_payload["add_ord_id"] = alert_id
@@ -619,6 +627,80 @@ class BrokerState:
             self.triggered_gtts.append({**gtt, "norentm": datetime.now(IST)})
         self._drain()
         return order.id
+
+    # --- OCOs (kept in the GTT lists, flagged by "oivariable") --------------------------------
+
+    @staticmethod
+    def _oco_fields(payload: Mapping[str, Any]) -> dict[str, Any]:
+        """The OCO's fields from a Place / Modify payload; ``ValueError`` if one is unusable."""
+        missing = [key for key in _OCO_FIELDS if not str(payload.get(key, "")).strip()]
+        if missing:
+            raise ValueError(f"{', '.join(missing)} required")
+        if payload["ai_t"] not in _OCO_TYPES:
+            raise ValueError(f"ai_t must be one of {', '.join(_OCO_TYPES)}")
+        triggers = payload.get("oivariable")
+        if not isinstance(triggers, list) or len(triggers) != 2:
+            raise ValueError("oivariable required: one trigger each for x and y")
+        values: dict[str, Decimal] = {}
+        for item in triggers:
+            name = item.get("var_name") if isinstance(item, Mapping) else None
+            number = _number(item.get("d"), "d") if isinstance(item, Mapping) else None
+            if name not in ("x", "y") or name in values or number is None:
+                raise ValueError("oivariable required: one trigger each for x and y")
+            values[name] = number
+        fields: dict[str, Any] = {
+            "oco": True,
+            **{k: payload[k] for k in _OCO_FIELDS},
+            "oivariable": [{"var_name": n, "d": values[n]} for n in ("x", "y")],
+        }
+        for key in ("place_order_params", "place_order_params_leg2"):
+            leg = payload.get(key)
+            if not isinstance(leg, Mapping):
+                raise ValueError(f"{key} required")
+            absent = [k for k in _OCO_LEG_FIELDS if not str(leg.get(k, "")).strip()]
+            if absent:
+                raise ValueError(f"{key}: {', '.join(absent)} required")
+            _number(leg["prc"], "prc")
+            _number(leg.get("trgprc"), "trgprc")
+            _whole(leg["qty"], "qty")
+            fields[key] = {k: leg[k] for k in (*_OCO_LEG_FIELDS, "trgprc", "remarks") if k in leg}
+        return fields
+
+    def place_oco(self, payload: Mapping[str, Any]) -> str:
+        """Store a ``PlaceOCOOrder`` as a pending OCO and return its alert id."""
+        fields = self._oco_fields(payload)
+        with self.lock:
+            self._gtt_seq += 1
+            alert_id = f"{self._day}{self._gtt_seq:08d}"
+            self.gtts.append({"al_id": alert_id, "norentm": datetime.now(IST), **fields})
+        return alert_id
+
+    def modify_oco(self, payload: Mapping[str, Any]) -> bool:
+        """Apply a ``ModifyOCOOrder``; ``False`` for an unknown or cancelled alert id."""
+        alert_id = str(payload.get("al_id", ""))
+        fields = self._oco_fields(payload)
+        with self.lock:
+            oco = self._pending_oco(alert_id)
+            if oco is None:
+                return False
+            placed = oco["norentm"]
+            oco.clear()
+            oco.update({"al_id": alert_id, "norentm": placed, **fields})
+        return True
+
+    def cancel_oco(self, alert_id: str) -> bool:
+        """Apply a ``CancelOCOOrder``: the OCO leaves pending and is listed as ``CANCELLED``."""
+        with self.lock:
+            oco = self._pending_oco(alert_id)
+            if oco is None:
+                return False
+            self.gtts.remove(oco)
+            self.triggered_gtts.append({**oco, "stat": "CANCELLED"})
+        return True
+
+    def _pending_oco(self, alert_id: str) -> dict[str, Any] | None:
+        gtt = self._pending_gtt(alert_id)
+        return gtt if gtt is not None and gtt.get("oco") else None
 
     def _pending_gtt(self, alert_id: str) -> dict[str, Any] | None:
         return next((gtt for gtt in self.gtts if gtt["al_id"] == alert_id), None)

@@ -121,6 +121,8 @@ class GttAlertType(_WordEnum):
     HIGH_52W_ABOVE = "LTP_A_52HIGH_O"
     HIGH_52W_BELOW = "LTP_B_52HIGH_O"
     VOLUME_ABOVE = "VOLUME_A_O"
+    OCO_BUY = "LMT_BOS_O"
+    OCO_SELL = "LMT_SOB_O"
 
     @classmethod
     def _aliases(cls) -> dict[str, str]:

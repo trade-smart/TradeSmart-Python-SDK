@@ -355,9 +355,155 @@
         ]
       },
       "name": "all_specials_together"
+    },
+    {
+      "expected": {
+        "body": "jData={\"uid\":\"TESTUID\",\"oivariable\":[{\"var_name\":\"x\",\"d\":\"1430.50\"},{\"var_name\":\"y\",\"d\":\"1170\"}],\"place_order_params\":{\"tsym\":\"RELIANCE-EQ\",\"exch\":\"NSE\",\"trantype\":\"B\",\"qty\":\"1\",\"prc\":\"1440\"}}",
+        "utf8_hex": "6a446174613d7b22756964223a2254455354554944222c226f697661726961626c65223a5b7b227661725f6e616d65223a2278222c2264223a22313433302e3530227d2c7b227661725f6e616d65223a2279222c2264223a2231313730227d5d2c22706c6163655f6f726465725f706172616d73223a7b227473796d223a2252454c49414e43452d4551222c2265786368223a224e5345222c227472616e74797065223a2242222c22717479223a2231222c22707263223a2231343430227d7d"
+      },
+      "input": {
+        "payload": [
+          [
+            "uid",
+            "TESTUID"
+          ],
+          [
+            "oivariable",
+            [
+              {
+                "var_name": "x",
+                "d": "1430.50"
+              },
+              {
+                "var_name": "y",
+                "d": "1170"
+              }
+            ]
+          ],
+          [
+            "place_order_params",
+            {
+              "tsym": "RELIANCE-EQ",
+              "exch": "NSE",
+              "trantype": "B",
+              "qty": "1",
+              "prc": "1440"
+            }
+          ]
+        ]
+      },
+      "name": "nested_list_of_objects_and_object_keep_order"
+    },
+    {
+      "expected": {
+        "body": "jData={\"place_order_params\":{\"tsym\":\"M%26M-EQ\",\"remarks\":\"a%26b%2Bc%25d=e\"},\"tags\":[\"50%25\",\"x%2By\",\"p%26q\"]}",
+        "utf8_hex": "6a446174613d7b22706c6163655f6f726465725f706172616d73223a7b227473796d223a224d2532364d2d4551222c2272656d61726b73223a22612532366225324263253235643d65227d2c2274616773223a5b223530253235222c227825324279222c227025323671225d7d"
+      },
+      "input": {
+        "payload": [
+          [
+            "place_order_params",
+            {
+              "tsym": "M&M-EQ",
+              "remarks": "a&b+c%d=e"
+            }
+          ],
+          [
+            "tags",
+            [
+              "50%",
+              "x+y",
+              "p&q"
+            ]
+          ]
+        ]
+      },
+      "name": "nested_strings_percent_ampersand_plus_are_encoded"
+    },
+    {
+      "expected": {
+        "body": "jData={\"items\":[],\"params\":{}}",
+        "utf8_hex": "6a446174613d7b226974656d73223a5b5d2c22706172616d73223a7b7d7d"
+      },
+      "input": {
+        "payload": [
+          [
+            "items",
+            []
+          ],
+          [
+            "params",
+            {}
+          ]
+        ]
+      },
+      "name": "nested_empty_list_and_empty_object"
+    },
+    {
+      "expected": {
+        "body": "jData={\"place_order_params\":{\"remarks\":\"₹ \\\"नमस्ते\\\"\\n\"}}",
+        "utf8_hex": "6a446174613d7b22706c6163655f6f726465725f706172616d73223a7b2272656d61726b73223a22e282b9205c22e0a4a8e0a4aee0a4b8e0a58de0a4a4e0a5875c225c6e227d7d"
+      },
+      "input": {
+        "payload": [
+          [
+            "place_order_params",
+            {
+              "remarks": "₹ \"नमस्ते\"\n"
+            }
+          ]
+        ]
+      },
+      "name": "nested_non_ascii_and_quotes"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "place_order_params"
+        ]
+      },
+      "input": {
+        "payload": [
+          [
+            "uid",
+            "TESTUID"
+          ],
+          [
+            "place_order_params",
+            {
+              "tsym": "RELIANCE-EQ",
+              "remarks": "a\ud800b"
+            }
+          ]
+        ]
+      },
+      "name": "nested_lone_surrogate_is_refused_on_the_top_level_key"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "oivariable"
+        ]
+      },
+      "input": {
+        "payload": [
+          [
+            "oivariable",
+            [
+              {
+                "var_name": "x",
+                "d": "\udfff"
+              }
+            ]
+          ]
+        ]
+      },
+      "name": "nested_lone_surrogate_in_a_list_is_refused_on_the_top_level_key"
     }
   ],
-  "description": "REST request body. input.payload is the ordered list of [key, value] string pairs (the wire key order is kept, never sorted). The body is jData= followed by compact JSON (separators \",\" and \":\", no spaces), non-ASCII characters written as UTF-8 (no \\u escapes), no HTML escaping of < > & or ', then only % & + percent-encoded, in that order (% first). Everything else, including = space / ? #, is sent as is. JSON string escapes: \" and \\ as \\\" and \\\\; the control characters U+0008, U+0009, U+000A, U+000C, U+000D as \\b \\t \\n \\f \\r; every other character below U+0020 as \\u00XX with lower-case hex; DEL (U+007F), U+2028 and U+2029 are sent raw as UTF-8. expected.utf8_hex is the exact body bytes.",
-  "source": "tradesmart._transport.codec.encode_jdata",
+  "description": "REST request body. input.payload is the ordered list of [key, value] pairs (the wire key order is kept, never sorted). A value is a string, or a nested object or list of such values (the OCO bodies): an object's keys and a list's items keep the order the file gives them (in this file every object that is a value is written in wire order, not sorted), and the rules below apply to every string at any depth. The body is jData= followed by compact JSON (separators \",\" and \":\", no spaces), non-ASCII characters written as UTF-8 (no \\u escapes), no HTML escaping of < > & or ', then only % & + percent-encoded, in that order (% first). Everything else, including = space / ? #, is sent as is. JSON string escapes: \" and \\ as \\\" and \\\\; the control characters U+0008, U+0009, U+000A, U+000C, U+000D as \\b \\t \\n \\f \\r; every other character below U+0020 as \\u00XX with lower-case hex; DEL (U+007F), U+2028 and U+2029 are sent raw as UTF-8. expected.utf8_hex is the exact body bytes. A lone surrogate in any key or value at any depth cannot be encoded as UTF-8: nothing is sent and the call is {\"error\": \"RequestValidationError\", \"fields\": [...]}, fields being the sorted top-level keys that hold it (a nested value is named by its top-level key). Such an input is written in the file with its \\uXXXX escape.",
+  "source": "tradesmart._transport.codec.encode_request_body",
   "tolerance": {}
 }

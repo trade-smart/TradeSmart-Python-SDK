@@ -297,3 +297,32 @@ def test_only_nested_records_get_the_masked_copy(counting_keys) -> None:
     assert holding.instruments is not None
     assert holding.instruments[0].raw == {**item, "access_token": "***"}
     assert counting_keys.lookups == len(item) * 2  # nested keys only, once per validation pass
+
+
+def test_to_wire_value_nested():
+    assert to_wire_value({"a": [{"d": Decimal("1.50")}]}) == {"a": [{"d": "1.50"}]}
+    assert to_wire_value(({"n": 3, "b": True}, [OrderType.LIMIT])) == [
+        {"n": "3", "b": "Yes"},
+        ["LMT"],
+    ]
+
+
+def test_to_wire_value_nested_keeps_order_and_rejects_none():
+    assert list(to_wire_value({"z": "1", "a": "2"})) == ["z", "a"]
+    with pytest.raises(TypeError):
+        to_wire_value({"a": [None]})
+    with pytest.raises(TypeError):
+        to_wire_value({1: "x"})
+
+
+def test_request_model_to_wire_nested_model():
+    class _Leg(RequestModel):
+        price: Decimal = Field(alias="prc")
+
+    class _R(RequestModel):
+        leg: _Leg
+        legs: list[_Leg]
+
+    leg = _Leg(price=Decimal("1.5"))
+    wire = _R(leg=leg, legs=[leg]).to_wire()
+    assert wire == {"leg": {"prc": "1.5"}, "legs": [{"prc": "1.5"}]}

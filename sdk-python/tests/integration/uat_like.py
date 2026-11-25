@@ -69,6 +69,7 @@ class UatLikeMarket:
     reject_all: str | None = None  # every accepted order is REJECTED with this message
     fill_far: dict[str, int | None] = field(default_factory=dict)  # symbol -> qty (None: all)
     stop_open: set[str] = field(default_factory=set)  # symbols whose stop orders rest OPEN
+    stop_as_limit: set[str] = field(default_factory=set)  # stop orders booked LMT / OPEN
     band_refusal: Callable[[dict[str, Any]], str | None] | None = None  # UAT's own band
     instruments: dict[str, Instrument] = field(default_factory=dict)
     on_place: Callable[[dict[str, Any]], None] | None = None  # called before each place
@@ -258,6 +259,8 @@ class UatLikeMarket:
         if order_type is not OrderType.LIMIT:
             if inst.tradingsymbol in self.stop_open:
                 self.broker.trigger(order_id)  # UAT: the stop order rests OPEN
+            elif inst.tradingsymbol in self.stop_as_limit:
+                self._book_as_limit(order_id)
             return  # stop orders rest TRIGGER_PENDING
         price = Decimal(str(kwargs["price"]))
         marketable = price >= inst.last if buy else price <= inst.last
@@ -267,6 +270,15 @@ class UatLikeMarket:
             self.broker.fill(order_id, inst.last, self.fill_far[inst.tradingsymbol])
         elif Validity(str(kwargs.get("validity", "DAY"))) is Validity.IOC:
             self.broker.cancel(order_id)  # the exchange cancels an IOC that does not match
+
+    def _book_as_limit(self, order_id: str) -> None:
+        """UAT (18 Nov 2026, N9 (e)): a stop order booked as a LIMIT, ``OPEN``, its trigger kept."""
+        state = self.broker._state
+        with state.lock:
+            order = state._find(order_id)
+            assert order is not None
+            state._update(order, "New", {"status": "OPEN", "order_type": "LMT"})
+        state._drain()
 
 
 def hold_every_stock(market: UatLikeMarket, quantity: int = 10) -> None:

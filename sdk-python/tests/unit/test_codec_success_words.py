@@ -1,9 +1,9 @@
-"""Per-endpoint success words (GTT and iceberg write endpoints).
+"""Per-endpoint success words (GTT, OCO and iceberg write endpoints).
 
 ``PlaceGTTOrder`` -> ``Oi created``, ``ModifyGTTOrder`` -> ``Oi replaced``,
-``CancelGTTOrder`` -> ``Oi delete success`` (each also needs a non-blank string ``al_id`` and
+``CancelGTTOrder`` -> ``OI deleted`` (each also needs a non-blank string ``al_id`` and
 no non-blank ``emsg``); the iceberg write endpoints answer ``true`` (``false`` is a definite
-rejection). The GTT words compare ignoring letter case only (UAT answers ``OI created``,
+rejection). The GTT and OCO words compare ignoring letter case only (UAT answers ``OI created``,
 spec F32); nothing is trimmed or normalised, and the iceberg words stay exact. Anything else
 on these endpoints is ``OrderStatusUnknownError``; every other endpoint still accepts only
 ``Ok``.
@@ -18,6 +18,7 @@ import pytest
 
 from tradesmart._client_core import (
     ACK_ID_FIELDS,
+    FAILURE_STATS,
     STATE_CHANGING_ENDPOINTS,
     SUCCESS_STATS,
     SUCCESS_STATS_IGNORE_CASE,
@@ -37,10 +38,15 @@ from tradesmart.errors import (
 GTT_WORDS = {
     "PlaceGTTOrder": "Oi created",
     "ModifyGTTOrder": "Oi replaced",
-    "CancelGTTOrder": "Oi delete success",
+    "CancelGTTOrder": "OI deleted",
 }
 ICEBERG = ("PlaceIceBergOrder", "ModifyIceBergOrder", "CancelIceBergOrder")
-NEW_ORDER_ENDPOINTS = (*GTT_WORDS, *ICEBERG)
+OCO_WORDS = {
+    "PlaceOCOOrder": "OI created",
+    "ModifyOCOOrder": "OI replaced",
+    "CancelOCOOrder": "OI deleted",
+}
+NEW_ORDER_ENDPOINTS = (*GTT_WORDS, *OCO_WORDS, *ICEBERG)
 
 
 def _gtt(endpoint: str, body: Any, *, status: int = 200) -> Any:
@@ -83,7 +89,10 @@ def test_success_stats_map_has_exactly_the_documented_words() -> None:
     assert dict(SUCCESS_STATS) == {
         "PlaceGTTOrder": frozenset({"Oi created"}),
         "ModifyGTTOrder": frozenset({"Oi replaced"}),
-        "CancelGTTOrder": frozenset({"Oi delete success"}),
+        "CancelGTTOrder": frozenset({"OI deleted"}),
+        "PlaceOCOOrder": frozenset({"OI created"}),
+        "ModifyOCOOrder": frozenset({"OI replaced"}),
+        "CancelOCOOrder": frozenset({"OI deleted"}),
         "PlaceIceBergOrder": frozenset({"true"}),
         "ModifyIceBergOrder": frozenset({"true"}),
         "CancelIceBergOrder": frozenset({"true"}),
@@ -95,8 +104,8 @@ def test_gtt_and_iceberg_writes_are_state_changing(name: str) -> None:
     assert name in STATE_CHANGING_ENDPOINTS
 
 
-def test_only_the_gtt_writes_ignore_letter_case() -> None:
-    assert frozenset(GTT_WORDS) == SUCCESS_STATS_IGNORE_CASE
+def test_only_the_gtt_and_oco_writes_ignore_letter_case() -> None:
+    assert frozenset(GTT_WORDS) | frozenset(OCO_WORDS) == SUCCESS_STATS_IGNORE_CASE
 
 
 # --- GTT ---------------------------------------------------------------------------------
@@ -129,7 +138,7 @@ def _case_variants(word: str) -> list[str]:
         ("PlaceGTTOrder", "OI created"),  # the UAT answer (spec F32)
         ("PlaceGTTOrder", "oi CREATED"),
         ("ModifyGTTOrder", "OI replaced"),
-        ("CancelGTTOrder", "OI DELETE SUCCESS"),
+        ("CancelGTTOrder", "OI DELETED"),
     ],
 )
 def test_gtt_word_in_any_letter_case_is_success(endpoint: str, stat: str) -> None:
@@ -139,7 +148,14 @@ def test_gtt_word_in_any_letter_case_is_success(endpoint: str, stat: str) -> Non
 
 @pytest.mark.parametrize(
     "stat",
-    ["OI deleted", "Oi deleted", "Oi  created", " Oi created", "Oi created ", "OI  CREATED"],
+    [
+        "Oi delete success",
+        "OI  deleted",
+        "Oi  created",
+        " Oi created",
+        "Oi created ",
+        "OI  CREATED",
+    ],
 )
 def test_gtt_case_rule_changes_nothing_but_letter_case(stat: str) -> None:
     # Only letter case is ignored: other words, spacing and padding stay unknown.
@@ -464,3 +480,92 @@ def test_gtt_reads_are_not_state_changing() -> None:
     for name in ("GetPendingGTTOrder", "GetTrgOi", "GetEnabledGTTs", "GetIceBergOrder"):
         call = build_raw_call("TEST123", name, {}, state_changing=False, expect="list")
         assert call.spec.state_changing is False, name
+
+
+# --- OCO writes and ``Invalid Oi`` ------------------------------------------------------------
+
+
+def _write(endpoint: str, body: Any, *, status: int = 200) -> Any:
+    return parse_response(
+        endpoint=endpoint,
+        status_code=status,
+        text=body if isinstance(body, str) else json.dumps(body),
+        expect="object",
+        allow_empty=False,
+        state_changing=True,
+        success_stats=SUCCESS_STATS[endpoint],
+        requires_ack_id=ACK_ID_FIELDS[endpoint],
+        stats_ignore_case=endpoint in SUCCESS_STATS_IGNORE_CASE,
+        failure_stats=FAILURE_STATS.get(endpoint, frozenset()),
+    )
+
+
+ALERT_WRITES = (*GTT_WORDS, *OCO_WORDS)
+INVALID_OI_ENDPOINTS = ("ModifyGTTOrder", "CancelGTTOrder", "ModifyOCOOrder", "CancelOCOOrder")
+
+
+def test_failure_stats_map_is_invalid_oi_on_modify_and_cancel_only() -> None:
+    assert dict(FAILURE_STATS) == {name: frozenset({"Invalid Oi"}) for name in INVALID_OI_ENDPOINTS}
+
+
+def test_endpoint_spec_defaults_have_no_failure_stats() -> None:
+    spec: EndpointSpec[Any] = EndpointSpec(name="Limits", parse=lambda b: b)
+    assert spec.failure_stats == frozenset()
+
+
+@pytest.mark.parametrize("name", OCO_WORDS)
+def test_oco_writes_are_state_changing_and_need_al_id(name: str) -> None:
+    assert name in STATE_CHANGING_ENDPOINTS
+    assert ACK_ID_FIELDS[name] == "al_id"
+
+
+@pytest.mark.parametrize("endpoint", OCO_WORDS)
+def test_oco_word_in_any_letter_case_is_success(endpoint: str) -> None:
+    for stat in (OCO_WORDS[endpoint], OCO_WORDS[endpoint].upper(), OCO_WORDS[endpoint].lower()):
+        body = {"stat": stat, "al_id": "26111800000001"}
+        assert _write(endpoint, body) == body
+
+
+@pytest.mark.parametrize("endpoint", INVALID_OI_ENDPOINTS)
+@pytest.mark.parametrize("stat", ["Invalid Oi", "INVALID OI", "invalid oi"])
+def test_invalid_oi_is_a_definite_rejection(endpoint: str, stat: str) -> None:
+    with pytest.raises(OrderRejectedError) as info:
+        _write(endpoint, {"stat": stat, "al_id": "1"})
+    assert info.value.message == "Invalid Oi"
+    assert info.value.emsg == stat
+
+
+@pytest.mark.parametrize("endpoint", INVALID_OI_ENDPOINTS)
+@pytest.mark.parametrize("stat", [" Invalid Oi", "Invalid Oi ", "Invalid  Oi"])
+def test_untrimmed_invalid_oi_is_unknown(endpoint: str, stat: str) -> None:
+    with pytest.raises(OrderStatusUnknownError):
+        _write(endpoint, {"stat": stat, "al_id": "1"})
+
+
+@pytest.mark.parametrize("endpoint", ["PlaceGTTOrder", "PlaceOCOOrder"])
+def test_invalid_oi_on_a_place_endpoint_stays_unknown(endpoint: str) -> None:
+    with pytest.raises(OrderStatusUnknownError):
+        _write(endpoint, {"stat": "Invalid Oi", "al_id": "1"})
+
+
+@pytest.mark.parametrize("name", INVALID_OI_ENDPOINTS)
+def test_request_wires_failure_stats_for_modify_and_cancel(name: str) -> None:
+    call = build_raw_call("TEST123", name.lower(), {}, state_changing=False, expect="object")
+    assert call.spec.failure_stats == frozenset({"Invalid Oi"})
+
+
+@pytest.mark.parametrize("name", ["PlaceGTTOrder", "PlaceOCOOrder", "PlaceOrder"])
+def test_request_has_no_failure_stats_elsewhere(name: str) -> None:
+    call = build_raw_call("TEST123", name, {}, state_changing=False, expect="object")
+    assert call.spec.failure_stats == frozenset()
+
+
+@pytest.mark.parametrize("endpoint", INVALID_OI_ENDPOINTS)
+def test_invalid_oi_rejection_carries_the_request_time(endpoint: str) -> None:
+    body = {"stat": "Invalid Oi", "request_time": "10:00:00 18-11-2026"}
+    with pytest.raises(OrderRejectedError) as info:
+        _write(endpoint, body)
+    assert info.value.request_time == "10:00:00 18-11-2026"
+    with pytest.raises(OrderRejectedError) as info2:
+        _write(endpoint, {"stat": "Invalid Oi", "request_time": 5})
+    assert info2.value.request_time is None

@@ -14,7 +14,7 @@ from tradesmart.auth import AccessToken
 from tradesmart.config import ClientConfig
 from tradesmart.endpoints.base import Call, EndpointSpec
 from tradesmart.errors import AuthenticationError, ConfigurationError
-from tradesmart.models.base import to_wire_value
+from tradesmart.models.base import WireValue, to_wire_value
 
 LOGIN_HINT = "run `python -m tradesmart login`"
 
@@ -40,6 +40,9 @@ STATE_CHANGING_ENDPOINTS: frozenset[str] = frozenset(
         "PlaceGTTOrder",
         "ModifyGTTOrder",
         "CancelGTTOrder",
+        "PlaceOCOOrder",
+        "ModifyOCOOrder",
+        "CancelOCOOrder",
         "PlaceIceBergOrder",
         "ModifyIceBergOrder",
         "CancelIceBergOrder",
@@ -53,7 +56,10 @@ SUCCESS_STATS: Mapping[str, frozenset[str]] = MappingProxyType(
     {
         "PlaceGTTOrder": frozenset({"Oi created"}),
         "ModifyGTTOrder": frozenset({"Oi replaced"}),
-        "CancelGTTOrder": frozenset({"Oi delete success"}),
+        "CancelGTTOrder": frozenset({"OI deleted"}),
+        "PlaceOCOOrder": frozenset({"OI created"}),
+        "ModifyOCOOrder": frozenset({"OI replaced"}),
+        "CancelOCOOrder": frozenset({"OI deleted"}),
         "PlaceIceBergOrder": frozenset({"true"}),
         "ModifyIceBergOrder": frozenset({"true"}),
         "CancelIceBergOrder": frozenset({"true"}),
@@ -64,12 +70,39 @@ SUCCESS_STATS: Mapping[str, frozenset[str]] = MappingProxyType(
 # sides; nothing trimmed or normalised): the test environment answers ``OI created`` for the
 # documented ``Oi created`` (spec F32). The iceberg ``true`` stays exact.
 SUCCESS_STATS_IGNORE_CASE: frozenset[str] = frozenset(
-    {"PlaceGTTOrder", "ModifyGTTOrder", "CancelGTTOrder"}
+    {
+        "PlaceGTTOrder",
+        "ModifyGTTOrder",
+        "CancelGTTOrder",
+        "PlaceOCOOrder",
+        "ModifyOCOOrder",
+        "CancelOCOOrder",
+    }
 )
 
-# The field a success reply must carry as a non-blank string (the GTT alert id).
+# The field a success reply must carry as a non-blank string (the GTT / OCO alert id).
 ACK_ID_FIELDS: Mapping[str, str] = MappingProxyType(
-    {name: "al_id" for name in ("PlaceGTTOrder", "ModifyGTTOrder", "CancelGTTOrder")}
+    {
+        name: "al_id"
+        for name in (
+            "PlaceGTTOrder",
+            "ModifyGTTOrder",
+            "CancelGTTOrder",
+            "PlaceOCOOrder",
+            "ModifyOCOOrder",
+            "CancelOCOOrder",
+        )
+    }
+)
+
+# ``stat`` words that are a definite rejection on an endpoint (compared with ``casefold()``,
+# nothing trimmed): ``Invalid Oi`` on the alert modify and cancel writes (an unknown alert id).
+# Anywhere else (place writes, every other endpoint) the word stays an unknown outcome.
+FAILURE_STATS: Mapping[str, frozenset[str]] = MappingProxyType(
+    {
+        name: frozenset({"Invalid Oi"})
+        for name in ("ModifyGTTOrder", "CancelGTTOrder", "ModifyOCOOrder", "CancelOCOOrder")
+    }
 )
 
 # Documented spelling of every endpoint the guards above know, keyed case-insensitively.
@@ -293,7 +326,15 @@ def build_raw_call(
     The name is normalised by :func:`canonical_endpoint` (raises ``ConfigurationError``).
     """
     name = canonical_endpoint(endpoint)
-    wire = {key: to_wire_value(value) for key, value in payload.items()}
+    wire: dict[str, WireValue] = {}
+    for key, value in payload.items():
+        try:
+            wire[key] = to_wire_value(value)
+        except RecursionError:
+            raise TypeError(f"payload value for {key!r}: nested too deeply (or cyclic)") from None
+        except TypeError as exc:
+            # Name only the top-level key: a nested path or value could carry a secret.
+            raise TypeError(f"payload value for {key!r}: {exc}") from None
     wire.setdefault("uid", client_id)
     spec: EndpointSpec[Any] = EndpointSpec(
         name=name,
@@ -304,5 +345,6 @@ def build_raw_call(
         success_stats=SUCCESS_STATS.get(name, OK_STATS),
         requires_ack_id=ACK_ID_FIELDS.get(name),
         stats_ignore_case=name in SUCCESS_STATS_IGNORE_CASE,
+        failure_stats=FAILURE_STATS.get(name, frozenset()),
     )
     return Call(spec, wire)

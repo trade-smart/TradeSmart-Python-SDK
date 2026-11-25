@@ -58,6 +58,8 @@ EXPECTED_FILES = frozenset(
         "read_payloads.json",
         "slice_plan.json",
         "success_words.json",
+        "oco_requests.json",
+        "oco_rows.json",
     }
 )
 
@@ -221,6 +223,19 @@ def test_sdk_reproduces_the_expected_value(name: str, case: dict[str, Any]) -> N
     # A JSON round trip: the SDK result must be expressible in the file (and finite).
     produced = json.loads(json.dumps(produced, allow_nan=False))
     assert_same(produced, case["expected"], tolerance, f"{name}::{case['name']}")
+    if name == "oco_requests.json" and "payload" in case["expected"]:
+        # assert_same compares object keys as sets; for an OCO body the key order is the
+        # contract, so compare the encoded text of the payload, keys unsorted.
+        assert json.dumps(produced["payload"]) == json.dumps(case["expected"]["payload"]), (
+            f"{name}::{case['name']}: key order differs"
+        )
+
+
+def test_oco_request_bodies_have_the_contract_key_order() -> None:
+    """Independent of the SDK: every OCO body in the file has the documented key sequences."""
+    for case in _read("oco_requests.json")["cases"]:
+        if "error" not in case["expected"]:
+            gen._check_oco_key_order(case["name"], case["input"]["method"], case["expected"])
 
 
 def test_checksum_worked_example_is_the_documented_value() -> None:

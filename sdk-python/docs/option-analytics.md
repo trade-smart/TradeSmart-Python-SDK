@@ -163,6 +163,9 @@ Errors that **are** raised:
   for an exchange without a known close time (and no `expiry_time`), for conflicting
   arguments, or for an `option_price` / `underlying_price` / `spot_price` that is not a number
   (`True`, an integer too large for a float); argument errors are raised before any request.
+- `ValueError` for a `rate` or `dividend_yield` so extreme (for example `-1e6`) that a discount
+  or carry factor such as `exp(-rate * years)` is too large for a float; this is found while
+  computing, after the quotes.
 - `ResponseParseError` when the cached instrument list is damaged (not UTF-8 or CSV text):
   delete the file and call again.
 - `APIError` when TradeSmart answers a `GetQuotes` call with `Not_Ok` (before expiry), plus the usual

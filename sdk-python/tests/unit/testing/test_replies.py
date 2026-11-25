@@ -408,7 +408,7 @@ def test_candle_time_text_is_passed_through() -> None:
     [
         ("place_gtt_success", "Oi created"),
         ("modify_gtt_success", "Oi replaced"),
-        ("cancel_gtt_success", "Oi delete success"),
+        ("cancel_gtt_success", "OI deleted"),
     ],
 )
 def test_gtt_ack(name: str, word: str) -> None:

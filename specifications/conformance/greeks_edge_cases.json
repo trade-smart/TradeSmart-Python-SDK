@@ -1484,6 +1484,65 @@
         "years": 0.25
       },
       "name": "error_option_type_is_checked_before_a_missing_underlying"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": -1000000.0,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "error_rate_overflowing_the_discount_factor"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "dividend_yield": -1000000.0,
+        "model": "bsm",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "error_bsm_dividend_yield_overflowing_the_discount_factor"
+    },
+    {
+      "expected": {
+        "delta": 1.0,
+        "gamma": 0.0,
+        "iv": null,
+        "price": 10.0,
+        "rho": 0.0,
+        "status": "expired",
+        "theta": 0.0,
+        "vega": 0.0,
+        "years_to_expiry": -0.01
+      },
+      "input": {
+        "dividend_yield": 0.0,
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": -1000000.0,
+        "strike": 90.0,
+        "tick_size": 0.0,
+        "underlying": 100.0,
+        "years": -0.01
+      },
+      "name": "expired_never_computes_the_discount_factor"
     }
   ],
   "description": "greeks_from_price status rules: expired, near_expiry (< 30 minutes), price_at_or_below_intrinsic (including the half-tick rule), no_price, the one-minute floor on time to expiry, and absurd inputs. Every value is finite or null.",

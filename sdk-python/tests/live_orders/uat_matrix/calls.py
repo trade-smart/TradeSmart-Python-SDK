@@ -36,7 +36,7 @@ from collections.abc import Callable, Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Any, Literal, Protocol
 
 from tests.live_orders import mock_session
 from tests.live_orders.safety import CHECK_THE_ACCOUNT, Refusal, is_final, status_of
@@ -47,7 +47,12 @@ from tests.live_orders.uat_matrix.ledger import (
     GTT_PLACE,
     INTERRUPTED,
     NOT_SENT,
+    OCO_CANCEL,
+    OCO_MODIFY,
+    OCO_PLACE,
     PLACE_KINDS,
+    _side,
+    _word,
     is_ours,
     read_book,
 )
@@ -57,12 +62,14 @@ from tests.live_orders.uat_matrix.ledger import (
 from tradesmart.enums import OrderType, Product, Validity
 from tradesmart.errors import APIError, ConfigurationError, RateLimitError, RequestValidationError
 from tradesmart.models.gtt import Gtt
+from tradesmart.models.oco import OcoLeg
 from tradesmart.models.orders import Order
 
 if TYPE_CHECKING:
     from tests.live_orders.uat_matrix.gate import MatrixSession
 
 ACKNOWLEDGED = "acknowledged"
+PYTHON = "python"  # the SDK whose order ids teardown trusts by id alone (the harness's own)
 
 FOUND = "unknown, found in the book"
 RESOLVED = "unknown, resolved by the book"
@@ -119,7 +126,13 @@ class CancelReport:
     stuck: list[str] = field(default_factory=list)  # noted stuck earlier: not cancelled again
     already_cancelled: list[str] = field(default_factory=list)  # one CancelOrder per order
     pending: list[str] = field(default_factory=list)  # a call of this process in flight
+    # Open orders of ours whose CancelOrder was never sent (the SDK's driver is stopped, so nothing
+    # more goes out through it, or the request was refused before it was written): not "stuck".
+    not_sent: list[str] = field(default_factory=list)
     missing: list[str] = field(default_factory=list)  # ours, never listed in the book read
+    # Ours by id, but the row's tag is not the ledger's tag for that id: with an SDK under test
+    # other than Python, never cancelled by id alone (a driver's id is not trusted that far).
+    tag_mismatch: list[str] = field(default_factory=list)
     book_unreadable: bool = False
     gtts: GttCleanup | None = None  # the teardown's GTT cancel (None: the run placed no GTT)
 
@@ -141,7 +154,17 @@ def _error(exc: BaseException) -> dict[str, Any]:
         data["stat"] = raw.get("stat")
         data["emsg"] = exc.emsg
         data["http_status"] = exc.http_status  # None: raised by the SDK, no server answer
+        sent = _driver_sent(exc)
+        if sent is not None:  # a driver's error: whether it went out, as the driver said
+            data["sent"] = sent
     return data
+
+
+def _driver_sent(exc: BaseException) -> bool | None:
+    """A driver's ``RateLimitError`` carries ``sent`` (live-driver.md: ``"sent": false`` for a
+    client-side refusal); ``None`` for the Python SDK's own errors, which have no such field."""
+    sent = exc.__dict__.get("sent") if isinstance(exc, RateLimitError) else None
+    return sent if isinstance(sent, bool) else None
 
 
 def _settle(outcome: OrderOutcome, verdict: str | None, exc: BaseException) -> None:
@@ -187,6 +210,15 @@ def _refuse_gtt(session: MatrixSession) -> None:
         raise Refusal(mock_session.NO_AMO_GTT)
 
 
+def _refuse_oco(session: MatrixSession) -> None:
+    """In a mock session every OCO write is refused before any call unless the owner's typed
+    OCO switch was on when the run opened (``session.mock_oco``, set by the gate:
+    ``mock_session.NO_OCO``). Places and modifies re-check the mock switch itself as well
+    (``check_mock``); a cancel of the run's own OCO does not (it only removes risk)."""
+    if session.mock and not session.mock_oco:
+        raise Refusal(mock_session.NO_OCO)
+
+
 def _refuse_case(session: MatrixSession, case: CaseRef) -> None:
     reason = session.case_done(case.case_id)
     if reason is not None:
@@ -217,6 +249,27 @@ def _our_tag(session: MatrixSession, order_id: str) -> str:
             "yet); no other call is made for it meanwhile"
         )
     return tag
+
+
+class _SendSlot:
+    """The SDK's send slot (``SdkUnderTest.send_slot``), held by one state-changing call from
+    just before its pacer wait to just after its write.
+
+    A serial SDK (a driver) has one slot: the pacer slot a call takes, the gate / STOP re-check
+    and the write are then one step, so no other write of that SDK can go out in between and
+    calls queued behind a slow reply cannot burst. ``release`` is idempotent: a call gives the
+    slot back right after its write (the reads that follow are never inside it), and every
+    path that leaves earlier (a refused re-check, an interrupted wait) gives it back too."""
+
+    def __init__(self, session: MatrixSession) -> None:
+        self._slot = session.sdk.send_slot()
+        self._slot.__enter__()
+        self._held = True
+
+    def release(self) -> None:
+        if self._held:
+            self._held = False
+            self._slot.__exit__(None, None, None)
 
 
 @contextmanager
@@ -392,41 +445,48 @@ def _place(
     session.guard.spend(case.case_id)
     tag = tag if tag is not None else session.ledger.new_tag(case.case_id)
     outcome = OrderOutcome("place", case.case_id, tag, ACKNOWLEDGED)
-    session.order_pacer.wait()  # every state-changing call: 6/s (ALGO_CHK counts all)
-    session.guard.check_new(case.segment)  # again: a STOP file or a trip during the wait
-    check_mock(session)  # again, right before the intent
-    mark = session.responses.mark()
-    outcome.call = session.ledger.intent(
-        tag, case.case_id, "place", segment=case.segment, plan=kwargs
-    )
-    with in_flight(session, outcome, case, lookup=True, opened=opened):
-        try:
-            order_id = session.client.place_order(**kwargs, tag=tag)
-        except RequestValidationError as exc:
-            _settle(outcome, NOT_SENT, exc)
-        except APIError as exc:  # stat Not_Ok: a definitive answer
-            _settle(outcome, REJECTED, exc)
-        except Exception as exc:  # ambiguous: it may exist; look it up by tag, never resend
-            _settle(outcome, None, exc)
-            rows, read_ok = _rows_with_tag(session, tag)
-            if rows:
-                outcome.verdict = FOUND
-                outcome.order_id = _id(rows[0]) or None
-                outcome.status = status_of(rows[0])
+    slot = _SendSlot(session)  # the SDK's send slot: pacer wait, re-check and write in one step
+    try:
+        session.order_pacer.wait()  # every state-changing call: 6/s (ALGO_CHK counts all)
+        session.guard.check_new(case.segment)  # again: a STOP file or a trip during the wait
+        check_mock(session)  # again, right before the intent
+        mark = session.responses.mark()
+        outcome.call = session.ledger.intent(
+            tag, case.case_id, "place", segment=case.segment, plan=kwargs
+        )
+        with in_flight(session, outcome, case, lookup=True, opened=opened):
+            try:
+                try:
+                    order_id = session.sdk.place_order(**kwargs, tag=tag)
+                finally:
+                    slot.release()  # the write is out: the next write of this SDK may go
+            except RequestValidationError as exc:
+                _settle(outcome, NOT_SENT, exc)
+            except APIError as exc:  # stat Not_Ok: a definitive answer
+                _settle(outcome, REJECTED, exc)
+            except Exception as exc:  # ambiguous: it may exist; look it up by tag, never resend
+                _settle(outcome, None, exc)
+                rows, read_ok = _rows_with_tag(session, tag)
+                if rows:
+                    outcome.verdict = FOUND
+                    outcome.order_id = _id(rows[0]) or None
+                    outcome.status = status_of(rows[0])
+                else:
+                    why = "it is not in orders()" if read_ok else "the order book could not be read"
+                    _check_the_account(
+                        session, outcome, case, f"order tag {tag}: place outcome unknown and {why}"
+                    )
+            except BaseException as exc:
+                _interrupted(session, outcome, exc, lookup=True)
+                opened.extend(outcome.order_ids)
+                raise
             else:
-                why = "it is not in orders()" if read_ok else "the order book could not be read"
-                _check_the_account(
-                    session, outcome, case, f"order tag {tag}: place outcome unknown and {why}"
-                )
-        except BaseException as exc:
-            _interrupted(session, outcome, exc, lookup=True)
-            opened.extend(outcome.order_ids)
-            raise
-        else:
-            outcome.order_id = order_id
-        if outcome.order_id is not None and not is_final(outcome.status):
-            opened.append(outcome.order_id)
-        return _finish(session, outcome, _response(session, "PlaceOrder", mark))
+                outcome.order_id = order_id
+            if outcome.order_id is not None and not is_final(outcome.status):
+                opened.append(outcome.order_id)
+            return _finish(session, outcome, _response(session, "PlaceOrder", mark))
+    finally:
+        slot.release()
 
 
 _BEFORE_SENDING = (RequestValidationError, ValueError, ConfigurationError)
@@ -440,6 +500,9 @@ def _refused_before_sending(exc: BaseException) -> bool:
     is returned in `result.error`, never raised).
     """
     if isinstance(exc, RateLimitError):
+        sent = _driver_sent(exc)
+        if sent is not None:  # a driver: its ``sent`` field only, never the message
+            return sent is False
         return exc.http_status is None
     return isinstance(exc, _BEFORE_SENDING)
 
@@ -484,57 +547,70 @@ def _place_sliced(
     session.guard.spend(case.case_id, max_slices)
     tag = tag if tag is not None else session.ledger.new_tag(case.case_id)
     outcome = OrderOutcome("place_sliced", case.case_id, tag, ACKNOWLEDGED)
-    session.order_pacer.wait(max_slices)  # the SDK sends up to max_slices calls
-    session.guard.check_new(case.segment)  # again: a STOP file or a trip during the wait
-    check_mock(session)  # again, right before the intent
-    outcome.call = session.ledger.intent(
-        tag,
-        case.case_id,
-        "place_sliced",
-        segment=case.segment,
-        plan=kwargs,
-        max_slices=max_slices,
-        max_slice_quantity=max_slice_quantity,
-    )
-    with in_flight(session, outcome, case, lookup=True, opened=opened):
-        try:
-            result = session.client.place_sliced_order(
-                **kwargs, tag=tag, max_slices=max_slices, max_slice_quantity=max_slice_quantity
-            )
-        except Exception as exc:  # never resend; the book decides what exists
-            _settle(outcome, None, exc)
-            partial = getattr(exc, "sliced_result", None)
-            known = tuple(partial.order_ids) if partial is not None else ()
-            # Documented as raised before any slice is sent, unless a partial result says so.
-            before_sending = _refused_before_sending(exc) and partial is None
-            outcome.order_ids = known  # kept if the lookup is interrupted
-            rows, read_ok = _rows_with_tag(session, tag, want=len(known) + 1)
-            seen = tuple(dict.fromkeys([*known, *(_id(o) for o in rows if _id(o))]))
-            outcome.order_ids = seen
-            if len(seen) > len(known):
-                outcome.verdict = FOUND
-            elif before_sending and read_ok:
-                outcome.verdict = NOT_SENT
+    slot = _SendSlot(session)  # the SDK's send slot: pacer wait, re-check and write in one step
+    try:
+        session.order_pacer.wait(max_slices)  # the SDK sends up to max_slices calls
+        session.guard.check_new(case.segment)  # again: a STOP file or a trip during the wait
+        check_mock(session)  # again, right before the intent
+        outcome.call = session.ledger.intent(
+            tag,
+            case.case_id,
+            "place_sliced",
+            segment=case.segment,
+            plan=kwargs,
+            max_slices=max_slices,
+            max_slice_quantity=max_slice_quantity,
+        )
+        with in_flight(session, outcome, case, lookup=True, opened=opened):
+            try:
+                try:
+                    result = session.sdk.place_sliced_order(
+                        **kwargs,
+                        tag=tag,
+                        max_slices=max_slices,
+                        max_slice_quantity=max_slice_quantity,
+                    )
+                finally:
+                    slot.release()  # the write is out: the next write of this SDK may go
+            except Exception as exc:  # never resend; the book decides what exists
+                _settle(outcome, None, exc)
+                partial = getattr(exc, "sliced_result", None)
+                known = tuple(partial.order_ids) if partial is not None else ()
+                # Documented as raised before any slice is sent, unless a partial result says so.
+                before_sending = _refused_before_sending(exc) and partial is None
+                outcome.order_ids = known  # kept if the lookup is interrupted
+                rows, read_ok = _rows_with_tag(session, tag, want=len(known) + 1)
+                seen = tuple(dict.fromkeys([*known, *(_id(o) for o in rows if _id(o))]))
+                outcome.order_ids = seen
+                if len(seen) > len(known):
+                    outcome.verdict = FOUND
+                elif before_sending and read_ok:
+                    outcome.verdict = NOT_SENT
+                else:
+                    why = "it is not in orders()" if read_ok else "the order book could not be read"
+                    _check_the_account(
+                        session,
+                        outcome,
+                        case,
+                        f"order tag {tag}: a slice's outcome unknown and {why}",
+                    )
+            except BaseException as exc:
+                partial = getattr(exc, "sliced_result", None)
+                if partial is not None:
+                    outcome.order_ids = tuple(partial.order_ids)
+                _interrupted(session, outcome, exc, lookup=True)
+                opened.extend(outcome.order_ids)
+                raise
             else:
-                why = "it is not in orders()" if read_ok else "the order book could not be read"
-                _check_the_account(
-                    session, outcome, case, f"order tag {tag}: a slice's outcome unknown and {why}"
-                )
-        except BaseException as exc:
-            partial = getattr(exc, "sliced_result", None)
-            if partial is not None:
-                outcome.order_ids = tuple(partial.order_ids)
-            _interrupted(session, outcome, exc, lookup=True)
+                outcome.order_ids = tuple(result.order_ids)
+                if not result.complete:
+                    outcome.verdict = REJECTED
+                    if result.error is not None:
+                        _settle(outcome, None, result.error)
             opened.extend(outcome.order_ids)
-            raise
-        else:
-            outcome.order_ids = tuple(result.order_ids)
-            if not result.complete:
-                outcome.verdict = REJECTED
-                if result.error is not None:
-                    _settle(outcome, None, result.error)
-        opened.extend(outcome.order_ids)
-        return _finish(session, outcome, {})
+            return _finish(session, outcome, {})
+    finally:
+        slot.release()
 
 
 # -- modify / cancel / exit -------------------------------------------------------------------
@@ -599,37 +675,44 @@ def modify(
         before = next((o for o in book or [] if _id(o) == order_id), None)
         session.guard.check_new(case.segment)  # again: the STOP file or a trip during the read
     outcome = OrderOutcome("modify", case.case_id, tag, ACKNOWLEDGED, order_id=order_id)
-    session.order_pacer.wait()  # every state-changing call: 6/s (ALGO_CHK counts all)
-    session.guard.check_new(case.segment)  # again: a STOP file or a trip during the wait
-    check_mock(session)  # again, right before the intent
-    mark = session.responses.mark()
-    outcome.call = session.ledger.intent(
-        tag, case.case_id, "modify", segment=case.segment, order_id=order_id, changes=changes
-    )
-    with in_flight(session, outcome, case, lookup=False):
-        try:
-            session.client.modify_order(order_id, **changes)
-        except RequestValidationError as exc:
-            _settle(outcome, NOT_SENT, exc)
-        except APIError as exc:
-            _settle(outcome, REJECTED, exc)
-        except Exception as exc:  # ambiguous: resolved by reading the book, never repeated
-            _settle(outcome, None, exc)
-            row, resolved = _row_of(
-                session,
-                order_id,
-                lambda r: is_final(status_of(r)) or _applied(r, before, changes),
-            )
-            outcome.status = status_of(row)
-            if resolved:
-                outcome.verdict = RESOLVED
-            else:
-                what = f"order {order_id}: modify outcome unknown"
-                _check_the_account(session, outcome, case, what)
-        except BaseException as exc:
-            _interrupted(session, outcome, exc, lookup=False)
-            raise
-        result = _finish(session, outcome, _response(session, "ModifyOrder", mark))
+    slot = _SendSlot(session)  # the SDK's send slot: pacer wait, re-check and write in one step
+    try:
+        session.order_pacer.wait()  # every state-changing call: 6/s (ALGO_CHK counts all)
+        session.guard.check_new(case.segment)  # again: a STOP file or a trip during the wait
+        check_mock(session)  # again, right before the intent
+        mark = session.responses.mark()
+        outcome.call = session.ledger.intent(
+            tag, case.case_id, "modify", segment=case.segment, order_id=order_id, changes=changes
+        )
+        with in_flight(session, outcome, case, lookup=False):
+            try:
+                try:
+                    session.sdk.modify_order(order_id, **changes)
+                finally:
+                    slot.release()  # the write is out: the next write of this SDK may go
+            except RequestValidationError as exc:
+                _settle(outcome, NOT_SENT, exc)
+            except APIError as exc:
+                _settle(outcome, REJECTED, exc)
+            except Exception as exc:  # ambiguous: resolved by reading the book, never repeated
+                _settle(outcome, None, exc)
+                row, resolved = _row_of(
+                    session,
+                    order_id,
+                    lambda r: is_final(status_of(r)) or _applied(r, before, changes),
+                )
+                outcome.status = status_of(row)
+                if resolved:
+                    outcome.verdict = RESOLVED
+                else:
+                    what = f"order {order_id}: modify outcome unknown"
+                    _check_the_account(session, outcome, case, what)
+            except BaseException as exc:
+                _interrupted(session, outcome, exc, lookup=False)
+                raise
+            result = _finish(session, outcome, _response(session, "ModifyOrder", mark))
+    finally:
+        slot.release()
     if new_tag is not None and outcome.verdict in (ACKNOWLEDGED, RESOLVED):
         session.ledger.retag(order_id, str(new_tag))
     return result
@@ -654,39 +737,46 @@ def _close_call(
         )
     session.guard.stopped()  # noted (sticky); a cancel or exit still goes out
     outcome = OrderOutcome(kind, case.case_id, tag, ACKNOWLEDGED, order_id=order_id)
-    session.order_pacer.wait()  # every state-changing call: 6/s (ALGO_CHK counts all)
-    mark = session.responses.mark()
-    outcome.call = session.ledger.intent(
-        tag, case.case_id, kind, segment=case.segment, order_id=order_id, **detail
-    )
-    with in_flight(session, outcome, case, lookup=False):
-        try:
-            send()
-        except RequestValidationError as exc:
-            _settle(outcome, NOT_SENT, exc)
-        except APIError as exc:
-            _settle(outcome, REJECTED, exc)
-        except Exception as exc:  # ambiguous: resolved by reading the book, never repeated
-            _settle(outcome, None, exc)
-            row, resolved = _row_of(session, order_id, lambda r: is_final(status_of(r)))
-            outcome.status = status_of(row)
-            if resolved:
-                outcome.verdict = RESOLVED
-                session.guard.closed(order_id)
-            else:
-                what = f"order {order_id}: {kind} outcome unknown"
-                _check_the_account(session, outcome, case, what)
-        except BaseException as exc:
-            _interrupted(session, outcome, exc, lookup=False)
-            raise
-        return _finish(session, outcome, _response(session, endpoint, mark))
+    slot = _SendSlot(session)  # the SDK's send slot: pacer wait and write in one step
+    try:
+        session.order_pacer.wait()  # every state-changing call: 6/s (ALGO_CHK counts all)
+        mark = session.responses.mark()
+        outcome.call = session.ledger.intent(
+            tag, case.case_id, kind, segment=case.segment, order_id=order_id, **detail
+        )
+        with in_flight(session, outcome, case, lookup=False):
+            try:
+                try:
+                    send()
+                finally:
+                    slot.release()  # the write is out: the next write of this SDK may go
+            except RequestValidationError as exc:
+                _settle(outcome, NOT_SENT, exc)
+            except APIError as exc:
+                _settle(outcome, REJECTED, exc)
+            except Exception as exc:  # ambiguous: resolved by reading the book, never repeated
+                _settle(outcome, None, exc)
+                row, resolved = _row_of(session, order_id, lambda r: is_final(status_of(r)))
+                outcome.status = status_of(row)
+                if resolved:
+                    outcome.verdict = RESOLVED
+                    session.guard.closed(order_id)
+                else:
+                    what = f"order {order_id}: {kind} outcome unknown"
+                    _check_the_account(session, outcome, case, what)
+            except BaseException as exc:
+                _interrupted(session, outcome, exc, lookup=False)
+                raise
+            return _finish(session, outcome, _response(session, endpoint, mark))
+    finally:
+        slot.release()
 
 
 def cancel(session: MatrixSession, order_id: str, case: CaseRef) -> OrderOutcome:
     """One ``cancel_order`` call for one of our orders (never repeated for this intent)."""
 
     def send() -> object:
-        return session.client.cancel_order(order_id)
+        return session.sdk.cancel_order(order_id)
 
     return _close_call(session, "cancel", "CancelOrder", order_id, case, send)
 
@@ -697,7 +787,7 @@ def exit(  # the matrix name for exit_order (ExitSNOOrder)
     """One ``exit_order`` call for one of our cover / bracket orders (never repeated)."""
 
     def send() -> object:
-        return session.client.exit_order(order_id, product)
+        return session.sdk.exit_order(order_id, product)
 
     return _close_call(session, "exit", "ExitSNOOrder", order_id, case, send, product=product)
 
@@ -728,7 +818,10 @@ def cancel_ours(session: MatrixSession) -> CancelReport:
     is handled once. Never touches an order that is not ours, nor an ignored (stuck on UAT) one,
     nor one with an unknown outcome (CHECK THE ACCOUNT, interrupted, or an intent without its
     outcome). An order still open after ``confirm_seconds`` is stuck: its segment's breaker trips
-    and a ``stuck`` line goes to the ledger.
+    and a ``stuck`` line goes to the ledger. With an SDK under test other than Python (a
+    driver), a row ours by id is cancelled only when it carries the ledger's tag for that id (or
+    is the order a GTT of ours placed, ``gtt_order_tag``); otherwise ``tag_mismatch`` (listed
+    in the end-of-session CHECK THE ACCOUNT notice, never cancelled).
     """
     report = CancelReport()
     ledger = session.ledger
@@ -767,6 +860,11 @@ def cancel_ours(session: MatrixSession) -> CancelReport:
         if tag is None or ledger.tag_flagged(tag):
             report.flagged.append(order_id)
             continue
+        if session.sdk.name != PYTHON and row_tag != tag and ledger.gtt_order_tag(row) is None:
+            # Defence in depth for a driver: the book row must carry the tag the ledger holds
+            # for this id (an order a GTT of ours placed keeps its own rule, gtt_order_tag).
+            report.tag_mismatch.append(order_id)
+            continue
         segment = ledger.segment_of(tag) or "unknown"
         if ledger.stuck(order_id):  # cancelled once and never final: a human looks at it
             report.stuck.append(order_id)
@@ -783,6 +881,11 @@ def cancel_ours(session: MatrixSession) -> CancelReport:
             continue
         if outcome.check_the_account:
             report.flagged.append(order_id)
+            continue
+        if (
+            outcome.verdict == NOT_SENT
+        ):  # nothing went out: no confirm, not stuck (the tool does it)
+            report.not_sent.append(order_id)
             continue
         if outcome.verdict in (ACKNOWLEDGED, RESOLVED):
             report.cancelled.append(order_id)
@@ -823,7 +926,9 @@ def stop_run(session: MatrixSession, stop: StopRun) -> CancelReport:
         not_final=report.not_final,
         flagged=report.flagged,
         pending=report.pending,
+        not_sent=report.not_sent,
         missing=report.missing,
+        tag_mismatch=report.tag_mismatch,
         untouched=report.untouched,
         book_unreadable=report.book_unreadable,
     )
@@ -865,7 +970,9 @@ def teardown(session: MatrixSession) -> CancelReport | None:
         not_final=report.not_final,
         flagged=report.flagged,
         pending=report.pending,
+        not_sent=report.not_sent,
         missing=report.missing,
+        tag_mismatch=report.tag_mismatch,
         untouched=report.untouched,
         book_unreadable=report.book_unreadable,
         **extra,
@@ -1051,14 +1158,18 @@ def gtt_place(session: MatrixSession, plan: Mapping[str, Any], case: CaseRef) ->
     session.guard.spend(case.case_id)
     tag = session.ledger.new_tag(case.case_id)
     outcome = GttOutcome(GTT_PLACE, case.case_id, tag, ACKNOWLEDGED)
-    session.order_pacer.wait()  # every state-changing call: 6/s (ALGO_CHK counts all)
-    session.guard.check_new(case.segment)  # again: a STOP file or a trip during the wait
-    mark = session.responses.mark()
-    outcome.call = session.ledger.intent(
-        tag, case.case_id, GTT_PLACE, segment=case.segment, plan=kwargs
-    )
-    with gtt_in_flight(session, outcome, case):
-        result = _send_gtt_place(session, kwargs, case, outcome, mark)
+    slot = _SendSlot(session)  # the SDK's send slot: pacer wait, re-check and write in one step
+    try:
+        session.order_pacer.wait()  # every state-changing call: 6/s (ALGO_CHK counts all)
+        session.guard.check_new(case.segment)  # again: a STOP file or a trip during the wait
+        mark = session.responses.mark()
+        outcome.call = session.ledger.intent(
+            tag, case.case_id, GTT_PLACE, segment=case.segment, plan=kwargs
+        )
+        with gtt_in_flight(session, outcome, case):
+            result = _send_gtt_place(session, kwargs, case, outcome, mark, slot)
+    finally:
+        slot.release()
     return result
 
 
@@ -1068,12 +1179,17 @@ def _send_gtt_place(
     case: CaseRef,
     outcome: GttOutcome,
     mark: int,
+    slot: _SendSlot,
 ) -> GttOutcome:
-    """``gtt_place`` from its intent to its outcome (inside ``gtt_in_flight``)."""
+    """``gtt_place`` from its intent to its outcome (inside ``gtt_in_flight``); the slot is
+    given back right after the write."""
     tag = outcome.tag
     extra: dict[str, Any] = {}
     try:
-        alert_id = session.client.place_gtt(**kwargs, tag=tag)
+        try:
+            alert_id = session.sdk.place_gtt(**kwargs, tag=tag)
+        finally:
+            slot.release()
     except RequestValidationError as exc:
         _gtt_settle(outcome, NOT_SENT, exc)
     except APIError as exc:  # stat Not_Ok: a definitive answer
@@ -1187,14 +1303,18 @@ def gtt_modify(
         pending = read_gtts(session)
         before = next((g for g in pending or [] if _gtt_id(g) == alert_id), None)
     outcome = GttOutcome(GTT_MODIFY, case.case_id, tag, ACKNOWLEDGED, alert_id=alert_id)
-    session.order_pacer.wait()  # every state-changing call: 6/s (ALGO_CHK counts all)
-    session.guard.check_new(case.segment)  # again: a STOP file or a trip during the wait
-    mark = session.responses.mark()
-    outcome.call = session.ledger.intent(
-        tag, case.case_id, GTT_MODIFY, segment=case.segment, alert_id=alert_id, changes=fields
-    )
-    with gtt_in_flight(session, outcome, case):
-        result = _send_gtt_modify(session, alert_id, case, outcome, mark, before, fields)
+    slot = _SendSlot(session)  # the SDK's send slot: pacer wait, re-check and write in one step
+    try:
+        session.order_pacer.wait()  # every state-changing call: 6/s (ALGO_CHK counts all)
+        session.guard.check_new(case.segment)  # again: a STOP file or a trip during the wait
+        mark = session.responses.mark()
+        outcome.call = session.ledger.intent(
+            tag, case.case_id, GTT_MODIFY, segment=case.segment, alert_id=alert_id, changes=fields
+        )
+        with gtt_in_flight(session, outcome, case):
+            result = _send_gtt_modify(session, alert_id, case, outcome, mark, before, fields, slot)
+    finally:
+        slot.release()
     return result
 
 
@@ -1206,12 +1326,17 @@ def _send_gtt_modify(
     mark: int,
     before: Gtt | None,
     fields: dict[str, Any],
+    slot: _SendSlot,
 ) -> GttOutcome:
-    """``gtt_modify`` from its intent to its outcome (inside ``gtt_in_flight``)."""
+    """``gtt_modify`` from its intent to its outcome (inside ``gtt_in_flight``); the slot is
+    given back right after the write."""
     tag = outcome.tag
     notes: dict[str, Any] = {}
     try:
-        returned = session.client.modify_gtt(alert_id, **fields, tag=tag)
+        try:
+            returned = session.sdk.modify_gtt(alert_id, **fields, tag=tag)
+        finally:
+            slot.release()
     except RequestValidationError as exc:
         _gtt_settle(outcome, NOT_SENT, exc)
     except APIError as exc:
@@ -1312,23 +1437,36 @@ def gtt_cancel(session: MatrixSession, alert_id: str, case: CaseRef) -> GttOutco
         )
     session.guard.stopped()  # noted (sticky); a cancel still goes out
     outcome = GttOutcome(GTT_CANCEL, case.case_id, tag, ACKNOWLEDGED, alert_id=alert_id)
-    session.order_pacer.wait()  # every state-changing call: 6/s (ALGO_CHK counts all)
-    mark = session.responses.mark()
-    outcome.call = session.ledger.intent(
-        tag, case.case_id, GTT_CANCEL, segment=case.segment, alert_id=alert_id
-    )
-    with gtt_in_flight(session, outcome, case):
-        result = _send_gtt_cancel(session, alert_id, case, outcome, mark)
+    slot = _SendSlot(session)  # the SDK's send slot: pacer wait and write in one step
+    try:
+        session.order_pacer.wait()  # every state-changing call: 6/s (ALGO_CHK counts all)
+        mark = session.responses.mark()
+        outcome.call = session.ledger.intent(
+            tag, case.case_id, GTT_CANCEL, segment=case.segment, alert_id=alert_id
+        )
+        with gtt_in_flight(session, outcome, case):
+            result = _send_gtt_cancel(session, alert_id, case, outcome, mark, slot)
+    finally:
+        slot.release()
     return result
 
 
 def _send_gtt_cancel(
-    session: MatrixSession, alert_id: str, case: CaseRef, outcome: GttOutcome, mark: int
+    session: MatrixSession,
+    alert_id: str,
+    case: CaseRef,
+    outcome: GttOutcome,
+    mark: int,
+    slot: _SendSlot,
 ) -> GttOutcome:
-    """``gtt_cancel`` from its intent to its outcome (inside ``gtt_in_flight``)."""
+    """``gtt_cancel`` from its intent to its outcome (inside ``gtt_in_flight``); the slot is
+    given back right after the write."""
     notes: dict[str, Any] = {}
     try:
-        returned = session.client.cancel_gtt(alert_id)
+        try:
+            returned = session.sdk.cancel_gtt(alert_id)
+        finally:
+            slot.release()
     except RequestValidationError as exc:
         _gtt_settle(outcome, NOT_SENT, exc)
     except APIError as exc:
@@ -1379,7 +1517,7 @@ def cancel_our_gtts(session: MatrixSession) -> GttCleanup:
         return report
     tags = ledger.gtt_tags()
     for row in pending:
-        alert_id, row_tag = _gtt_id(row), (row.tag or "").strip()
+        alert_id, row_tag = _gtt_id(row), _row_gtt_tag(row, tags)
         if not alert_id:
             continue
         if ledger.alert_tag(alert_id) is None and row_tag in tags and ledger.pending_tag(row_tag):
@@ -1398,7 +1536,11 @@ def cancel_our_gtts(session: MatrixSession) -> GttCleanup:
         tag = ledger.alert_tag(alert_id) or row_tag
         case = CaseRef(ledger.case_of(tag) or "cleanup", ledger.segment_of(tag) or "unknown")
         try:
-            outcome = gtt_cancel(session, alert_id, case)
+            outcome = (
+                oco_cancel(session, case, alert_id)
+                if ledger.alert_is_oco(alert_id)
+                else gtt_cancel(session, alert_id, case)
+            )
         except Refusal:
             report.flagged.append(alert_id)
             continue
@@ -1434,3 +1576,646 @@ def _note_left(session: MatrixSession, alert_ids: list[str], why: str) -> None:
             tag=session.ledger.alert_tag(alert_id),
             alert=f"{CHECK_THE_ACCOUNT}: GTT {alert_id} of this run: {why}",
         )
+
+
+# -- OCOs (family m_oco) --------------------------------------------------------------------------
+#
+# PlaceOCOOrder / ModifyOCOOrder / CancelOCOOrder under exactly the GTT rules above (same ledger
+# tracking, one call per intent, never repeated, one cancel per alert id per run, the tag always
+# the ledger's, never in a mock session unless the owner's OCO switch is on). What differs is the
+# lookup: an OCO row of the pending / triggered list has an EMPTY top-level ``remarks`` (F35 c);
+# the tag is only in the legs' ``remarks`` (both legs carry exactly the tag), so an ambiguous
+# call is looked up by alert id, leg tag, or, for a row with no tag at all, tradingsymbol + both
+# trigger values (``find_oco``); anything else is CHECK THE ACCOUNT. A row carrying someone
+# else's leg tag is never matched by symbol and triggers.
+
+
+@dataclass
+class OcoOutcome(GttOutcome):
+    """What one OCO call did: a ``GttOutcome`` (same ledger ``outcome`` line) with its ``word``."""
+
+    @property
+    def word(self) -> Literal["accepted", "rejected", "unknown", "not_sent"]:
+        """``accepted`` (the server acknowledged), ``rejected`` (a definitive refusal),
+        ``not_sent`` (refused client-side), else ``unknown`` (found, resolved, CHECK THE
+        ACCOUNT, interrupted)."""
+        if self.verdict == ACKNOWLEDGED:
+            return "accepted"
+        if self.verdict == REJECTED:
+            return "rejected"
+        if self.verdict == NOT_SENT:
+            return "not_sent"
+        return "unknown"
+
+
+def _leg_tags(row: Gtt) -> list[str]:
+    legs = (row.oco_first, row.oco_second)
+    return [(leg.tag or "").strip() for leg in legs if leg is not None and (leg.tag or "").strip()]
+
+
+def _row_gtt_tag(row: Gtt, tags: set[str]) -> str:
+    """The row's tag among ``tags`` (the run's): its own ``remarks``, else the tag one of its
+    legs carries (exactly the tag); else its own ``remarks`` as read."""
+    own = (row.tag or "").strip()
+    if own in tags:
+        return own
+    for leg in _leg_tags(row):
+        if leg in tags:
+            return leg
+    return own
+
+
+def _oco_trigger_values(row: Gtt) -> list[Decimal]:
+    return sorted(t.trigger_value for t in row.oco_triggers or [] if t.trigger_value is not None)
+
+
+def _oco_row_kind(
+    row: Gtt, tag: str, symbol: str, triggers: tuple[Decimal, Decimal], ids: list[str]
+) -> str | None:
+    """How a row matches: ``id`` (an alert id of ``ids``), ``tag`` (its own or a leg's
+    ``remarks``), ``shape`` (a row with no tag at all, same symbol and both triggers), else
+    ``None``. A row tagged by someone else is never a ``shape`` match."""
+    if not row.is_oco:
+        return None
+    if _gtt_id(row) and _gtt_id(row) in ids:
+        return "id"
+    if (row.tag or "").strip() == tag or tag in _leg_tags(row):
+        return "tag"
+    if (row.tag or "").strip() or _leg_tags(row):
+        return None
+    if (row.tradingsymbol or "").strip() == symbol and _oco_trigger_values(row) == sorted(triggers):
+        return "shape"
+    return None
+
+
+def _oco_plan_shape_ok(row: Gtt, plan: Mapping[str, Any]) -> bool:
+    """Whether the row's exchange, both legs' side and quantity are the plan's."""
+    legs = (row.oco_first, row.oco_second)
+    if any(leg is None for leg in legs) or _word(row.exchange) != _word(plan.get("exchange")):
+        return False
+    return all(
+        leg is not None
+        and _side(leg.transaction_type) == _side(plan.get("transaction_type"))
+        and _same_value(leg.quantity, plan.get("quantity"))
+        for leg in legs
+    )
+
+
+def _oco_rows(
+    session: MatrixSession,
+    tag: str,
+    symbol: str,
+    triggers: tuple[Decimal, Decimal],
+    ids: list[str],
+    *,
+    triggered: bool,
+    exclude: frozenset[str] | None = None,
+) -> list[Gtt] | None:
+    rows = read_gtts(session, triggered=triggered)
+    if rows is None:
+        return None
+    found: list[Gtt] = []
+    for row in rows:
+        kind = _oco_row_kind(row, tag, symbol, triggers, ids)
+        if kind == "shape" and (exclude is None or _gtt_id(row) in exclude):
+            continue
+        if kind is not None:
+            found.append(row)
+    return found
+
+
+def find_oco(
+    session: MatrixSession,
+    tag: str,
+    symbol: str,
+    triggers: tuple[Decimal, Decimal],
+    ids: list[str],
+    *,
+    exclude: frozenset[str] | None = None,
+) -> list[Gtt] | None:
+    """The pending OCOs (one read, read-only) matching the alert id in ``ids``, a leg tag
+    (``remarks`` equal to the tag), or, for an untagged row, ``symbol`` and both ``triggers``
+    (either slot); ``None`` when the read fails. Untagged rows whose alert id is in ``exclude``
+    (the ones pending before the place) never match by symbol and triggers; ``exclude=None``
+    (the default: fail closed) switches that fallback off, so a caller that wants it passes
+    its snapshot."""
+    return _oco_rows(session, tag, symbol, triggers, ids, triggered=False, exclude=exclude)
+
+
+def _untagged_oco_ids(session: MatrixSession) -> frozenset[str] | None:
+    """The alert ids of the untagged OCOs in the pending and triggered lists now (read-only);
+    ``None`` when either list cannot be read (then no symbol-and-triggers match is ever made)."""
+    found: set[str] = set()
+    for triggered in (False, True):
+        rows = read_gtts(session, triggered=triggered)
+        if rows is None:
+            return None
+        found.update(
+            _gtt_id(g) for g in rows if g.is_oco and not (g.tag or "").strip() and not _leg_tags(g)
+        )
+    return frozenset(found)
+
+
+def _look_up_oco(
+    session: MatrixSession,
+    tag: str,
+    symbol: str,
+    triggers: tuple[Decimal, Decimal],
+    exclude: frozenset[str] | None,
+    plan: Mapping[str, Any],
+) -> tuple[str | None, str | None, bool, str | None]:
+    """(alert id, list, any read succeeded, why not) of the OCO of ``tag``: the pending list up
+    to ``lookup_attempts`` times, then the triggered list once (it may have fired). A leg tag
+    decides. Failing that, an untagged OCO is ours only when it was not pending before the
+    place (``exclude``), its symbol, both triggers, exchange, side and quantity are the plan's,
+    and it is the only one: more than one candidate is never ``found`` (``why not`` says so)."""
+    read_ok = False
+    candidates: list[tuple[str, str]] = []
+    for index in range(session.lookup_attempts):
+        if index:
+            session.sleep(session.lookup_interval)
+        rows = read_gtts(session)
+        if rows is None:
+            continue
+        read_ok = True
+        candidates = []
+        for row in rows:
+            kind = _oco_row_kind(row, tag, symbol, triggers, [])
+            if kind == "tag" and _gtt_id(row):
+                return _gtt_id(row), "pending", True, None
+            if kind == "shape" and _oco_plan_shape_ok(row, plan):
+                candidates.append((_gtt_id(row), "pending"))
+    fired = read_gtts(session, triggered=True)
+    if fired is not None:
+        read_ok = True
+        for row in fired:
+            kind = _oco_row_kind(row, tag, symbol, triggers, [])
+            if kind == "tag" and _gtt_id(row):
+                return _gtt_id(row), "triggered", True, None
+            if kind == "shape" and _oco_plan_shape_ok(row, plan):
+                candidates.append((_gtt_id(row), "triggered"))
+    if exclude is None:
+        return None, None, read_ok, None
+    fresh = {(i, w) for i, w in candidates if i and i not in exclude}
+    if len(fresh) == 1:
+        alert_id, where = next(iter(fresh))
+        return alert_id, where, True, None
+    if len(fresh) > 1:
+        return None, None, True, "more than one untagged OCO fits its symbol, triggers and size"
+    return None, None, read_ok, None
+
+
+def _oco_triggers(stop_loss: OcoLeg, target: OcoLeg) -> tuple[Decimal, Decimal]:
+    """Both trigger values as decimals (the lookup's), else ``ValueError``: worked out before
+    anything is spent, written or sent."""
+    try:
+        return Decimal(str(stop_loss.trigger_value)), Decimal(str(target.trigger_value))
+    except (ValueError, InvalidOperation):
+        raise ValueError(
+            "calls.oco_*: an OCO trigger value is not a number; nothing was spent or sent"
+        ) from None
+
+
+_OCO_FIELD_KEYS = frozenset(
+    {"exchange", "tradingsymbol", "quantity", "product", "validity", "alert_validity"}
+)
+
+
+def _oco_wire_fields(fields: Mapping[str, Any]) -> dict[str, Any]:
+    """The call's plain fields: only the six keys of ``_OCO_FIELD_KEYS`` (never ``tag``, which
+    is the ledger's), and ``alert_validity`` present and ``DAY`` (every OCO of the matrix ends
+    with its day); else ``ValueError`` before anything is spent or sent."""
+    if "tag" in fields:
+        raise ValueError("calls.oco_* send the ledger's tag of the OCO, never a caller's tag")
+    unknown = sorted(set(fields) - _OCO_FIELD_KEYS)
+    if unknown:
+        allowed = sorted(_OCO_FIELD_KEYS)
+        raise ValueError(f"calls.oco_*: unknown field(s) {unknown}; allowed: {allowed}")
+    if "alert_validity" not in fields:
+        raise ValueError("calls.oco_*: alert_validity is required and must be DAY")
+    if _word(fields["alert_validity"]) != "DAY":
+        raise ValueError("calls.oco_*: alert_validity must be DAY (never GTT) in the matrix")
+    return dict(fields)
+
+
+def oco_place(
+    session: MatrixSession,
+    case: CaseRef,
+    *,
+    stop_loss: OcoLeg,
+    target: OcoLeg,
+    transaction_type: Any,
+    tag: str | None = None,
+    **fields: Any,
+) -> OcoOutcome:
+    """One ``place_oco`` call (``fields``: ``exchange``, ``tradingsymbol``, ``quantity``,
+    ``product``, ``validity``, ``alert_validity``; never resent).
+
+    Refused when the case is done, the run is stopped or the segment tripped; it spends one of
+    the case's declared count. The tag is the ledger's: ``tag`` may only be one the ledger
+    issued (``ledger.new_tag``) and not yet sent, else ``ValueError``. Never in a mock session
+    without the owner's OCO switch (refused before any call).
+    """
+    _refuse_oco(session)
+    check_mock(session)  # mock session: the switch again (date rollover)
+    if tag is not None and not session.ledger.issued(tag):
+        raise ValueError("calls.oco_place sets the tag itself (the ledger's), never a caller's tag")
+    kwargs = {
+        **_oco_wire_fields(fields),
+        "stop_loss": stop_loss,
+        "target": target,
+        "transaction_type": transaction_type,
+    }
+
+    def send(sent: dict[str, Any], sent_tag: str) -> str:
+        return session.sdk.place_oco(**sent, tag=sent_tag)
+
+    return _place_oco_alert(session, case, kwargs, tag, send, {})
+
+
+# Owner decision E5: no OCO is ever made to fire in a mock session, whatever the OCO switch.
+MOCK_NO_FIRE = (
+    "no OCO is made to fire in a mock session (owner decision E5, whatever the OCO switch): "
+    "the fires and slot-observation cases are skipped"
+)
+
+# The slot order ``oco_place_raw`` sends (the docs example's): the target in ``x`` /
+# ``place_order_params``, the stop-loss in ``y`` / ``place_order_params_leg2``.
+REVERSED_SLOTS = {"x": "target", "y": "stop_loss"}
+
+
+def reversed_oco_body(uid: str, kwargs: Mapping[str, Any], tag: str) -> dict[str, Any]:
+    """The ``PlaceOCOOrder`` body of ``kwargs`` (``oco_place``'s keywords) in the docs-example
+    slot order: built and validated as the SDK builds it (stop-loss ``x``, target ``y``), then
+    the two triggers and the two legs swapped, nothing else changed (``REVERSED_SLOTS``)."""
+    from tradesmart.endpoints.oco import place_oco_call  # noqa: PLC0415 (the SDK's own builder)
+
+    wire = dict(place_oco_call(uid, **kwargs, tag=tag).payload)
+    triggers = {i["var_name"]: i["d"] for i in wire["oivariable"]}  # type: ignore[union-attr,index]
+    wire["oivariable"] = [
+        {"var_name": "x", "d": triggers["y"]},  # the target's trigger
+        {"var_name": "y", "d": triggers["x"]},  # the stop-loss's trigger
+    ]
+    first, second = wire["place_order_params"], wire["place_order_params_leg2"]
+    wire["place_order_params"], wire["place_order_params_leg2"] = second, first
+    return wire
+
+
+def oco_place_raw(
+    session: MatrixSession,
+    case: CaseRef,
+    *,
+    stop_loss: OcoLeg,
+    target: OcoLeg,
+    transaction_type: Any,
+    **fields: Any,
+) -> OcoOutcome:
+    """One ``PlaceOCOOrder`` sent through the Python client's ``request()`` with the slots in
+    the docs-example order (``reversed_oco_body``; the slot-observation case), under every rule
+    of ``oco_place``: the six fields only, ``alert_validity`` DAY, the ledger's tag (on both
+    legs), spend, STOP / breaker / mock re-checks, order pacer, ledger intent before and outcome
+    after, never resent, an unknown outcome looked up (leg tag, else symbol and both triggers).
+    The Python SDK only (a driver SDK has no ``request()`` path here): ``ValueError`` before
+    anything is spent or sent. Never in a mock session, whatever the OCO switch (owner decision
+    E5: this OCO is made to fire): ``Refusal`` before any call."""
+    if session.mock:
+        raise Refusal(MOCK_NO_FIRE)
+    _refuse_oco(session)
+    check_mock(session)
+    kwargs = {
+        **_oco_wire_fields(fields),
+        "stop_loss": stop_loss,
+        "target": target,
+        "transaction_type": transaction_type,
+    }
+    if session.sdk.name != PYTHON:
+        raise ValueError(
+            f"calls.oco_place_raw is for the Python SDK only, not {session.sdk.name!r}"
+        )
+    client = session.client
+
+    def send(sent: dict[str, Any], sent_tag: str) -> str:
+        body = reversed_oco_body(client.client_id, sent, sent_tag)
+        reply = client.request("PlaceOCOOrder", body, state_changing=True)
+        return str(reply.get("al_id") or "") if isinstance(reply, Mapping) else ""
+
+    return _place_oco_alert(session, case, kwargs, None, send, {"slot_order": REVERSED_SLOTS})
+
+
+def _place_oco_alert(
+    session: MatrixSession,
+    case: CaseRef,
+    kwargs: dict[str, Any],
+    tag: str | None,
+    send: Callable[[dict[str, Any], str], str],
+    note: dict[str, Any],
+) -> OcoOutcome:
+    """The body of ``oco_place`` / ``oco_place_raw`` after their own checks: ``send(kwargs,
+    tag)`` makes the one write and returns the alert id; ``note`` goes on the outcome line.
+    The lookup values (symbol and both triggers) are worked out first: a failure there is a
+    ``ValueError`` with nothing spent, written or sent (never a CHECK THE ACCOUNT)."""
+    lookup = (
+        str(kwargs.get("tradingsymbol") or "").strip(),
+        _oco_triggers(kwargs["stop_loss"], kwargs["target"]),
+    )
+    _refuse_case(session, case)
+    session.guard.check_new(case.segment)
+    session.guard.spend(case.case_id)
+    tag = tag or session.ledger.new_tag(case.case_id)
+    outcome = OcoOutcome(OCO_PLACE, case.case_id, tag, ACKNOWLEDGED)
+    # Read-only snapshot of the untagged OCOs already there: never adopted by a lookup.
+    exclude = _untagged_oco_ids(session)
+    slot = _SendSlot(session)  # the SDK's send slot: pacer wait, re-check and write in one step
+    try:
+        session.order_pacer.wait()  # every state-changing call: 6/s
+        session.guard.check_new(case.segment)  # again: a STOP file or a trip during the wait
+        check_mock(session)  # again, right before the intent
+        mark = session.responses.mark()
+        outcome.call = session.ledger.intent(
+            tag, case.case_id, OCO_PLACE, segment=case.segment, plan=kwargs, **note
+        )
+        with gtt_in_flight(session, outcome, case):
+            _send_oco_place(session, kwargs, case, outcome, mark, slot, exclude, send, note, lookup)
+    finally:
+        slot.release()
+    return outcome
+
+
+def _send_oco_place(
+    session: MatrixSession,
+    kwargs: dict[str, Any],
+    case: CaseRef,
+    outcome: OcoOutcome,
+    mark: int,
+    slot: _SendSlot,
+    exclude: frozenset[str] | None,
+    send: Callable[[dict[str, Any], str], str],
+    note: dict[str, Any],
+    lookup: tuple[str, tuple[Decimal, Decimal]],
+) -> None:
+    """``oco_place`` from its intent to its outcome (inside ``gtt_in_flight``); the slot is
+    given back right after the write. ``lookup``: the symbol and both triggers, worked out
+    before the intent."""
+    tag = outcome.tag
+    symbol, triggers = lookup
+    extra: dict[str, Any] = dict(note)
+    try:
+        try:
+            alert_id = send(kwargs, tag)
+        finally:
+            slot.release()
+    except RequestValidationError as exc:
+        _gtt_settle(outcome, NOT_SENT, exc)
+    except APIError as exc:  # stat Not_Ok: a definitive answer
+        _gtt_settle(outcome, REJECTED, exc)
+    except Exception as exc:  # ambiguous: it may exist (or have fired); look it up
+        _gtt_settle(outcome, None, exc)
+
+        def look_up() -> None:
+            found, where, read_ok, reason = _look_up_oco(
+                session, tag, symbol, triggers, exclude, kwargs
+            )
+            if found is not None:
+                outcome.verdict = FOUND
+                outcome.alert_id = found
+                extra["found_in"] = where
+            else:
+                why = reason or (
+                    "it is in neither list" if read_ok else "the GTT lists could not be read"
+                )
+                _check_the_account_gtt(
+                    session, outcome, case, f"OCO tag {tag}: place outcome unknown and {why}"
+                )
+
+        extra.update(_look_up_or_interrupt(session, outcome, case, look_up))
+    except BaseException as exc:
+        _gtt_settle(outcome, INTERRUPTED, exc)
+        extra["alert"] = f"{CHECK_THE_ACCOUNT}: interrupted during the OCO place"
+        if isinstance(exc, KeyboardInterrupt):
+            session.interrupted = True
+        try:
+            if not isinstance(exc, KeyboardInterrupt):  # one read to record what exists
+                rows = find_oco(session, tag, symbol, triggers, [], exclude=None)
+                outcome.alert_id = next((_gtt_id(g) for g in rows or [] if _gtt_id(g)), None)
+        except BaseException as during:  # interrupted again (Ctrl-C) during that read
+            if isinstance(during, KeyboardInterrupt):
+                session.interrupted = True
+            extra["lookup_interrupted"] = type(during).__name__
+            raise
+        finally:
+            _gtt_finish(session, outcome, extra)
+        raise
+    else:
+        outcome.alert_id = (alert_id or "").strip() or None
+    extra.update(_response(session, "PlaceOCOOrder", mark))
+    _gtt_finish(session, outcome, extra)
+
+
+def _our_oco(session: MatrixSession, alert_id: str) -> str:
+    """``_our_alert`` for an OCO call: also refuses, before any call, an alert of the run that
+    the ledger does not know as an OCO (a plain GTT is never sent an OCO modify or cancel)."""
+    tag = _our_alert(session, alert_id)
+    if not session.ledger.alert_is_oco(alert_id):
+        raise Refusal(
+            f"alert {alert_id} is not an OCO of this run (not placed by oco_place); refusing to "
+            "send an OCO call for it"
+        )
+    return tag
+
+
+def _oco_values(row: Gtt) -> list[tuple[Any, Any]] | None:
+    """(trigger value, leg price) of the stop-loss and target sides of a row, or ``None``."""
+    sl, tg = row.stop_loss, row.target
+    if sl is None or tg is None:
+        return None
+    return [(sl.trigger_value, sl.leg.price), (tg.trigger_value, tg.leg.price)]
+
+
+def _oco_shows(row: Gtt, stop_loss: OcoLeg, target: OcoLeg) -> bool:
+    """Whether the row's trigger values (and leg prices, when asked) equal the requested ones."""
+    now = _oco_values(row)
+    if now is None:
+        return False
+    for (trigger, price), leg in zip(now, (stop_loss, target), strict=True):
+        if not _same_value(trigger, leg.trigger_value):
+            return False
+        if leg.price is not None and not _same_value(price, leg.price):
+            return False
+    return True
+
+
+def _oco_applied(row: Gtt, before: Gtt | None, stop_loss: OcoLeg, target: OcoLeg) -> bool:
+    """The pending row shows every requested value, and the row read before the modify did not
+    (else it cannot tell an applied modify from none)."""
+    return (
+        before is not None
+        and _oco_shows(row, stop_loss, target)
+        and not _oco_shows(before, stop_loss, target)
+    )
+
+
+def oco_modify(
+    session: MatrixSession,
+    case: CaseRef,
+    alert_id: str,
+    *,
+    stop_loss: OcoLeg,
+    target: OcoLeg,
+    transaction_type: Any,
+    tag: str | None = None,
+    before: Gtt | None = None,
+    **fields: Any,
+) -> OcoOutcome:
+    """One ``modify_oco`` call of one of our OCOs (``fields``: ``exchange``, ``tradingsymbol``,
+    ``quantity``, ``product``, ``validity``, ``alert_validity``); never repeated. The tag sent
+    is the ledger's (``tag`` may only be that one). ``before`` is its pending row before the
+    modify (read here when not given): an ambiguous outcome is resolved only when the pending
+    row then shows the change. Spends nothing. Refused when stopped or tripped, and in a mock
+    session without the owner's OCO switch."""
+    _refuse_oco(session)
+    check_mock(session)  # mock session: the switch again (date rollover)
+    kwargs = {
+        **_oco_wire_fields(fields),
+        "stop_loss": stop_loss,
+        "target": target,
+        "transaction_type": transaction_type,
+    }
+    ours = _our_oco(session, alert_id)
+    if tag is not None and tag != ours:
+        raise ValueError("calls.oco_modify sends the ledger's tag of the OCO, never a caller's tag")
+    session.guard.check_new(case.segment)
+    if before is None:
+        pending = read_gtts(session)
+        before = next((g for g in pending or [] if _gtt_id(g) == alert_id), None)
+    outcome = OcoOutcome(OCO_MODIFY, case.case_id, ours, ACKNOWLEDGED, alert_id=alert_id)
+    slot = _SendSlot(session)
+    try:
+        session.order_pacer.wait()
+        session.guard.check_new(case.segment)
+        check_mock(session)  # again, right before the intent
+        mark = session.responses.mark()
+        outcome.call = session.ledger.intent(
+            ours, case.case_id, OCO_MODIFY, segment=case.segment, alert_id=alert_id, changes=kwargs
+        )
+        with gtt_in_flight(session, outcome, case):
+            _send_oco_modify(session, alert_id, case, outcome, mark, before, kwargs, slot)
+    finally:
+        slot.release()
+    return outcome
+
+
+def _send_oco_modify(
+    session: MatrixSession,
+    alert_id: str,
+    case: CaseRef,
+    outcome: OcoOutcome,
+    mark: int,
+    before: Gtt | None,
+    kwargs: dict[str, Any],
+    slot: _SendSlot,
+) -> None:
+    notes: dict[str, Any] = {}
+    try:
+        try:
+            returned = session.sdk.modify_oco(alert_id, **kwargs, tag=outcome.tag)
+        finally:
+            slot.release()
+    except RequestValidationError as exc:
+        _gtt_settle(outcome, NOT_SENT, exc)
+    except APIError as exc:
+        _gtt_settle(outcome, REJECTED, exc)
+    except Exception as exc:  # ambiguous: resolved by reading the pending list, never repeated
+        _gtt_settle(outcome, None, exc)
+
+        def look_up() -> None:
+            if _gtt_resolved(
+                session,
+                lambda rows: any(
+                    _gtt_id(g) == alert_id
+                    and _oco_applied(g, before, kwargs["stop_loss"], kwargs["target"])
+                    for g in rows
+                ),
+            ):
+                outcome.verdict = RESOLVED
+            else:
+                what = f"OCO {alert_id}: modify outcome unknown"
+                _check_the_account_gtt(session, outcome, case, what)
+
+        notes.update(_look_up_or_interrupt(session, outcome, case, look_up))
+    except BaseException as exc:
+        _gtt_interrupted(session, outcome, exc)
+        raise
+    else:
+        outcome.returned = (returned or "").strip() or None
+    extra = {**_response(session, "ModifyOCOOrder", mark), **notes}
+    if outcome.returned is not None and outcome.returned != alert_id:
+        extra["returned_differs"] = True
+    _gtt_finish(session, outcome, extra)
+
+
+def oco_cancel(session: MatrixSession, case: CaseRef, alert_id: str) -> OcoOutcome:
+    """One ``cancel_oco`` call for one of our OCOs: at most one per alert id per run (a NOT_SENT
+    one excepted); allowed when stopped or tripped (it only removes risk). An ambiguous outcome
+    is resolved when the pending list no longer lists the alert id, else CHECK THE ACCOUNT.
+    Refused in a mock session without the owner's OCO switch."""
+    _refuse_oco(session)
+    tag = _our_oco(session, alert_id)
+    if session.ledger.gtt_cancel_sent(alert_id):
+        raise Refusal(
+            f"OCO {alert_id} was already cancelled once in this run; a CancelOCOOrder is sent "
+            "at most once per OCO"
+        )
+    session.guard.stopped()  # noted (sticky); a cancel still goes out
+    outcome = OcoOutcome(OCO_CANCEL, case.case_id, tag, ACKNOWLEDGED, alert_id=alert_id)
+    slot = _SendSlot(session)
+    try:
+        session.order_pacer.wait()
+        mark = session.responses.mark()
+        outcome.call = session.ledger.intent(
+            tag, case.case_id, OCO_CANCEL, segment=case.segment, alert_id=alert_id
+        )
+        with gtt_in_flight(session, outcome, case):
+            _send_oco_cancel(session, alert_id, case, outcome, mark, slot)
+    finally:
+        slot.release()
+    return outcome
+
+
+def _send_oco_cancel(
+    session: MatrixSession,
+    alert_id: str,
+    case: CaseRef,
+    outcome: OcoOutcome,
+    mark: int,
+    slot: _SendSlot,
+) -> None:
+    notes: dict[str, Any] = {}
+    try:
+        try:
+            returned = session.sdk.cancel_oco(alert_id)
+        finally:
+            slot.release()
+    except RequestValidationError as exc:
+        _gtt_settle(outcome, NOT_SENT, exc)
+    except APIError as exc:
+        _gtt_settle(outcome, REJECTED, exc)
+    except Exception as exc:  # ambiguous: resolved when the OCO is no longer pending
+        _gtt_settle(outcome, None, exc)
+
+        def look_up() -> None:
+            if _gtt_resolved(session, lambda rows: all(_gtt_id(g) != alert_id for g in rows)):
+                outcome.verdict = RESOLVED
+            else:
+                what = f"OCO {alert_id}: cancel outcome unknown"
+                _check_the_account_gtt(session, outcome, case, what)
+
+        notes.update(_look_up_or_interrupt(session, outcome, case, look_up))
+    except BaseException as exc:
+        _gtt_interrupted(session, outcome, exc)
+        raise
+    else:
+        outcome.returned = (returned or "").strip() or None
+    extra = {**_response(session, "CancelOCOOrder", mark), **notes}
+    if outcome.returned is not None and outcome.returned != alert_id:
+        extra["returned_differs"] = True
+    _gtt_finish(session, outcome, extra)

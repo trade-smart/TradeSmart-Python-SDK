@@ -538,7 +538,7 @@
         "requires_ack_id": "al_id",
         "state_changing": true,
         "success_stats": [
-          "Oi delete success"
+          "OI deleted"
         ]
       },
       "input": {
@@ -553,6 +553,131 @@
         "state_changing": false
       },
       "name": "cancel_gtt_any_case_is_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"exch\":\"NSE\",\"uid\":\"TEST123\"}",
+        "endpoint": "PlaceOCOOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": "al_id",
+        "state_changing": true,
+        "success_stats": [
+          "OI created"
+        ]
+      },
+      "input": {
+        "endpoint": "placeocoorder",
+        "expect": "object",
+        "payload": [
+          [
+            "exch",
+            "NSE"
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "place_oco_any_case_is_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"al_id\":\"1\",\"uid\":\"TEST123\"}",
+        "endpoint": "ModifyOCOOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": "al_id",
+        "state_changing": true,
+        "success_stats": [
+          "OI replaced"
+        ]
+      },
+      "input": {
+        "endpoint": "MODIFYOCOORDER",
+        "expect": "object",
+        "payload": [
+          [
+            "al_id",
+            "1"
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "modify_oco_any_case_is_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"al_id\":\"1\",\"uid\":\"TEST123\"}",
+        "endpoint": "CancelOCOOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": "al_id",
+        "state_changing": true,
+        "success_stats": [
+          "OI deleted"
+        ]
+      },
+      "input": {
+        "endpoint": " /CancelOcoOrder/ ",
+        "expect": "object",
+        "payload": [
+          [
+            "al_id",
+            "1"
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "cancel_oco_any_case_is_state_changing"
+    },
+    {
+      "expected": {
+        "allow_empty": false,
+        "body": "jData={\"tsym\":\"RELIANCE-EQ\",\"oivariable\":[{\"var_name\":\"x\",\"d\":\"1430\"},{\"var_name\":\"y\",\"d\":\"1170\"}],\"place_order_params\":{\"tsym\":\"RELIANCE-EQ\",\"qty\":\"1\",\"prc\":\"1440\"},\"uid\":\"TEST123\"}",
+        "endpoint": "PlaceOCOOrder",
+        "expect": "object",
+        "rate_group": null,
+        "requires_ack_id": "al_id",
+        "state_changing": true,
+        "success_stats": [
+          "OI created"
+        ]
+      },
+      "input": {
+        "endpoint": "PlaceOCOOrder",
+        "expect": "object",
+        "payload": [
+          [
+            "tsym",
+            "RELIANCE-EQ"
+          ],
+          [
+            "oivariable",
+            [
+              {
+                "var_name": "x",
+                "d": "1430"
+              },
+              {
+                "var_name": "y",
+                "d": "1170"
+              }
+            ]
+          ],
+          [
+            "place_order_params",
+            {
+              "tsym": "RELIANCE-EQ",
+              "qty": "1",
+              "prc": "1440"
+            }
+          ]
+        ],
+        "state_changing": false
+      },
+      "name": "place_oco_nested_payload_is_kept_in_order"
     },
     {
       "expected": {
@@ -660,7 +785,7 @@
       "name": "iceberg_book_read_is_sent_as_given"
     }
   ],
-  "description": "The low-level request(endpoint, payload, state_changing, expect) call as built before sending. input.payload is the ordered list of [key, value] pairs. The endpoint is trimmed of whitespace and slashes and must then be ASCII letters only (else {\"error\": \"ConfigurationError\"}); the names PlaceOrder, PlaceMultiOrder, ModifyOrder, CancelOrder, ExitSNOOrder, GenAcsTok, PlaceGTTOrder, ModifyGTTOrder, CancelGTTOrder, PlaceIceBergOrder, ModifyIceBergOrder, CancelIceBergOrder, GetQuotes, GetQuotesMultiple and TPSeries match case-insensitively and are rewritten to that spelling, every other name is sent as given. expected.state_changing is the caller's flag or a state-changing name; expected.rate_group is place_order (the orders group), quotes, tpseries or null; allow_empty is always false; expected.success_stats is the sorted list of documented success words (['Ok'] except the GTT and iceberg writes; the GTT words compare ignoring letter case, see success_words.json) and expected.requires_ack_id the field a success must carry as a non-blank string (al_id for the GTT writes, else null). uid is appended when absent; values become wire strings (true / false as Yes / No); a null value is {\"error\": \"TypeError\"} (a programming error, nothing is sent).",
+  "description": "The low-level request(endpoint, payload, state_changing, expect) call as built before sending. input.payload is the ordered list of [key, value] pairs. The endpoint is trimmed of whitespace and slashes and must then be ASCII letters only (else {\"error\": \"ConfigurationError\"}); the names PlaceOrder, PlaceMultiOrder, ModifyOrder, CancelOrder, ExitSNOOrder, GenAcsTok, PlaceGTTOrder, ModifyGTTOrder, CancelGTTOrder, PlaceOCOOrder, ModifyOCOOrder, CancelOCOOrder, PlaceIceBergOrder, ModifyIceBergOrder, CancelIceBergOrder, GetQuotes, GetQuotesMultiple and TPSeries match case-insensitively and are rewritten to that spelling, every other name is sent as given. expected.state_changing is the caller's flag or a state-changing name; expected.rate_group is place_order (the orders group), quotes, tpseries or null; allow_empty is always false; expected.success_stats is the sorted list of success words (['Ok'] except the GTT, OCO and iceberg writes; the GTT and OCO words compare ignoring letter case, see success_words.json) and expected.requires_ack_id the field a success must carry as a non-blank string (al_id for the GTT and OCO writes, else null). Values may be nested objects and lists (the OCO bodies): their key and item order is kept, encoded as in jdata_encoding.json. uid is appended when absent; values become wire strings (true / false as Yes / No); a null value is {\"error\": \"TypeError\"} (a programming error, nothing is sent).",
   "source": "tradesmart._client_core.build_raw_call",
   "tolerance": {}
 }

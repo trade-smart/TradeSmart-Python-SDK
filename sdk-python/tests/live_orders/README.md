@@ -251,6 +251,7 @@ any API call. On UAT it runs at any hour (like the other UAT order tests). On pr
 | `test_far_gtt_buy_is_placed_read_back_modified_once_and_cancelled` | 3 (place, modify, cancel) | One GTT on NSE `ITC-EQ`: alert `LTP_A_O` (LTP greater than the trigger) with the trigger at **3 × a fresh last price** (a `quote()` read just before sending; refused before sending when the quote has no last price or the condition would already be true), alert validity `DAY` (a GTT left behind ends with the day). Its order: a CNC DAY LIMIT BUY of 1 share 10 % below the market (never below `lc`; refused unless at least 1 % below). The GTT must be in `pending_gtts()` once by its tag with the trigger, alert type, alert validity, quantity and price sent; its trigger is then modified **once** to 3.1 × a fresh last price (the same checks first) and read back; then cancelled. Skips (after recording) when TradeSmart rejects the GTT. |
 | `test_gtt_alert_types_are_a_list_of_words` | 0 | Read-only: `gtt_alert_types()` is a list of non-blank words (recorded). |
 | `test_triggered_gtts_are_readable` | 0 | Read-only: `triggered_gtts()` answers a list (its length and any `sdkgtt-` tags recorded). |
+| `test_oco_lifecycle` | 4 on UAT, 3 on production | One BUY OCO of 1 `ITC-EQ` (CNC, LIMIT legs, `sdkgtt-` tag): stop-loss trigger 1.10 × and target trigger 0.90 × a fresh last price (refused before sending when a trigger would already be crossed), placed, read back by alert id (`is_oco`, `stop_loss`, `target`), its stop-loss modified once, cancelled and confirmed gone. On UAT one more `modify_oco` on the cancelled id must be `OrderRejectedError` (`Invalid Oi`); on production that probe is not sent. Skips (after recording) when TradeSmart rejects the OCO. |
 
 The run is `gtt.run_gtt` (pinned by the "GTT" tests of `tests/unit/test_live_orders_safety.py`;
 a dry run of the test file on the offline broker, in a UAT and a production session, is
@@ -259,7 +260,9 @@ a dry run of the test file on the offline broker, in a UAT and a production sess
 - **Budget.** Place, modify and cancel each count as one call against the run cap and the test's
   own cap of 3, each spent just before it is sent; without room for all three before the place,
   the test skips and nothing is sent. The production cap is 3, so on production run this file on
-  its own (not after the order tests of `test_live_orders.py`).
+  its own (not after the order tests of `test_live_orders.py`), and the GTT and OCO tests in
+  separate runs: `-k "not oco"`, then `-k oco` (each needs the whole run budget). The OCO test
+  (`gtt.run_oco_lifecycle`) follows the same budget, never-resend, clean-up and record rules.
 - **Never resend.** One place, at most one modify, one cancel per GTT of this run. Each GTT
   carries a unique tag `sdkgtt-<hex>` (outside the suite's `sdklive-` prefix). After an accepted or
   ambiguous place, or an interruption other than Ctrl-C, the GTT is looked up in `pending_gtts()`
@@ -303,7 +306,11 @@ place and modify (after midnight IST the run stops; cancels still go out). A lim
 `margins()` before any order (`MOCK_MIN_LIMIT`). There is no market-hours check and no fill
 cut-off, the position ceiling stays, cases are judged as on production (the UAT-only recording
 rules are off), and no AMO or GTT is ever sent: those families skip ("AMO and GTT are not sent in
-a mock session: they are stored past it"). Every module carries `pytestmark = [live_orders, uat_matrix, m_<family>]`; case ids
+a mock session: they are stored past it"). The OCO family (`m_oco`) skips too unless
+`TRADESMART_LIVE_MOCK_OCO` is set by hand to exactly `oco in mock session <today's IST date>` for
+that run; then only its three far cases run (no `Invalid Oi` probe, alert validity `DAY`), and
+only the OCOs and orders the run placed are cancelled and confirmed gone, else CHECK THE ACCOUNT.
+Every module carries `pytestmark = [live_orders, uat_matrix, m_<family>]`; case ids
 are `<family>-<role>-<product>-<prctyp>-<ret>-<side>[-<variant>]` (for example
 `shapes-nfo-nifty-f-nrml-sl-lmt-day-sell`), so `-k` selects by any part.
 
@@ -324,6 +331,7 @@ are `<family>-<role>-<product>-<prctyp>-<ret>-<side>[-<variant>]` (for example
 | `test_tags.py` | `m_tags` | M11 tags and `&` encoding | 9 (2) | |
 | `test_m12_hold.py` | `m_hold` | M12 CNC SELL of the account's holdings | 2 (1) | |
 | `test_gtt.py` | `m_gtt` | M13 GTT place, modify, cancel; a GTT that fires at once | 4 (3) | any hour on UAT |
+| `test_oco.py` | `m_oco` | OCO place, modify, cancel with far triggers (BUY, SELL, an SL-LMT stop-loss leg) and an `Invalid Oi` probe on the cancelled id; OCOs that fire at once (which leg fired, told by the order's price); the docs-example slot order through `request()` (Python only, recorded) | 6 (1) | any hour on UAT; leg `remarks` carry the case tag on both legs; mock session only with the OCO switch `TRADESMART_LIVE_MOCK_OCO`, far cases only |
 | `test_bse.py` | `m_bse` | M14 BSE and BFO canaries, the BSE grid | 36 (9) | |
 | `test_mcx.py` | `m_mcx` | M15 MCX (CRUDEOIL, GOLD, GOLDM, GOLDPETAL) in trade units | 136 (10) | any hour on UAT |
 | `test_z_algo_id.py` | `m_algo` | U15 a test `algo_id`, recorded only | 3 (1) | run last or on its own |
@@ -421,9 +429,19 @@ refusal is an environment limit of that case only; prices use the contract's tic
   run id is `MMDD` (IST) plus 4 hex digits; `ledger.jsonl` (a line written and flushed before and
   after every state-changing call), `positions.jsonl` (what the run's fills left open),
   `contracts.json` (the day's instruments) and one JSON record per case. No account id is written.
-  Every order carries the tag `sdkuat-<run>-<key>-<n>` (at most 30 characters, 21 by default; the
-  run's own tags round trip through `remarks`, which is the verified bound: no caller tags and no
-  longer-tag probe).
+  Every order carries the tag `sdkuat-<run>-<sdk><key>-<n>` (`<sdk>` is one letter: `p` Python, `j`
+  JavaScript; at most 30 characters, 22 by default; tags written before the SDK code, `sdkuat-<run>-<key>-<n>`,
+  are still read by the matrix and the cleanup tool). `TRADESMART_LIVE_SDKS` (unset: `python`; `all`; or a
+  comma list) selects the SDKs, one session each, run serially; only the eleven state-changing calls
+  (the eight order and GTT calls and, since driver protocol 2, the three OCO calls) go through the SDK, every read stays on the Python client, and family M9 skips for other SDKs.
+  Another SDK runs through a driver process (`specifications/live-driver.md`); the harness acts on
+  each reply's wire body, never on the driver's own ids. Its teardown is **fail-closed** (owner,
+  2026-11-16): after a driver has been stopped nothing more is sent for that run, through the driver
+  or the Python client, and its open orders are listed for `uat_cleanup`; while it runs, a book row
+  is cancelled only when it carries the ledger's tag for its id. The
+  run's own tags (22 characters for Python, 23 for JavaScript, whose run id carries the SDK letter) round trip through
+  `remarks`; UAT was verified to echo both lengths whole on 2026-11-17 (a one-order canary per SDK). A tag-length
+  canary stays an optional first step for a new SDK or a changed tag scheme. No caller tags and no longer-tag probe).
 - **Resume.** `TRADESMART_UAT_RUN_ID=<run id>` with the same command continues that run: cases
   with a verdict skip ("done in run ..."), a case an earlier process started without a verdict is
   never placed again. Only on the **same trading day** (IST); another day is refused before any
@@ -449,10 +467,14 @@ refusal is an environment limit of that case only; prices use the contract's tic
 - **Market path.** The run sends at most one order that may fill at the market; it is claimed in
   the ledger (`market_claim`, released by `market_release` when it certainly did not fill) before
   it is sent, and a resume restores the claim.
-- **End-of-session notice.** The terminal summary shows one CHECK THE ACCOUNT notice listing every
-  leftover order and GTT of the session (not final, stuck, unknown outcome, never listed in the
-  book, an unreadable book), its last line the open-AMO line; it is also noted in the ledger
-  (`session_notice`). After Ctrl-C it may list orders that are already final.
+- **End-of-session notice.** The terminal summary shows one notice per session, in this order: the
+  CHECK THE ACCOUNT lines listing every leftover order and GTT of the session (not final, stuck,
+  unknown outcome, never listed in the book, an unreadable book, a driver's tag mismatch or stop),
+  then the open-AMO line, and last the `POSITIONS LEFT` line (the positions the run's fills left:
+  the run's own position ledger, or the group's shared one for another SDK's run; a listing, never
+  a CHECK THE ACCOUNT). It is also noted in the ledger (`session_notice`, which may hold the
+  positions line alone; `positions_notice` holds that line). After Ctrl-C it may list orders that
+  are already final.
 
 ### Safety rules of the matrix
 

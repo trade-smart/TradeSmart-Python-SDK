@@ -179,6 +179,42 @@ def test_the_stop_file_mid_sequence_sends_no_further_modify(rig: Rig) -> None:
     assert rig.count_for("CancelOrder", order_id) == 1
 
 
+# -- a stop order the broker stores as a LIMIT (UAT, live 18 Nov 2026: N9 (e), (k)) ---------------
+
+STOP_ONLY_STEPS = ("trigger", "price-trigger", "to-lmt")
+
+
+def _stop_as_limit(tmp_path: Path, *, uat: bool) -> Iterator[tuple[Rig, batch.CaseResult]]:
+    with modify_views_rig(tmp_path, uat=uat) as built:
+        built.market.stop_as_limit.add("ITC-EQ")  # placed SL-LMT, booked LMT / OPEN, trigger kept
+        case = _case("nse-b", "SL-LMT")
+        [result] = cases_modify.run_cases(built.run, [case], timing=FAST).values()
+        yield built, result
+
+
+def test_a_stop_order_stored_as_a_limit_on_uat_is_recorded_and_skips_the_stop_steps(
+    tmp_path: Path,
+) -> None:
+    for built, result in _stop_as_limit(tmp_path, uat=True):
+        assert result.verdict == batch.RECORD, (result.reason, _steps(result))
+        assert result.record["notes"]["uat_stop_open"]["status"] == "OPEN"
+        steps = {s["step"]: s for s in _steps(result)}
+        for name in STOP_ONLY_STEPS:
+            assert steps[name]["result"] == "skipped", steps[name]
+            assert "stored as a LIMIT" in steps[name]["reason"]
+        assert not any(s["result"] == "fail" for s in steps.values()), steps
+        [order_id] = result.order_ids
+        assert built.statuses()[order_id] == "CANCELED"
+
+
+def test_a_stop_order_stored_as_a_limit_off_uat_fails_with_the_reason(tmp_path: Path) -> None:
+    for _built, result in _stop_as_limit(tmp_path, uat=False):
+        assert result.verdict == batch.FAIL
+        assert "stored as a LIMIT" in result.reason, result.reason
+        steps = {s["step"]: s for s in _steps(result)}
+        assert all(steps[name]["result"] == "skipped" for name in STOP_ONLY_STEPS), steps
+
+
 def test_modify_cases_skip_when_the_bfo_canary_is_not_confirmed(rig: Rig) -> None:
     rig.market.stuck.add("BSXFUT27NOV26")  # the BFO canary stays PENDING (F26)
     results = cases_modify.run_cases(rig.run, [_case("bfo-sensex-f")], timing=FAST)

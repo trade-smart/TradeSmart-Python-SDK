@@ -441,6 +441,26 @@ def test_is_exported_leaves_out_internal_only_tests() -> None:
     assert not is_exported("CLAUDE.md")
 
 
+def test_javascript_sdk_and_workflow_are_left_out_of_the_python_export() -> None:
+    # Each language profile ships its own SDK folder and workflows only: the Python export never
+    # ships the JavaScript SDK (in any spelling or case) or its workflow.
+    for rel in (
+        "sdk-javascript/package.json",
+        "sdk-javascript/src/index.ts",
+        "./sdk-javascript/README.md",
+        "SDK-JavaScript/NOTICE",
+        "sdk-javascript\\docs\\orders.md",
+        "sdk-javascript/repo-root/README.md",
+        ".github/workflows/javascript-ci.yml",
+        ".github/workflows/javascript-release.yml",
+    ):
+        assert not is_exported(rel, "python"), rel
+    assert is_exported("sdk-python/src/tradesmart/__init__.py")
+    assert is_exported("specifications/sdk-behaviour.md")
+    for rel in ("python-ci.yml", "release.yml", "install-check.yml"):
+        assert is_exported(f".github/workflows/{rel}", "python"), rel
+
+
 def test_normalise_rules() -> None:
     assert normalise("./a/b.md") == "a/b.md"
     assert normalise("././a.md") == "a.md"
@@ -609,3 +629,11 @@ def test_public_commits_carry_only_the_tradesmart_author() -> None:
     if internal_rules.exists():
         rules = internal_rules.read_text(encoding="utf-8")
         assert "Co-Authored-By: Claude" in rules and "every GitHub repository" in rules
+
+
+def test_the_root_contributing_names_no_repository_that_does_not_exist_yet() -> None:
+    """The JavaScript repository is not created yet: the root guide (exported to the Python
+    repository) points to it without naming one, until the owner creates it."""
+    text = (REPO_DIR / "CONTRIBUTING.md").read_text(encoding="utf-8")
+    assert "TradeSmart-JavaScript-SDK" not in text
+    assert "JavaScript SDK lives in its own repository (to be announced)" in text

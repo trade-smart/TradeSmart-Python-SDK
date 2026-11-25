@@ -338,8 +338,28 @@ class TradeSmartModel(BaseModel):
         return model
 
 
-def to_wire_value(value: Any) -> str:
-    """Convert a Python value to its wire string form."""
+WireValue = str | dict[str, "WireValue"] | list["WireValue"]
+
+
+MAX_WIRE_DEPTH = 100
+
+
+def to_wire_value(value: Any, _depth: int = 0) -> WireValue:
+    """Convert a Python value to its wire form: a string, or a nested dict / list of them.
+
+    A mapping keeps its key order (keys must be strings), a list or tuple its item order, and a
+    nested request model becomes its own wire dict. ``None`` is never encodable (``TypeError``).
+    """
+    if isinstance(value, RequestModel):
+        return value.to_wire()
+    if isinstance(value, (Mapping, list, tuple)) and _depth > MAX_WIRE_DEPTH:
+        raise TypeError("nested too deeply (or cyclic)")
+    if isinstance(value, Mapping):
+        if not all(isinstance(key, str) for key in value):
+            raise TypeError("cannot convert a mapping with non-string keys to a wire value")
+        return {key: to_wire_value(item, _depth + 1) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [to_wire_value(item, _depth + 1) for item in value]
     if isinstance(value, Enum):
         return str(value.value)
     if isinstance(value, bool):
@@ -360,7 +380,7 @@ class RequestModel(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True, populate_by_name=True)
 
-    def to_wire(self) -> dict[str, str]:
+    def to_wire(self) -> dict[str, WireValue]:
         dumped = self.model_dump(by_alias=True, exclude_none=True)
         return {key: to_wire_value(val) for key, val in dumped.items()}
 

@@ -4,8 +4,10 @@
 line, written and flushed to disk **before** every state-changing call (``intent``, with a unique
 ``call`` id) and **after** it (``outcome``, echoing that ``call`` id). It is how a run (and a
 resumed run, and the cleanup tool) knows which orders are its own: every order of the run carries
-a unique tag ``sdkuat-<run>-<key>-<n>``, where ``key`` is a short counter for the case id
-(``case`` lines map key -> case id), so tags stay short (at most ``TAG_MAX`` characters).
+a unique tag ``sdkuat-<run>-<sdk><key>-<n>``, where ``sdk`` is the one-letter code of the SDK under
+test (``p`` Python, ``j`` JavaScript) and ``key`` is a short counter for the case id (``case`` lines
+map key -> case id), so tags stay short (at most ``TAG_MAX`` characters). Tags written before the
+SDK code existed (``sdkuat-<run>-<key>-<n>``) are still read: the key is the part after the code.
 
 What makes an order **ours**: only a place / place_sliced intent (its tag) and that call's outcome
 or a lookup by that tag (the order id). A modify, cancel or exit intent never adopts an id or a tag.
@@ -17,7 +19,8 @@ order whose ``add_ord_id`` (``Order.parent_id``) is one of our alert ids, the or
 placed, is ours (``adopt`` writes the link). ``gtt_modify`` / ``gtt_cancel`` intents never adopt
 an alert id; one ``gtt_cancel`` per alert id per run; an unknown GTT outcome flags the GTT's tag
 and alert id (no further GTT call for it), and a ``gtt_place`` intent without its outcome on
-reopening blocks its case like a place intent.
+reopening blocks its case like a place intent. OCOs (``oco_place`` / ``oco_modify`` /
+``oco_cancel``) are tracked exactly like GTTs (same tags, alert ids, flags, one-cancel rule).
 
 What makes an order **unknown** (no further state-changing call from this run, the teardown
 cancel included): an outcome ``CHECK THE ACCOUNT`` or ``interrupted``, and, when a ledger is
@@ -39,6 +42,7 @@ from __future__ import annotations
 import itertools
 import json
 import os
+import re
 import secrets
 import string
 import threading
@@ -69,10 +73,23 @@ REJECTED = "rejected"  # a definitive refusal (calls.REJECTED)
 UNKNOWN_VERDICTS = frozenset({CHECK_THE_ACCOUNT, INTERRUPTED})
 PLACE_KINDS = frozenset({"place", "place_sliced"})
 GTT_PLACE, GTT_MODIFY, GTT_CANCEL = "gtt_place", "gtt_modify", "gtt_cancel"
-GTT_KINDS = frozenset({GTT_PLACE, GTT_MODIFY, GTT_CANCEL})
-_STARTS_A_CASE = PLACE_KINDS | {GTT_PLACE}  # a call that may create something for its case
+OCO_PLACE, OCO_MODIFY, OCO_CANCEL = "oco_place", "oco_modify", "oco_cancel"
+OCO_KINDS = frozenset({OCO_PLACE, OCO_MODIFY, OCO_CANCEL})
+# An OCO is tracked like a GTT: its tag, alert id, one cancel per alert id (the same sets).
+GTT_KINDS = frozenset({GTT_PLACE, GTT_MODIFY, GTT_CANCEL}) | OCO_KINDS
+_ALERT_PLACES = frozenset({GTT_PLACE, OCO_PLACE})
+_ALERT_CANCELS = frozenset({GTT_CANCEL, OCO_CANCEL})
+_STARTS_A_CASE = PLACE_KINDS | _ALERT_PLACES  # a call that may create something for its case
 _BASE36 = string.digits + string.ascii_lowercase  # case counters: 000, 001, ... zzz
 _KEY_WIDTH = 3
+_SDK_CODE = re.compile(r"[a-z]")  # one lower-case letter (``sdk_under_test.SDK_CODES``)
+
+
+def _case_key(segment: str) -> str:
+    """The case key of a tag's middle segment: ``<sdk><key>`` (new) or ``<key>`` (old tags)."""
+    return segment[1:] if len(segment) == _KEY_WIDTH + 1 else segment
+
+
 _MIN_FORBIDDEN = 4  # shorter values could match ordinary text
 READ_ATTEMPTS = 3  # read-only order-book reads (a read may be repeated; a write never)
 READ_INTERVAL = 1.0
@@ -97,7 +114,8 @@ def nothing_sent(
     rate limit: a ``RateLimitError`` with no server answer (``http_status`` recorded as
     ``None``) and the SDK's client-side wording, on a ``place`` / ``place_sliced`` /
     ``gtt_place`` call (for a GTT, ``order_id`` is the alert id). A server 429 never counts,
-    whatever its text.
+    whatever its text. A driver's error carries ``sent`` (``live-driver.md``): it counts only
+    as a ``RateLimitError`` with ``sent`` false, whatever its text or status.
     """
     if verdict in UNKNOWN_VERDICTS or order_id or any(i for i in order_ids or ()):
         return False
@@ -107,6 +125,8 @@ def nothing_sent(
         return True
     if verdict != REJECTED or not isinstance(error, Mapping):
         return False
+    if "sent" in error:  # a driver's error: its explicit field and the type, never the message
+        return error.get("exception") == "RateLimitError" and error["sent"] is False
     return (
         error.get("exception") == "RateLimitError"
         and "http_status" in error
@@ -174,9 +194,16 @@ def _key(number: int) -> str:
 class Ledger:
     """The run ledger: appends records, replays them on open (resume)."""
 
-    def __init__(self, path: Path, run_id: str, *, forbidden: Iterable[str] = ()) -> None:
+    def __init__(
+        self, path: Path, run_id: str, *, forbidden: Iterable[str] = (), sdk_code: str = "p"
+    ) -> None:
+        if not isinstance(sdk_code, str) or not _SDK_CODE.fullmatch(sdk_code):
+            raise ValueError(
+                f"sdk_code must be exactly one lower-case letter (p, j, ...), got {sdk_code!r}"
+            )
         self.path = path
         self.run_id = run_id
+        self.sdk_code = sdk_code  # one letter in every new tag (``p`` Python, ``j`` JavaScript)
         self.forbidden = tuple(forbidden)
         self._lock = threading.RLock()
         self._keys: dict[str, str] = {}  # case id -> key
@@ -199,6 +226,7 @@ class Ledger:
         self._alert_tag: dict[str, str] = {}  # alert id -> GTT tag (our GTTs)
         self._flagged_alerts: set[str] = set()  # alert ids with an unknown outcome
         self._gtt_cancel_sent: set[str] = set()  # alert ids with a gtt_cancel intent
+        self._oco_tags: set[str] = set()  # of the GTT tags, those of an OCO (oco_place)
         self._call_prefix = secrets.token_hex(3)
         self._calls = itertools.count(1)
         self._loading = False
@@ -233,7 +261,9 @@ class Ledger:
 
     def _apply_gtt_intent(self, record: Mapping[str, Any]) -> None:
         kind, tag = record.get("kind"), str(record.get("tag"))
-        if kind == GTT_PLACE:
+        if kind in _ALERT_PLACES:
+            if kind == OCO_PLACE:
+                self._oco_tags.add(tag)
             detail = record.get("detail")
             plan = detail.get("plan") if isinstance(detail, Mapping) else None
             self._gtt_tags.setdefault(
@@ -249,7 +279,7 @@ class Ledger:
                 case_id = str(record["case_id"])
                 self._started_before.add(case_id)
                 self._places_before[case_id] = self._places_before.get(case_id, 0) + 1
-        elif kind == GTT_CANCEL and record.get("alert_id"):
+        elif kind in _ALERT_CANCELS and record.get("alert_id"):
             self._gtt_cancel_sent.add(str(record["alert_id"]))
 
     def _apply_gtt_outcome(
@@ -258,11 +288,11 @@ class Ledger:
         tag = str(record.get("tag"))
         alerts = [record.get("alert_id"), *(record.get("alert_ids") or [])]
         target = (intent or {}).get("alert_id")
-        if kind == GTT_PLACE and tag in self._gtt_tags:
+        if kind in _ALERT_PLACES and tag in self._gtt_tags:
             for alert_id in alerts:
                 if alert_id:
                     self._alert_tag[str(alert_id)] = tag
-        if kind == GTT_CANCEL and record.get("verdict") == NOT_SENT and target:
+        if kind in _ALERT_CANCELS and record.get("verdict") == NOT_SENT and target:
             self._gtt_cancel_sent.discard(str(target))  # nothing went out: it keeps its cancel
         if record.get("verdict") in UNKNOWN_VERDICTS:
             self._flag(tag, [], [*alerts, target])
@@ -305,7 +335,7 @@ class Ledger:
                 if (
                     self._loading
                     and intent is not None
-                    and call_kind == GTT_PLACE
+                    and call_kind in _ALERT_PLACES
                     and intent.get("case_id")
                     and nothing_sent(
                         record.get("verdict"),
@@ -368,7 +398,8 @@ class Ledger:
         prefix = f"{TAG_PREFIX}{self.run_id}-"
         if not tag.startswith(prefix):
             return
-        key, _, number = tag[len(prefix) :].partition("-")
+        segment, _, number = tag[len(prefix) :].partition("-")
+        key = _case_key(segment)
         if number.isdigit():
             self._places[key] = max(self._places.get(key, 0), int(number))
 
@@ -416,7 +447,7 @@ class Ledger:
             return str(entry["case_id"])
         prefix = f"{TAG_PREFIX}{self.run_id}-"
         if tag.startswith(prefix):
-            return self._cases.get(tag[len(prefix) :].partition("-")[0])
+            return self._cases.get(_case_key(tag[len(prefix) :].partition("-")[0]))
         return None
 
     def segment_of(self, tag: str) -> str | None:
@@ -429,6 +460,11 @@ class Ledger:
         """Tags of this run's GTT place calls (whether or not an alert id came back)."""
         with self._lock:
             return set(self._gtt_tags)
+
+    def oco_tags(self) -> set[str]:
+        """Tags of this run's OCO place calls (a subset of ``gtt_tags``; a copy)."""
+        with self._lock:
+            return set(self._oco_tags)
 
     def alerts(self) -> set[str]:
         """Alert ids of this run's GTTs (from its GTT place calls and lookups by its tags)."""
@@ -463,6 +499,12 @@ class Ledger:
             if shape is None or tuple(shape) != _order_shape(row):
                 return None
             return tag
+
+    def alert_is_oco(self, alert_id: str) -> bool:
+        """Whether one of our alert ids was placed by an ``oco_place`` call (it is cancelled
+        with ``oco_cancel``, never ``gtt_cancel``)."""
+        with self._lock:
+            return self._alert_tag.get(alert_id, "") in self._oco_tags
 
     def alert_flagged(self, alert_id: str) -> bool:
         """Whether a GTT call for the alert id had an unknown outcome (no further GTT call)."""
@@ -588,12 +630,12 @@ class Ledger:
             return key
 
     def new_tag(self, case_id: str) -> str:
-        """A tag never issued in this run: ``sdkuat-<run>-<key>-<n>``."""
+        """A tag never issued in this run: ``sdkuat-<run>-<sdk><key>-<n>``."""
         with self._lock:
             key = self.case_key(case_id)
             number = self._places.get(key, 0) + 1
             self._places[key] = number
-            tag = f"{TAG_PREFIX}{self.run_id}-{key}-{number}"
+            tag = f"{TAG_PREFIX}{self.run_id}-{self.sdk_code}{key}-{number}"
             if len(tag) > TAG_MAX:
                 raise ValueError(f"tag {tag} is longer than {TAG_MAX} characters")
             self._issued.add(tag)

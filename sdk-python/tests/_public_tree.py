@@ -82,6 +82,30 @@ INTERNAL_ONLY_TESTS = (
     "sdk-*/tests/**/test_internal_*.py",
 )
 
+# Per-language export profiles (design D13: one public repository per language). A profile ships
+# the shared material (root files, ``specifications/``, ``docs/``, the shared issue templates),
+# its own ``sdk-<profile>/`` folder, and its own workflows; every other ``sdk-*`` folder and every
+# workflow it does not list stay out. A workflow that no profile lists is exported nowhere.
+PROFILES = ("python", "javascript")
+PROFILE_WORKFLOWS = {
+    "python": frozenset({"python-ci.yml", "release.yml", "install-check.yml"}),
+    "javascript": frozenset({"javascript-ci.yml", "javascript-release.yml"}),
+}
+WORKFLOW_DIR = ".github/workflows/"
+
+# Names (lower-case, any depth) and file-name patterns that a profile adds to the never-public
+# names above. The Python profile adds none (its file list is unchanged).
+PROFILE_NEVER_PUBLIC_NAMES = {
+    "python": frozenset(),
+    "javascript": frozenset({"node_modules", "coverage"}),
+}
+PROFILE_NEVER_PUBLIC_FILES = {"python": (), "javascript": ("*.tgz",)}
+
+# The files of ``sdk-<profile>/repo-root/`` are placed at the root of that profile's export,
+# replacing the root file of the same name. Only the JavaScript profile has such a folder; the
+# Python profile keeps the internal root files (the root README is the Python public README).
+PROFILE_ROOT_FOLDER = {"python": None, "javascript": "sdk-javascript/repo-root/"}
+
 # Public files allowed to name the patterns, by repo-relative posix glob (fnmatch): ignore rules
 # are not references; internal-only tests are not exported; this module and the layout guard
 # hold the patterns (and their negative controls).
@@ -97,6 +121,7 @@ OPEN_ITEM_RE = re.compile(r"\bF\d{1,3}\b")
 # File types scanned for open-item ids (``F19``), by suffix, plus ``Dockerfile``.
 OPEN_ITEM_FILES = frozenset(
     {".md", ".py", ".toml", ".yml", ".yaml", ".txt", ".sh", ".json", ".ps1"}
+    | {".ts", ".js", ".mjs", ".cjs"}
 )
 _OPEN_ITEM_ROW = re.compile(r"^\|\s*(F\d{1,3})\s*\|", re.M)
 
@@ -157,10 +182,30 @@ def is_internal_only_test(rel: str) -> bool:
     return any(fnmatch.fnmatchcase(folded, pattern) for pattern in INTERNAL_ONLY_TESTS)
 
 
-def is_exported(rel: str) -> bool:
-    """Whether the listed file goes into the public export: a well-formed path, public, and not
-    an internal-only test."""
-    return is_public(rel) and not is_internal_only_test(rel)
+def is_exported(rel: str, profile: str = "python") -> bool:
+    """Whether the listed file goes into the public export of ``profile``: a well-formed path,
+    public, not an internal-only test, and inside the profile (its own SDK folder, its own
+    workflows, none of its extra never-public names). Overrides from the profile's root folder are
+    the export's business, not this function's."""
+    if profile not in PROFILES:
+        raise ValueError(f"unknown export profile {profile!r}; choose one of {', '.join(PROFILES)}")
+    if not is_public(rel) or is_internal_only_test(rel):
+        return False
+    norm = normalise(rel)
+    if norm is None:  # is_public already rejects this; keep the type checker and readers honest
+        return False
+    folded = norm.casefold()
+    parts = folded.split("/")
+    if len(parts) > 1 and parts[0].startswith("sdk-") and parts[0] != f"sdk-{profile}":
+        return False
+    if (
+        folded.startswith(WORKFLOW_DIR)
+        and folded[len(WORKFLOW_DIR) :] not in (PROFILE_WORKFLOWS[profile])
+    ):
+        return False
+    if any(part in PROFILE_NEVER_PUBLIC_NAMES[profile] for part in parts):
+        return False
+    return not any(fnmatch.fnmatchcase(parts[-1], p) for p in PROFILE_NEVER_PUBLIC_FILES[profile])
 
 
 def is_exempt(rel: str) -> bool:

@@ -62,6 +62,7 @@ from tradesmart.endpoints.market import (
     security_info_call,
     time_price_series_call,
 )
+from tradesmart.endpoints.oco import cancel_oco_call, modify_oco_call, place_oco_call
 from tradesmart.endpoints.orders import (
     cancel_order_call,
     exit_sno_order_call,
@@ -103,6 +104,7 @@ from tradesmart.models.market import (
     ScripMatch,
     SecurityInfo,
 )
+from tradesmart.models.oco import OcoLeg
 from tradesmart.models.orders import Order, OrderHistoryEntry, OrderMargin, Trade
 from tradesmart.models.portfolio import Holding, Limits, Position
 from tradesmart.models.user import UserDetails
@@ -552,6 +554,94 @@ class TradeSmart:
         """
         returned = self._transport.execute(cancel_gtt_call(self.client_id, alert_id))
         return acknowledged_alert_id("CancelGTTOrder", alert_id, returned)
+
+    # -- OCO orders ----------------------------------------------------------------
+
+    def place_oco(
+        self,
+        *,
+        exchange: Exchange | str,
+        tradingsymbol: str,
+        transaction_type: TransactionType | str,
+        quantity: int,
+        product: Product | str,
+        stop_loss: OcoLeg,
+        target: OcoLeg,
+        tag: str | None = None,
+        validity: Validity | str = Validity.DAY,
+        alert_validity: GttValidity | str = GttValidity.GTT,
+    ) -> str:
+        """Place an OCO (one cancels the other) and return its alert id (never retried).
+
+        A stop-loss order and a target order wait on the server, each behind its own trigger
+        value (``stop_loss`` and ``target`` are an ``OcoLeg`` each); when one trigger is reached
+        its order is sent and the other is cancelled. A BUY OCO needs the stop-loss trigger above
+        the target trigger, a SELL OCO below it (never equal). A trigger already crossed when the
+        OCO is placed may fire at once. ``alert_validity`` ``GTT`` keeps it until one side
+        triggers or it is cancelled, ``DAY`` ends it with the trading day. After
+        ``OrderStatusUnknownError`` check ``pending_gtts()`` before placing anything again.
+        """
+        call = place_oco_call(
+            self.client_id,
+            exchange=exchange,
+            tradingsymbol=tradingsymbol,
+            transaction_type=transaction_type,
+            quantity=quantity,
+            product=product,
+            stop_loss=stop_loss,
+            target=target,
+            tag=tag,
+            validity=validity,
+            alert_validity=alert_validity,
+        )
+        return self._transport.execute(call)
+
+    def modify_oco(
+        self,
+        alert_id: str,
+        *,
+        exchange: Exchange | str,
+        tradingsymbol: str,
+        transaction_type: TransactionType | str,
+        quantity: int,
+        product: Product | str,
+        stop_loss: OcoLeg,
+        target: OcoLeg,
+        tag: str | None = None,
+        validity: Validity | str,
+        alert_validity: GttValidity | str,
+    ) -> str:
+        """Modify a pending OCO (never retried) and return the alert id the server acknowledged.
+
+        Send the whole OCO again, also the unchanged parts. ``validity`` and ``alert_validity``
+        have no defaults: both are sent on every modify. The side rule of ``place_oco`` applies,
+        and a modify that makes a trigger already crossed may fire it at once. The returned id
+        is the server's ``al_id``, as returned (a DEBUG line says so when it differs).
+        """
+        call = modify_oco_call(
+            self.client_id,
+            alert_id,
+            exchange=exchange,
+            tradingsymbol=tradingsymbol,
+            transaction_type=transaction_type,
+            quantity=quantity,
+            product=product,
+            stop_loss=stop_loss,
+            target=target,
+            tag=tag,
+            validity=validity,
+            alert_validity=alert_validity,
+        )
+        returned = self._transport.execute(call)
+        return acknowledged_alert_id("ModifyOCOOrder", alert_id, returned)
+
+    def cancel_oco(self, alert_id: str) -> str:
+        """Cancel a pending (not yet triggered) OCO (never retried).
+
+        Returns the server's acknowledged ``al_id``, as returned.
+        """
+        returned = self._transport.execute(cancel_oco_call(self.client_id, alert_id))
+        return acknowledged_alert_id("CancelOCOOrder", alert_id, returned)
 
     def pending_gtts(self) -> list[Gtt]:
         """Fetch the GTTs that have not triggered yet (empty list when there are none)."""

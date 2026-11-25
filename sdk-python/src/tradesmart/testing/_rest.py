@@ -212,6 +212,9 @@ class _Handler:
             "PlaceGTTOrder": self._place_gtt,
             "ModifyGTTOrder": self._modify_gtt,
             "CancelGTTOrder": self._cancel_gtt,
+            "PlaceOCOOrder": self._place_oco,
+            "ModifyOCOOrder": self._modify_oco,
+            "CancelOCOOrder": self._cancel_oco,
             "GetPendingGTTOrder": self._pending_gtts,
             "GetTrgOi": self._triggered_gtts,
             "GetEnabledGTTs": self._enabled_gtts,
@@ -392,7 +395,27 @@ class _Handler:
         accepted, result = self._state.cancel_gtt(str(payload.get("al_id", "")))
         if not accepted:
             return _not_ok(result, now)
-        return _json(_replies.gtt_ack("Oi delete success", result, now))
+        return _json(_replies.gtt_ack("OI deleted", result, now))
+
+    def _place_oco(self, payload: dict[str, Any], now: datetime) -> httpx.Response:
+        try:
+            alert_id = self._state.place_oco(payload)
+        except ValueError as exc:
+            return _not_ok(f"Invalid Input : {exc}", now)
+        return _json(_replies.gtt_ack("OI created", alert_id, now))
+
+    def _modify_oco(self, payload: dict[str, Any], now: datetime) -> httpx.Response:
+        try:
+            accepted = self._state.modify_oco(payload)
+        except ValueError as exc:
+            return _not_ok(f"Invalid Input : {exc}", now)
+        word = "OI replaced" if accepted else "Invalid Oi"
+        return _json(_replies.gtt_ack(word, str(payload.get("al_id", "")), now))
+
+    def _cancel_oco(self, payload: dict[str, Any], now: datetime) -> httpx.Response:
+        alert_id = str(payload.get("al_id", ""))
+        word = "OI deleted" if self._state.cancel_oco(alert_id) else "Invalid Oi"
+        return _json(_replies.gtt_ack(word, alert_id, now))
 
     def _gtt_rows(
         self, gtts: list[dict[str, Any]], build: Callable[..., dict[str, Any]], now: datetime

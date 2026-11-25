@@ -53,6 +53,7 @@ from tests.live_orders.safety import (
     Refusal,
     Segment,
 )
+from tradesmart import OcoLeg, round_to_tick
 from tradesmart.enums import GttAlertType, GttValidity, OrderType, TransactionType, Validity
 from tradesmart.errors import (
     AuthenticationError,
@@ -220,17 +221,74 @@ def _row(gtt: Gtt) -> dict[str, Any]:
     }
 
 
+@dataclass
+class OcoMatch:
+    """How this run's OCO is recognised in ``pending_gtts()`` besides its alert id: an OCO row
+    carries no top-level tag (``remarks`` is empty, F35 c), so the tag is looked for in the legs
+    and, in case a leg tag does not come back, the row is matched by its tradingsymbol and both
+    trigger values sent (by any place or modify of this run). OCOs already pending before the
+    place are never taken for this run's."""
+
+    tradingsymbol: str
+    triggers: list[tuple[Decimal, Decimal]] = field(default_factory=list)  # (stop-loss, target)
+    preexisting: set[str] = field(default_factory=set)
+
+    def sent(self, stop_loss: Decimal, target: Decimal) -> None:
+        if (stop_loss, target) not in self.triggers:
+            self.triggers.append((stop_loss, target))
+
+    def path(self, row: Gtt, tag: str) -> str | None:
+        """``leg_tag`` or ``symbol_and_triggers`` when the row is this run's OCO, else ``None``."""
+        if not row.is_oco or (row.alert_id or "").strip() in self.preexisting:
+            return None
+        if _tag_in_legs([row], tag):
+            return "leg_tag"
+        stop, target = row.stop_loss, row.target
+        if stop is None or target is None:
+            return None
+        if (row.tradingsymbol or "").strip() != self.tradingsymbol:
+            return None
+        if (stop.trigger_value, target.trigger_value) in self.triggers:
+            return "symbol_and_triggers"
+        return None
+
+
+def _found_path(row: Gtt, tag: str, ids: list[str], oco: OcoMatch | None) -> str | None:
+    if (row.alert_id or "").strip() in ids:
+        return "alert_id"
+    if (row.tag or "").strip() == tag:
+        return "tag"
+    return oco.path(row, tag) if oco is not None else None
+
+
 def _pending(
-    session: OrderSession, tag: str, ids: list[str], entry: dict[str, Any], key: str
+    session: OrderSession,
+    tag: str,
+    ids: list[str],
+    entry: dict[str, Any],
+    key: str,
+    oco: OcoMatch | None = None,
 ) -> list[Gtt] | None:
     """The pending GTTs carrying ``tag`` or one of the alert ``ids`` (``None`` when
-    ``pending_gtts()`` could not be read); the alert ids seen are added to ``entry["seen"]``."""
+    ``pending_gtts()`` could not be read); the alert ids seen are added to ``entry["seen"]``.
+    With ``oco`` an OCO row is also found by its leg tag or by its symbol and triggers, and how
+    each row was found is recorded in ``entry["found_by"][key]``."""
     try:
         rows = session.client.pending_gtts()
     except Exception as exc:
         entry[key] = {"error": safety._error_record(exc)}
         return None
-    found = [g for g in rows if (g.tag or "").strip() == tag or (g.alert_id or "").strip() in ids]
+    if oco is not None and not oco.triggers:  # nothing sent yet: these OCOs are not this run's
+        oco.preexisting.update(i for i in ((g.alert_id or "").strip() for g in rows) if i)
+    paths = [(g, _found_path(g, tag, ids, oco)) for g in rows]
+    found = [g for g, path in paths if path is not None]
+    if oco is not None:
+        found_by: dict[str, Any] = entry.setdefault("found_by", {})
+        found_by[key] = {
+            (g.alert_id or "").strip() or "(no alert id)": path
+            for g, path in paths
+            if path is not None
+        }
     entry[key] = [_row(g) for g in found]
     seen: list[str] = entry.setdefault("seen", [])
     seen.extend(i for i in _ids(found) if i not in seen)
@@ -347,6 +405,7 @@ def _look_up(
     entry: dict[str, Any],
     known: list[str],
     sleep: Callable[[float], None],
+    oco: OcoMatch | None = None,
 ) -> list[Gtt] | None:
     """Read ``pending_gtts()`` after the place, up to ``LOOKUPS`` times ``LOOKUP_PAUSE_SECONDS``
     apart, until the GTT (its tag, or the acknowledged alert id) shows (the list can lag)."""
@@ -354,7 +413,7 @@ def _look_up(
     for lookup in range(LOOKUPS):
         if lookup:
             sleep(LOOKUP_PAUSE_SECONDS)
-        rows = _pending(session, plan.tag, known, entry, "after_place")
+        rows = _pending(session, plan.tag, known, entry, "after_place", oco)
         entry["place_lookups"] = lookup + 1
         if rows:
             return rows
@@ -365,13 +424,17 @@ def _cancel_pending(
     session: OrderSession,
     plan: OrderPlan,
     entry: dict[str, Any],
-    outcome: GttOutcome,
+    outcome: GttOutcome | OcoOutcome,
     known: list[str],
+    *,
+    endpoint: str,
+    cancel_call: Callable[[str], str],
 ) -> None:
     """Cancel every GTT of this run once (never retried): the pending rows of the tag and every
     alert id known from an acknowledgement, also one not (yet) visible. Then nothing of the tag
     or of a known id may still be pending."""
-    rows = _pending(session, plan.tag, known, entry, "before_cancel")
+    oco = outcome.match if isinstance(outcome, OcoOutcome) else None
+    rows = _pending(session, plan.tag, known, entry, "before_cancel", oco)
     to_cancel: list[str] = []
     _add(to_cancel, _ids(rows or []))
     _add(to_cancel, known)
@@ -379,12 +442,12 @@ def _cancel_pending(
     for alert_id in to_cancel:
 
         def send(alert_id: str = alert_id) -> str:
-            return session.client.cancel_gtt(alert_id)
+            return cancel_call(alert_id)
 
         cancel: dict[str, Any] = {}
         cancels[alert_id] = cancel
         try:
-            word, _, _ = _write(session, "CancelGTTOrder", cancel, send)
+            word, _, _ = _write(session, endpoint, cancel, send)
         except Refusal as exc:  # the cap: not sent; the check below fails the test
             cancel.update({"outcome": "not sent", "reason": exc.reason})
             continue
@@ -392,7 +455,7 @@ def _cancel_pending(
             outcome.cancelled.append(alert_id)
     if cancels:
         entry["cancel"] = cancels
-    after = _pending(session, plan.tag, to_cancel, entry, "after_cancel")
+    after = _pending(session, plan.tag, to_cancel, entry, "after_cancel", oco)
     if after is None:
         raise CheckTheAccount(
             f"{CHECK_THE_ACCOUNT}: GTT tag {plan.tag}: pending_gtts() unreadable after the cancel"
@@ -548,7 +611,15 @@ def run_gtt(
     finally:
         if not interrupted:
             try:
-                _cancel_pending(session, plan, entry, outcome, known)
+                _cancel_pending(
+                    session,
+                    plan,
+                    entry,
+                    outcome,
+                    known,
+                    endpoint="CancelGTTOrder",
+                    cancel_call=lambda alert_id: session.client.cancel_gtt(alert_id),
+                )
                 _fired(session, plan, entry, known)
             except BaseException as base:
                 if not isinstance(base, Exception):
@@ -563,4 +634,312 @@ def run_gtt(
         )
     if outcome.place == "not sent":
         raise Refusal(f"the SDK refused the GTT before sending: {place.get('message')}")
+    return outcome
+
+
+# -- OCO (one cancels the other): the same gates, its own run -----------------------------------
+
+OCO_CALLS_PRODUCTION = 3  # place, modify, cancel: the whole production run budget (-k oco)
+OCO_CALLS_UAT = 4  # ... and a modify on the cancelled id (expected: OrderRejectedError)
+OCO_STOP_FACTOR = Decimal("1.10")  # the stop-loss trigger: 1.10 x a fresh last price (BUY OCO)
+OCO_TARGET_FACTOR = Decimal("0.90")  # the target trigger: 0.90 x a fresh last price
+OCO_MODIFY_STOP_FACTOR = Decimal("1.15")  # the stop-loss trigger is modified once to 1.15 x
+
+
+@dataclass
+class OcoOutcome:
+    place: str = "not sent"  # accepted / rejected / unknown / not sent
+    modify: str | None = None  # accepted / rejected / unknown / not sent / refused
+    probe: str | None = None  # the modify on the cancelled id (UAT only)
+    alert_id: str | None = None
+    stop_loss: Decimal | None = None
+    target: Decimal | None = None
+    modified_stop_loss: Decimal | None = None
+    placed_row: Gtt | None = None
+    modified_row: Gtt | None = None
+    match: OcoMatch | None = None  # how its rows are found besides the alert id
+    refusal: str | None = None
+    exception: str | None = None
+    cancelled: list[str] = field(default_factory=list)
+    seen: list[str] = field(default_factory=list)
+    left_pending: list[str] = field(default_factory=list)
+
+
+def oco_calls_needed(session: OrderSession) -> int:
+    """4 writes on UAT, 3 on production."""
+    return OCO_CALLS_UAT if session.uat else OCO_CALLS_PRODUCTION
+
+
+def oco_triggers(
+    last_price: Decimal | None, tick: Decimal | None, stop_factor: Decimal
+) -> tuple[Decimal, Decimal]:
+    """``(stop-loss, target)`` triggers of a BUY OCO: ``stop_factor`` x and 0.90 x the last
+    price, each rounded to the tick; refused with no usable price or tick, or when the rounding
+    does not leave the target below the last price and the stop-loss above it (a trigger would
+    be crossed at once)."""
+    if last_price is None or last_price <= 0:
+        raise Refusal("no fresh last price from quote(); not sending an OCO")
+    if tick is None or tick <= 0:
+        raise Refusal("no tick size from quote() or the script master; not sending an OCO")
+    stop = round_to_tick(last_price * stop_factor, tick)
+    target = round_to_tick(last_price * OCO_TARGET_FACTOR, tick)
+    if not target < last_price < stop:
+        raise Refusal(
+            f"OCO triggers {stop} / {target} do not bracket the last price {last_price}; "
+            "not sending an OCO"
+        )
+    return stop, target
+
+
+def _oco_fresh(
+    session: OrderSession,
+    plan: OrderPlan,
+    stop_factor: Decimal,
+    record: dict[str, Any],
+    key: str,
+) -> tuple[Decimal, Decimal]:
+    """A new ``quote()`` of the plan's instrument, then ``oco_triggers``; recorded under ``key``."""
+    try:
+        quote = session.client.quote(plan.exchange, plan.token)
+    except Exception as exc:  # any failure means: no fresh price, so no OCO
+        raise Refusal(f"quote() failed ({type(exc).__name__}); not sending an OCO") from exc
+    tick = quote.tick_size if quote.tick_size is not None and quote.tick_size > 0 else None
+    tick = tick if tick is not None else plan.tick_size
+    seen: dict[str, Any] = {
+        "lp": safety._text(quote.last_price),
+        "ti": safety._text(quote.tick_size),
+    }
+    record[key] = seen
+    stop, target = oco_triggers(quote.last_price, tick, stop_factor)
+    seen.update({"stop_loss": str(stop), "target": str(target)})
+    return stop, target
+
+
+def oco_kwargs(plan: OrderPlan, stop_loss: Decimal, target: Decimal) -> dict[str, Any]:
+    """The ``place_oco`` / ``modify_oco`` keywords: BUY, CNC, two LIMIT legs well below the market
+    (the plan's price), alert validity ``DAY`` (a left-behind OCO ends with the trading day)."""
+    return {
+        "exchange": plan.exchange,
+        "tradingsymbol": plan.tradingsymbol,
+        "transaction_type": TransactionType.BUY,
+        "quantity": plan.quantity,
+        "product": plan.product,
+        "stop_loss": OcoLeg(trigger_value=stop_loss, price=plan.price, order_type=OrderType.LIMIT),
+        "target": OcoLeg(trigger_value=target, price=plan.price, order_type=OrderType.LIMIT),
+        "tag": plan.tag,
+        "validity": Validity.DAY,
+        "alert_validity": GttValidity.DAY,
+    }
+
+
+def _oco_refusal_before_any_call(session: OrderSession, plan: OrderPlan) -> None:
+    if session.funded:
+        raise Refusal(NOT_FUNDED)
+    if not plan.is_production_shape or plan.product != "CNC":
+        raise Refusal(
+            "the OCO's orders are CNC DAY LIMIT BUYs only; refusing "
+            f"{plan.product} {plan.validity} {plan.order_type} {plan.transaction_type}"
+        )
+    if plan.last_price is None or plan.price > plan.last_price * WELL_BELOW:
+        raise Refusal(
+            f"the OCO order price {plan.price} is not well below the last price "
+            f"{plan.last_price}; refusing"
+        )
+    if not plan.tag.startswith(GTT_TAG_PREFIX):
+        raise Refusal(f"the OCO needs a {GTT_TAG_PREFIX} tag (new_gtt_tag()); refusing")
+    if session.test_budget is None:
+        raise Refusal("no per-test order budget (session.test_budget); refusing")
+    need = oco_calls_needed(session)
+    left = session.budget.limit - session.budget.used
+    if not session.uat and left != OCO_CALLS_PRODUCTION:
+        raise Refusal(
+            f"on production the OCO test needs the whole run budget of {OCO_CALLS_PRODUCTION} "
+            f"writes ({left} left): run it on its own with -k oco"
+        )
+    for budget, what in ((session.budget, "order cap"), (session.test_budget, "per-test cap")):
+        if budget.limit - budget.used < need:
+            raise Refusal(
+                f"{what} reached: the OCO test needs {need} calls, "
+                f"{budget.limit - budget.used} left"
+            )
+
+
+def _tag_in_legs(rows: list[Gtt], tag: str) -> bool:
+    """Whether the tag came back as the ``remarks`` of an order leg of a pending OCO row."""
+    for row in rows:
+        for leg in (row.oco_first, row.oco_second):
+            if leg is not None and (leg.tag or "").strip() == tag:
+                return True
+    return False
+
+
+def _oco_modify(
+    session: OrderSession,
+    plan: OrderPlan,
+    entry: dict[str, Any],
+    outcome: OcoOutcome,
+    known: list[str],
+) -> None:
+    modify: dict[str, Any] = {}
+    entry["modify"] = modify
+    assert outcome.alert_id is not None and outcome.target is not None
+    try:
+        stop, _ = _oco_fresh(session, plan, OCO_MODIFY_STOP_FACTOR, entry, "modify_quote")
+    except Refusal as exc:
+        outcome.modify = "refused"
+        outcome.refusal = exc.reason
+        modify.update({"outcome": "refused", "reason": exc.reason})
+        return
+    outcome.modified_stop_loss = stop
+    alert_id, target = outcome.alert_id, outcome.target  # the target stays as placed
+    if outcome.match is not None:
+        outcome.match.sent(stop, target)  # before sending: an unknown outcome may still apply
+    word, returned, _ = _write(
+        session,
+        "ModifyOCOOrder",
+        modify,
+        lambda: session.client.modify_oco(alert_id, **oco_kwargs(plan, stop, target)),
+    )
+    outcome.modify = word
+    if returned is not None:
+        modify["returned_differs"] = returned != alert_id
+        outcome.alert_id = returned
+        _add(known, [returned])
+    rows = _pending(session, plan.tag, known, entry, "after_modify", outcome.match)
+    if rows:
+        _add(known, _ids(rows))
+        outcome.modified_row = rows[0] if len(rows) == 1 else None
+
+
+def _oco_probe(
+    session: OrderSession, plan: OrderPlan, entry: dict[str, Any], outcome: OcoOutcome
+) -> None:
+    """UAT only: one more modify on the cancelled id, expected ``OrderRejectedError``
+    (``Invalid Oi``). Anything else is recorded and the OCO read again: still pending is
+    CHECK THE ACCOUNT."""
+    assert outcome.alert_id is not None
+    assert outcome.modified_stop_loss is not None and outcome.target is not None
+    probe: dict[str, Any] = {}
+    entry["probe_after_cancel"] = probe
+    alert_id = outcome.alert_id
+    stop, target = outcome.modified_stop_loss, outcome.target
+    word, returned, _ = _write(
+        session,
+        "ModifyOCOOrder",
+        probe,
+        lambda: session.client.modify_oco(alert_id, **oco_kwargs(plan, stop, target)),
+    )
+    outcome.probe = word
+    ids: list[str] = []
+    _add(ids, [alert_id])
+    if returned and returned.strip():
+        _add(ids, [returned.strip()])
+    if word != "rejected":
+        # accepted or unknown: the server may have made a new OCO (maybe under another alert id)
+        rows = _pending(session, plan.tag, ids, entry, "after_probe", outcome.match)
+        if rows is None or rows:
+            raise CheckTheAccount(
+                f"{CHECK_THE_ACCOUNT}: OCO {', '.join(ids)} (tag {plan.tag}): the modify on the "
+                f"cancelled id was {word}, not rejected; pending_gtts() "
+                f"{'could not be read' if rows is None else 'lists ' + ', '.join(_ids(rows))}"
+            )
+    _fired(session, plan, entry, ids)
+
+
+def run_oco_lifecycle(
+    session: OrderSession,
+    plan: OrderPlan,
+    record: dict[str, Any],
+    *,
+    sleep: Callable[[float], None] = time.sleep,
+) -> OcoOutcome:
+    """Place a BUY OCO once, read it back by its alert id, modify its stop-loss trigger once,
+    cancel it, confirm it is gone and never fired, and (UAT only) modify the cancelled id once
+    (expected: rejected). Production runs place, modify and cancel only and needs the whole run
+    budget (run it with ``-k oco``).
+
+    A refusal before sending is a ``Refusal``; anything left behind or fired is "CHECK THE
+    ACCOUNT". Nothing is ever resent.
+    """
+    _oco_refusal_before_any_call(session, plan)
+    entry: dict[str, Any] = {
+        "plan": plan.describe(),
+        "alert_validity": GttValidity.DAY.value,
+        "calls_needed": oco_calls_needed(session),
+    }
+    record["oco"] = entry
+    match = OcoMatch(plan.tradingsymbol)
+    if _pending(session, plan.tag, [], entry, "before_place", match) is None:
+        raise Refusal("pending_gtts() could not be read before placing; not sending an OCO")
+    entry.pop("seen", None)
+    stop, target = _oco_fresh(session, plan, OCO_STOP_FACTOR, entry, "place_quote")
+    outcome = OcoOutcome(stop_loss=stop, target=target, match=match)
+    match.sent(stop, target)  # before sending: an unknown outcome may still have placed it
+    known: list[str] = []
+    place: dict[str, Any] = {}
+    entry["place"] = place
+    interrupted = False
+    try:
+        try:
+            word, alert_id, exc = _write(
+                session,
+                "PlaceOCOOrder",
+                place,
+                lambda: session.client.place_oco(**oco_kwargs(plan, stop, target)),
+            )
+        except BaseException as base:  # Ctrl-C, SystemExit, a test timeout: an OCO may exist
+            interrupted = isinstance(base, KeyboardInterrupt)
+            place.update({"outcome": "interrupted", "exception": type(base).__name__})
+            _alert(entry, plan, "during the place", base)
+            raise
+        outcome.place = word
+        outcome.exception = None if exc is None else type(exc).__name__
+        if alert_id is not None:
+            outcome.alert_id = alert_id
+            _add(known, [alert_id])
+        if word in ("accepted", "unknown"):
+            rows = _look_up(session, plan, entry, known, sleep, match)
+        else:
+            rows = _pending(session, plan.tag, known, entry, "after_place", match)
+        if rows:
+            found = [i for i in _ids(rows) if i not in known]
+            if found:
+                entry["found_by_tag"] = found
+                _add(known, found)
+            outcome.placed_row = rows[0] if len(rows) == 1 else None
+            entry["tag_in_pending_row"] = _tag_in_legs(rows, plan.tag)
+        if word == "accepted" and outcome.placed_row is not None:
+            _oco_modify(session, plan, entry, outcome, known)
+    except BaseException as base:
+        if not isinstance(base, Exception) and "alert" not in entry:
+            _alert(entry, plan, "after the place", base)
+        raise
+    finally:
+        if not interrupted:
+            try:
+                _cancel_pending(
+                    session,
+                    plan,
+                    entry,
+                    outcome,
+                    known,
+                    endpoint="CancelOCOOrder",
+                    cancel_call=session.client.cancel_oco,
+                )
+                _fired(session, plan, entry, known)
+            except BaseException as base:
+                if not isinstance(base, Exception):
+                    _alert(entry, plan, "during the clean-up", base)
+                raise
+        outcome.seen = list(entry.get("seen", []))
+    if outcome.place in ("accepted", "unknown") and not outcome.seen and not outcome.cancelled:
+        raise CheckTheAccount(
+            f"{CHECK_THE_ACCOUNT}: OCO tag {plan.tag}: PlaceOCOOrder outcome {outcome.place}, but "
+            f"the OCO was never seen in pending_gtts() ({LOOKUPS} reads) and no cancel was "
+            "accepted; it may exist or have fired"
+        )
+    if outcome.place == "not sent":
+        raise Refusal(f"the SDK refused the OCO before sending: {place.get('message')}")
+    if session.uat and outcome.modify == "accepted" and outcome.cancelled:
+        _oco_probe(session, plan, entry, outcome)
     return outcome

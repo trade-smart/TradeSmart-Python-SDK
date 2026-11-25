@@ -1266,6 +1266,37 @@
         "years": 0.25
       },
       "name": "error_zero_strike"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "model": "black76",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": -1000000.0,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "error_rate_overflowing_the_discount_factor"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "dividend_yield": -1000000.0,
+        "model": "bsm",
+        "option_price": 3.0,
+        "option_type": "CE",
+        "rate": 0.065,
+        "strike": 100.0,
+        "underlying": 100.0,
+        "years": 0.25
+      },
+      "name": "error_bsm_dividend_yield_overflowing_the_discount_factor"
     }
   ],
   "description": "Implied volatility from an option price. expected.iv is null when no volatility in [0.0001, 5.0] reproduces the price within 1e-8. volatility_used (informational, not an input of the function) is the volatility the price was generated from.",

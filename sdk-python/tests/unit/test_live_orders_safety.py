@@ -6,6 +6,7 @@ Nothing here touches the network: the fake client below stands in for ``TradeSma
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -2195,7 +2196,7 @@ def test_response_log_keeps_gtt_write_bodies() -> None:
     for name, word in (
         ("PlaceGTTOrder", "Oi created"),
         ("ModifyGTTOrder", "Oi replaced"),
-        ("CancelGTTOrder", "Oi delete success"),
+        ("CancelGTTOrder", "OI deleted"),
     ):
         log.hook(_response(name, {"stat": word, "al_id": "26111200000010", "uid": "TEST01"}))
         assert log.last(name) == {
@@ -2279,16 +2280,21 @@ MATRIX_SAFETY_FILES = (
     "conftest.py",
 )
 # The never-resend wrappers: the only matrix files that may make a state-changing call, each
-# method at most once per file (calls_async.py has no sliced variant).
+# method at most once per file (calls_async.py has no sliced variant). ``sdk_under_test.py`` is
+# the seam: ``PythonSdk`` forwards each write once, and ``calls.py`` reaches it through
+# ``session.sdk``.
 MATRIX_CALL_FILES = {
-    ".place_order(": {"calls.py": 1, "calls_async.py": 1},
-    ".modify_order(": {"calls.py": 1, "calls_async.py": 1},
-    ".cancel_order(": {"calls.py": 1, "calls_async.py": 1},
-    ".exit_order(": {"calls.py": 1, "calls_async.py": 1},
-    ".place_sliced_order(": {"calls.py": 1},
-    ".place_gtt(": {"calls.py": 1},
-    ".modify_gtt(": {"calls.py": 1},
-    ".cancel_gtt(": {"calls.py": 1},
+    ".place_order(": {"calls.py": 1, "calls_async.py": 1, "sdk_under_test.py": 1},
+    ".modify_order(": {"calls.py": 1, "calls_async.py": 1, "sdk_under_test.py": 1},
+    ".cancel_order(": {"calls.py": 1, "calls_async.py": 1, "sdk_under_test.py": 1},
+    ".exit_order(": {"calls.py": 1, "calls_async.py": 1, "sdk_under_test.py": 1},
+    ".place_sliced_order(": {"calls.py": 1, "sdk_under_test.py": 1},
+    ".place_gtt(": {"calls.py": 1, "sdk_under_test.py": 1},
+    ".modify_gtt(": {"calls.py": 1, "sdk_under_test.py": 1},
+    ".cancel_gtt(": {"calls.py": 1, "sdk_under_test.py": 1},
+    ".place_oco(": {"calls.py": 1, "sdk_under_test.py": 1},
+    ".modify_oco(": {"calls.py": 1, "sdk_under_test.py": 1},
+    ".cancel_oco(": {"calls.py": 1, "sdk_under_test.py": 1},
 }
 
 
@@ -2321,9 +2327,41 @@ def test_no_matrix_module_imports_funded_mode() -> None:
 WRITE_METHODS = frozenset(m.strip(".(") for m in MATRIX_CALL_FILES)
 RAW_SENDS = frozenset({"request", "execute", "send"})  # the client's / transport's raw paths
 TRANSPORT_FILES = frozenset({"conftest.py", "calls_async.py"})  # the response-log hooks only
+# The driver protocol names the write methods as data (``{"method": "place_order"}`` lines to a
+# child process, ``live-driver.md``): its file may hold them as strings, nothing more. It holds no
+# client and never calls a write method on any object (``test_the_driver_process_holds_no_client``).
+# Exempt by its exact path under ``tests/live_orders`` (never a file of that name elsewhere).
+PROTOCOL_PATHS = frozenset({"uat_matrix/driver_process.py"})
+# The one raw send of the matrix: ``calls.oco_place_raw`` (the slot-observation case, OCO family
+# design §3) sends ``request("PlaceOCOOrder", ...)`` once, in ``calls.py``, under every rule of
+# ``oco_place``. Counted like a write method; any other raw send anywhere is refused.
+RAW_SEND_FILES = {".request(": {"calls.py": 1}}
+RAW_SEND_ENDPOINT = "PlaceOCOOrder"
 
 
-def _write_uses(name: str, source: str) -> tuple[dict[str, int], list[str]]:
+def _allowed_raw_send(name: str, node: Any, calls: dict[int, Any]) -> bool:
+    """``node`` (an attribute) is ``.request`` called in ``calls.py`` with the literal endpoint
+    ``PlaceOCOOrder`` first."""
+    import ast
+
+    call = calls.get(id(node))
+    return (
+        name == "calls.py"
+        and node.attr == "request"
+        and call is not None
+        and bool(call.args)
+        and isinstance(call.args[0], ast.Constant)
+        and call.args[0].value == RAW_SEND_ENDPOINT
+    )
+
+
+def _is_protocol_file(path: Path) -> bool:
+    return path.relative_to(MATRIX_DIR.parent).as_posix() in PROTOCOL_PATHS
+
+
+def _write_uses(
+    name: str, source: str, *, protocol: bool = False
+) -> tuple[dict[str, int], list[str]]:
     """(the calls of each SDK write method in ``source``, every other use that could reach one:
     an attribute used without a call (an alias, ``functools.partial``), the method's name as a
     string (``getattr(client, "place_order")``) or a bare name / import, a raw send
@@ -2331,7 +2369,8 @@ def _write_uses(name: str, source: str) -> tuple[dict[str, int], list[str]]:
     import ast
 
     tree = ast.parse(source)
-    called = {id(node.func) for node in ast.walk(tree) if isinstance(node, ast.Call)}
+    calls = {id(node.func): node for node in ast.walk(tree) if isinstance(node, ast.Call)}
+    called = set(calls)
     counts: dict[str, int] = {}
     problems: list[str] = []
     for node in ast.walk(tree):
@@ -2343,11 +2382,14 @@ def _write_uses(name: str, source: str) -> tuple[dict[str, int], list[str]]:
                 else:
                     problems.append(f"{where}: .{node.attr} used without a call (an alias)")
             elif node.attr in RAW_SENDS:
-                problems.append(f"{where}: .{node.attr} (a raw send)")
+                if _allowed_raw_send(name, node, calls):
+                    counts[node.attr] = counts.get(node.attr, 0) + 1
+                else:
+                    problems.append(f"{where}: .{node.attr} (a raw send)")
             elif node.attr == "_transport" and name not in TRANSPORT_FILES:
                 problems.append(f"{where}: ._transport")
         elif isinstance(node, ast.Constant) and isinstance(node.value, str):
-            if node.value in WRITE_METHODS:
+            if node.value in WRITE_METHODS and not protocol:
                 problems.append(f"{where}: the string {node.value!r} (getattr?)")
             elif node.value == "_transport" and name not in TRANSPORT_FILES:
                 problems.append(f"{where}: the string '_transport'")
@@ -2378,11 +2420,60 @@ def _write_uses(name: str, source: str) -> tuple[dict[str, int], list[str]]:
         "client.request('PlaceOrder', {})",
         "from tradesmart import place_order",
         "session.client.modify_order (order_id)",  # a space before the call is still a call
+        "getattr(client, 'place_oco')(**plan)",
+        "modify = client.modify_oco\nmodify('1', **plan)",
+        "functools.partial(client.cancel_oco, '1')()",
+        "from tradesmart import place_oco",
+        "session.client.cancel_oco (alert_id)",
     ],
 )
 def test_the_never_resend_guard_catches_indirect_writes(snippet: str) -> None:
     counts, problems = _write_uses("cases_x.py", snippet)
     assert problems or counts, snippet
+
+
+@pytest.mark.parametrize("method", ["place_oco", "modify_oco", "cancel_oco"])
+def test_the_oco_writes_are_guarded_like_the_gtt_writes(method: str) -> None:
+    """Each OCO write is made once in ``calls.py`` and forwarded once in ``sdk_under_test.py``;
+    a direct call in a case file is counted there, so the per-file check refuses it."""
+    assert MATRIX_CALL_FILES[f".{method}("] == {"calls.py": 1, "sdk_under_test.py": 1}
+    counts, problems = _write_uses("cases_oco.py", f"session.client.{method}(**plan)")
+    assert counts == {method: 1} and problems == []
+    # The real per-file check over the real matrix files: as they are it passes; with one
+    # direct call added to ``cases_oco.py`` it no longer matches the allowed table.
+    used, found = _matrix_write_usage()
+    assert found == [] and used == {**MATRIX_CALL_FILES, **RAW_SEND_FILES}
+    direct = f"\n\ndef _direct(session, plan):\n    session.client.{method}(**plan)\n"
+    used, found = _matrix_write_usage(extra={"cases_oco.py": direct})
+    assert found == []
+    assert used[f".{method}("] == {**MATRIX_CALL_FILES[f".{method}("], "cases_oco.py": 1}
+    assert used != {**MATRIX_CALL_FILES, **RAW_SEND_FILES}
+    _, aliased = _write_uses("cases_oco.py", f"send = session.client.{method}")
+    assert aliased
+
+
+@pytest.mark.parametrize(
+    "name, snippet",
+    [
+        ("cases_oco.py", "client.request('PlaceOCOOrder', body, state_changing=True)"),
+        ("calls.py", "client.request('PlaceOrder', body, state_changing=True)"),
+        ("calls.py", "client.request(endpoint, body, state_changing=True)"),
+        ("calls.py", "send = client.request"),
+        ("calls.py", "client.execute('PlaceOCOOrder', body)"),
+    ],
+)
+def test_the_one_raw_oco_send_is_allowed_only_in_calls_py(name: str, snippet: str) -> None:
+    """``calls.oco_place_raw`` (the slot-observation case) is the one raw send of the matrix:
+    a ``.request("PlaceOCOOrder", ...)`` call in ``calls.py``; any other raw send is refused."""
+    counts, problems = _write_uses(name, snippet)
+    assert problems and not counts, snippet
+
+
+def test_the_raw_oco_send_in_calls_py_is_counted_not_refused() -> None:
+    counts, problems = _write_uses(
+        "calls.py", "client.request('PlaceOCOOrder', body, state_changing=True)"
+    )
+    assert counts == {"request": 1} and problems == []
 
 
 def test_matrix_state_changing_calls_live_only_in_calls_py() -> None:
@@ -2392,15 +2483,25 @@ def test_matrix_state_changing_calls_live_only_in_calls_py() -> None:
     them, names them in a string (``getattr``), sends a raw request, or reaches the transport
     (the response-log hooks in ``conftest.py`` / ``calls_async.py`` excepted). AST-based: a
     space before ``(``, an alias or ``functools.partial`` are caught too."""
+    used, problems = _matrix_write_usage()
+    assert not problems, problems
+    assert used == {**MATRIX_CALL_FILES, **RAW_SEND_FILES}, used
+
+
+def _matrix_write_usage(
+    extra: Mapping[str, str] | None = None,
+) -> tuple[dict[str, dict[str, int]], list[str]]:
+    """The per-file write uses of every matrix file (``extra``: source appended to a file by
+    name, to prove the check sees it): ({".method(": {file: count}}, problems)."""
     used: dict[str, dict[str, int]] = {}
     problems: list[str] = []
     for path in _matrix_files():
-        counts, found = _write_uses(path.name, path.read_text(encoding="utf-8"))
+        source = path.read_text(encoding="utf-8") + (extra or {}).get(path.name, "")
+        counts, found = _write_uses(path.name, source, protocol=_is_protocol_file(path))
         problems.extend(found)
         for method, count in counts.items():
             used.setdefault(f".{method}(", {})[path.name] = count
-    assert not problems, problems
-    assert used == MATRIX_CALL_FILES, used
+    return used, problems
 
 
 @pytest.mark.parametrize(
@@ -2478,3 +2579,70 @@ def test_no_matrix_module_but_calls_uses_the_older_live_order_helpers(helper: st
         if path.name == "calls.py":
             continue
         assert helper not in path.read_text(encoding="utf-8"), (path.name, helper)
+
+
+def test_the_driver_process_holds_no_client() -> None:
+    """``driver_process.py`` (the driver's harness side) may name the write methods only as
+    protocol strings: it imports no SDK client, makes no ``getattr`` and calls no write method
+    on any object (each of its eight writes is one request line through ``_call``)."""
+    import ast
+
+    path = MATRIX_DIR / "driver_process.py"
+    source = path.read_text(encoding="utf-8")
+    counts, problems = _write_uses(path.name, source, protocol=True)
+    assert counts == {} and problems == []
+    tree = ast.parse(source)
+    imported = {
+        alias.name.rsplit(".", 1)[-1]
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.Import, ast.ImportFrom))
+        for alias in node.names
+    }
+    assert imported.isdisjoint({"TradeSmart", "AsyncTradeSmart", "httpx"}), imported
+    assert not any(
+        isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "getattr"
+        for node in ast.walk(tree)
+    )
+    # The exemption is for that file alone: anywhere else a write method's name is a problem.
+    assert _write_uses("cases_x.py", "getattr(client, 'place_order')")[1]
+    assert _is_protocol_file(path)
+    assert not _is_protocol_file(MATRIX_DIR / "family" / "driver_process.py")
+    # One place writes to the driver: exactly one ``write`` / ``writelines`` call whose receiver
+    # chain ends in ``stdin`` (``stdin.write``, ``self.process.stdin.write``, ...).
+    assert len(_stdin_writes(tree)) == 1
+    assert (
+        len(_stdin_writes(ast.parse("self.process.stdin.write(b'x')\nstdin.writelines([])"))) == 2
+    )
+    # Each write method reaches ``_call`` exactly once, by its own name.
+    reached: dict[str, int] = {}
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "_call"
+            and node.args
+            and isinstance(node.args[0], ast.Constant)
+        ):
+            reached[str(node.args[0].value)] = reached.get(str(node.args[0].value), 0) + 1
+    # (protocol 2 adds the three OCO calls; the matrix lists them once its own calls use them)
+    oco = {"place_oco", "modify_oco", "cancel_oco"}
+    assert reached == {method: 1 for method in WRITE_METHODS | oco}
+
+
+def _stdin_writes(tree: Any) -> list[Any]:
+    """Every ``write`` / ``writelines`` call whose receiver chain ends in ``stdin``."""
+    import ast
+
+    def ends_in_stdin(node: Any) -> bool:
+        return (isinstance(node, ast.Name) and node.id == "stdin") or (
+            isinstance(node, ast.Attribute) and node.attr == "stdin"
+        )
+
+    return [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr in ("write", "writelines")
+        and ends_in_stdin(node.func.value)
+    ]

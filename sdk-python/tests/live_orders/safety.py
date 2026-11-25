@@ -954,6 +954,9 @@ ORDER_ENDPOINTS = frozenset(
         "PlaceGTTOrder",
         "ModifyGTTOrder",
         "CancelGTTOrder",
+        "PlaceOCOOrder",
+        "ModifyOCOOrder",
+        "CancelOCOOrder",
     }
 )
 
@@ -966,7 +969,26 @@ class ResponseLog:
     """
 
     def __init__(self) -> None:
-        self._responses: list[tuple[str, httpx.Response]] = []
+        # An httpx response (the Python client's hook) or a body a driver process reported
+        # (``record``: its reply's ``raw``, already parsed).
+        self._responses: list[tuple[str, httpx.Response | dict[str, Any]]] = []
+
+    def record(
+        self,
+        endpoint: str,
+        http_status: int | None,
+        body: Any,
+        *,
+        request: Mapping[str, Any] | None = None,
+    ) -> None:
+        """Keep a body a driver process reported for ``endpoint`` (a live-order driver's reply
+        ``raw``, ``uat_matrix/driver_process.py``) and the request it answered; ``last`` returns
+        it scrubbed like a hooked response."""
+        if endpoint in ORDER_ENDPOINTS:
+            entry: dict[str, Any] = {"http_status": http_status, "body": body}
+            if request is not None:
+                entry["request"] = dict(request)
+            self._responses.append((endpoint, entry))
 
     def hook(self, response: httpx.Response) -> None:
         name = response.request.url.path.rstrip("/").rsplit("/", 1)[-1]
@@ -988,6 +1010,8 @@ class ResponseLog:
         for name, response in reversed(self._responses[since:]):
             if name != endpoint:
                 continue
+            if isinstance(response, dict):
+                return {key: scrub(value) for key, value in response.items()}
             try:
                 body = response.json()
             except httpx.ResponseNotRead:

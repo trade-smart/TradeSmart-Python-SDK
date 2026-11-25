@@ -61,7 +61,10 @@ Concurrency lives here only (threads; one pytest process). Place calls are paced
 under the SDK's own order limits (10/s, 200/min by default, never raised), so the SDK never has to
 refuse an order for its client-side rate limit; and every
 state-changing call of the run (place, modify, cancel, exit, GTT writes) also waits on the
-session's ``order_pacer`` (6 in any rolling second: TradeSmart's ALGO_CHK counts them all).
+session's ``order_pacer`` (6 in any rolling second: TradeSmart's ALGO_CHK counts them all). A
+driver SDK serves one request at a time: its calls take the SDK's send slot before the pacer
+wait and give it back after the write (``calls``), so a driver session uses the same worker
+count as any other and its writes still cannot burst.
 """
 
 from __future__ import annotations
@@ -101,7 +104,7 @@ from tests.live_orders.uat_matrix.ledger import (
     nothing_sent,
     read_book,
 )
-from tests.live_orders.uat_matrix.positions import POSITIONS_NAME, PositionLedger
+from tests.live_orders.uat_matrix.positions import PositionLedger
 from tests.live_orders.uat_matrix.pricing import PriceSnapshot
 from tests.live_orders.uat_matrix.quote_pacer import QuotePacer
 from tests.live_orders.uat_matrix.record import Recorder
@@ -458,7 +461,7 @@ def open_run(
         profile=profile,
         issues=issues,
         recorder=Recorder(session.run_dir, run_id=session.run_id, forbidden=forbidden),
-        positions=PositionLedger(session.run_dir / POSITIONS_NAME, forbidden=forbidden),
+        positions=PositionLedger(session.positions_path, forbidden=forbidden),
         watcher=watcher,
     )
     if now is not None:
@@ -478,7 +481,11 @@ def _ledger_verdicts(run: MatrixRun) -> dict[str, str]:
 
 def _ledger_lines(run: MatrixRun) -> dict[str, tuple[str, str]]:
     """Every case's latest ``(verdict, reason)`` in the run's ledger file (in order)."""
-    path = run.session.ledger.path
+    return _verdict_lines(run.session.ledger.path)
+
+
+def _verdict_lines(path: Path) -> dict[str, tuple[str, str]]:
+    """Every case's latest ``(verdict, reason)`` in the ledger file at ``path`` (in order)."""
     verdicts: dict[str, tuple[str, str]] = {}
     for line in path.read_text(encoding="utf-8").splitlines() if path.exists() else []:
         try:
@@ -497,7 +504,11 @@ def _ledger_lines(run: MatrixRun) -> dict[str, tuple[str, str]]:
 def _market_claims(run: MatrixRun) -> list[str]:
     """The cases whose market claim (``market_claim``) an earlier process never released: the
     run's market path is used (an order went out, or may have)."""
-    path = run.session.ledger.path
+    return _claims_at(run.session.ledger.path)
+
+
+def _claims_at(path: Path) -> list[str]:
+    """The unreleased market claims of the ledger file at ``path``."""
     open_claims: dict[str, None] = {}
     for line in path.read_text(encoding="utf-8").splitlines() if path.exists() else []:
         try:
@@ -511,6 +522,18 @@ def _market_claims(run: MatrixRun) -> list[str]:
         elif record.get("type") == MARKET_RELEASE:
             open_claims.pop(str(record["case_id"]), None)
     return list(open_claims)
+
+
+def _sibling_market(run: MatrixRun) -> str | None:
+    """The run's single market path is shared by every SDK of the group (one budget, design
+    §9.1): another SDK's run that sent a market order (a ``market fill`` verdict, or a claim it
+    never released) uses it for this run too."""
+    for path in run.session.sibling_ledgers():
+        used = [case_id for case_id, (v, _) in _verdict_lines(path).items() if v == MARKET_FILL]
+        used += _claims_at(path)
+        if used:
+            return f"{_market_reason(used[0])} (the run {path.parent.name} of another SDK)"
+    return None
 
 
 def _restore(run: MatrixRun) -> None:
@@ -535,6 +558,8 @@ def _restore(run: MatrixRun) -> None:
     claimed = _market_claims(run)
     if claimed and run.market_filled is None:
         run.market_filled = _market_reason(claimed[0])
+    if run.market_filled is None:
+        run.market_filled = _sibling_market(run)
     for case in case_table.registered():  # CASES and the families' registered cases
         if case.canary and case.family in SEPARATE_CANARY_FAMILIES:
             continue  # its canary unlocks its own family's cases only, never the segment's

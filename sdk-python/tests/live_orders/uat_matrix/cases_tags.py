@@ -8,7 +8,8 @@
   short or dropped is recorded (``judged``). The hook records the sent and echoed tag lengths
   (``round_trip`` in the case record): the lower bound of the ``remarks`` length UAT keeps.
 - **Tags unique over the whole run** (``tag_problems``): every place call of the run carries its
-  own ``sdkuat-<run>-<key>-<n>`` tag of at most 30 characters.
+  own ``sdkuat-<run>-<sdk><key>-<n>`` tag of at most 30 characters (``sdk``: the one-letter
+  code of the SDK under test, ``p`` Python, ``j`` JavaScript).
 - **Tags the run cannot send** (the longest tag UAT returns unchanged, spaces, ``&``,
   non-ASCII) are not probed: ``calls.place`` sets every tag itself and ``calls.modify`` accepts
   only a tag the ledger issued (``ledger.new_tag``, the fixed short scheme), so a caller cannot

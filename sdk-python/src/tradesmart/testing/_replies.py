@@ -801,6 +801,8 @@ def gtt_row(
     gtt: Mapping[str, Any], *, client_id: str, instrument: Mapping[str, Any] | None
 ) -> dict[str, Any]:
     """One ``GetPendingGTTOrder`` record (the documented example's keys; ``qty`` a number)."""
+    if gtt.get("oco"):
+        return oco_row(gtt, client_id=client_id, instrument=instrument)
     base = _base(instrument)
     product = str(gtt["prd"])
     row: dict[str, Any] = {
@@ -834,6 +836,8 @@ def triggered_gtt_row(
     gtt: Mapping[str, Any], *, client_id: str, instrument: Mapping[str, Any] | None
 ) -> dict[str, Any]:
     """One ``GetTrgOi`` record: the pending record plus the trigger time and the flags."""
+    if gtt.get("oco"):
+        return oco_row(gtt, client_id=client_id, instrument=instrument)
     row = gtt_row(gtt, client_id=client_id, instrument=instrument)
     row["norentm"] = request_time(gtt["norentm"])
     row.update(sms_flag="0", email_flag="0", push_flag="0")
@@ -847,3 +851,62 @@ def enabled_gtts(when: datetime) -> dict[str, Any]:
         "request_time": when.astimezone(IST).strftime("%d%m%Y%H%M%S"),
         "ai_ts": [{"ai_t": family} for family in GTT_ALERT_FAMILIES],
     }
+
+
+def oco_row(
+    oco: Mapping[str, Any], *, client_id: str, instrument: Mapping[str, Any] | None
+) -> dict[str, Any]:
+    """One OCO record of ``GetPendingGTTOrder`` / ``GetTrgOi`` (the shape of the fixture rows:
+    the first leg's order fields repeated at the top, ``d`` the ``x`` trigger, ``qty`` a number,
+    the account id and the empty ``remarks`` only inside / besides the legs)."""
+    base = _base(instrument)
+    legs = [oco["place_order_params"], oco["place_order_params_leg2"]]
+
+    def leg_row(leg: Mapping[str, Any], *, alias: bool) -> dict[str, Any]:
+        product = str(leg["prd"])
+        row: dict[str, Any] = {
+            "actid": client_id,
+            "trantype": leg["trantype"],
+            "prctyp": leg["prctyp"],
+            "qty": int(Decimal(str(leg["qty"]))),
+            "prc": price_text(Decimal(str(leg["prc"]))),
+            "C": "0",
+            "prd": product,
+            "ordersource": "API",
+        }
+        if str(leg.get("trgprc") or "").strip():
+            row["trgprc"] = price_text(Decimal(str(leg["trgprc"])))
+        if alias:
+            row["s_prdt_ali"] = PRODUCT_ALIAS.get(product, product)
+        return row
+
+    first, second = leg_row(legs[0], alias=True), leg_row(legs[1], alias=False)
+    triggers = {item["var_name"]: item["d"] for item in oco["oivariable"]}
+    placed = request_time(oco["norentm"])
+    row: dict[str, Any] = {
+        "stat": oco.get("stat", "Ok"),
+        "ai_t": oco["ai_t"],
+        "al_id": oco["al_id"],
+        "tsym": oco["tsym"],
+        "exch": oco["exch"],
+        "token": base["token"],
+        "remarks": "",
+        "validity": oco["validity"],
+        "pp": base["pp"],
+        "ls": base["ls"],
+        "ti": base["ti"],
+        "norentm": placed,
+        "upd_tm": placed,
+        "d": price_text(triggers["x"]),
+        "trantype": first["trantype"],
+        "prctyp": first["prctyp"],
+        "qty": first["qty"],
+        "prc": first["prc"],
+        "prd": first["prd"],
+        "ordersource": "API",
+        "C": "0",
+        "place_order_params": first,
+        "place_order_params_leg2": second,
+        "oivariable": [{"var_name": name, "d": price_text(triggers[name])} for name in ("x", "y")],
+    }
+    return row

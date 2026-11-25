@@ -13,6 +13,12 @@ dist/
 coverage.xml
 htmlcov/
 
+# Node (the JavaScript SDK; sdk-javascript/.gitignore anchors the package's own entries)
+node_modules/
+coverage/
+*.tgz
+.npm/
+
 # Secrets / local config — never commit credentials
 .env
 .env.*

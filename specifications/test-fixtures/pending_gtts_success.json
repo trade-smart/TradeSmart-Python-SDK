@@ -43,5 +43,121 @@
     "ret": "DAY",
     "ordersource": "API",
     "d": "1610.00"
+  },
+  {
+    "stat": "Ok",
+    "ai_t": "LMT_BOS_O",
+    "al_id": "26111800000001",
+    "tsym": "RELIANCE-EQ",
+    "exch": "NSE",
+    "token": "2885",
+    "remarks": "",
+    "validity": "GTT",
+    "pp": "2",
+    "ls": "1",
+    "ti": "0.05",
+    "brkname": "TESTBRK",
+    "cname": "TEST NAME",
+    "norentm": "09:31:12 18-11-2026",
+    "upd_tm": "09:31:12 18-11-2026",
+    "d": "1430.00",
+    "trantype": "B",
+    "prctyp": "LMT",
+    "qty": 1,
+    "prc": "1440.00",
+    "prd": "C",
+    "ordersource": "API",
+    "C": "0",
+    "place_order_params": {
+      "actid": "TESTUID",
+      "trantype": "B",
+      "prctyp": "LMT",
+      "qty": 1,
+      "prc": "1440.00",
+      "C": "0",
+      "prd": "C",
+      "ordersource": "API",
+      "ipaddr": "0.0.0.0",
+      "s_prdt_ali": "CNC"
+    },
+    "place_order_params_leg2": {
+      "actid": "TESTUID",
+      "trantype": "B",
+      "prctyp": "LMT",
+      "qty": 1,
+      "prc": "1160.00",
+      "C": "0",
+      "prd": "C",
+      "ordersource": "API",
+      "ipaddr": "0.0.0.0"
+    },
+    "oivariable": [
+      {
+        "var_name": "x",
+        "d": "1430.00"
+      },
+      {
+        "var_name": "y",
+        "d": "1170.00"
+      }
+    ]
+  },
+  {
+    "stat": "Ok",
+    "ai_t": "LMT_SOB_O",
+    "al_id": "26111800000002",
+    "tsym": "RELIANCE-EQ",
+    "exch": "NSE",
+    "token": "2885",
+    "remarks": "",
+    "validity": "GTT",
+    "pp": "2",
+    "ls": "1",
+    "ti": "0.05",
+    "brkname": "TESTBRK",
+    "cname": "TEST NAME",
+    "norentm": "09:31:12 18-11-2026",
+    "upd_tm": "09:31:12 18-11-2026",
+    "d": "1430.00",
+    "trantype": "S",
+    "prctyp": "LMT",
+    "qty": 1,
+    "prc": "1420.00",
+    "prd": "C",
+    "ordersource": "API",
+    "C": "0",
+    "place_order_params": {
+      "actid": "TESTUID",
+      "trantype": "S",
+      "prctyp": "LMT",
+      "qty": 1,
+      "prc": "1420.00",
+      "C": "0",
+      "prd": "C",
+      "ordersource": "API",
+      "ipaddr": "0.0.0.0",
+      "s_prdt_ali": "CNC"
+    },
+    "place_order_params_leg2": {
+      "actid": "TESTUID",
+      "trantype": "S",
+      "prctyp": "LMT",
+      "qty": 1,
+      "prc": "1160.00",
+      "C": "0",
+      "prd": "C",
+      "ordersource": "API",
+      "ipaddr": "0.0.0.0"
+    },
+    "oivariable": [
+      {
+        "var_name": "x",
+        "d": "1430.00"
+      },
+      {
+        "var_name": "y",
+        "d": "1170.00"
+      }
+    ]
   }
 ]

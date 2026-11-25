@@ -105,7 +105,7 @@ pip install "tradesmart @ git+https://github.com/trade-smart/TradeSmart-Python-S
 Check it:
 
 ```bash
-python -c "import tradesmart; print(tradesmart.__version__)"    # 2.0.0
+python -c "import tradesmart; print(tradesmart.__version__)"    # 2.1.0
 ```
 
 ## 3. Log in once a day

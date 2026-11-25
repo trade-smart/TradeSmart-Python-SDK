@@ -31,7 +31,7 @@ def test_the_ampersand_symbol_and_the_tag_round_trip(tmp_path: Path) -> None:
             trip = record["notes"]["round_trip"]
             assert trip["tsym_book"] == trip["tsym_history"] == "M&M-EQ"
             assert trip["remarks_book"] == trip["remarks_sent"]
-            assert trip["remarks_echoed_length"] == trip["remarks_sent_length"] == 21
+            assert trip["remarks_echoed_length"] == trip["remarks_sent_length"] == 22
         assert cases_tags.tag_problems(rig.ledger_path(), RUN_ID) == []
         assert all(o.status == "CANCELED" for o in rig.broker.orders)
 
@@ -56,7 +56,7 @@ def test_a_tag_cut_short_in_the_book_is_recorded(tmp_path: Path) -> None:
     with family_rig(tmp_path) as rig:
         result = _smoke_with_book(rig, lambda o: {"tag": (o.tag or "")[:10]})
         assert result.verdict == batch.RECORD
-        assert "truncated" in result.reason and "10 of 21" in result.reason
+        assert "truncated" in result.reason and "10 of 22" in result.reason
         trip = rig.records()[0]["notes"]["round_trip"]
         assert trip["remarks_echoed_length"] == 10 and trip["remarks_finding"] == "truncated"
 

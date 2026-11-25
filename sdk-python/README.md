@@ -5,7 +5,7 @@ TradeSmart's official Python client for the
 find instruments, place and manage orders, and stream live prices and order updates, from plain
 Python scripts or `asyncio` programs.
 
-> **Version 2.0.0.** Trading involves real money: read the
+> **Version 2.1.0.** Trading involves real money: read the
 > [Orders guide](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/orders.md)
 > before sending anything that changes state.
 
@@ -15,7 +15,7 @@ Python scripts or `asyncio` programs.
 - **One-command daily login:** `python -m tradesmart login`; your scripts pick the token up with
   `TradeSmart.from_env()`, so no keys live in your code.
 - **Orders:** place, modify, cancel and exit; large orders sent in slices; GTT (good-till-triggered)
-  orders. Orders are never retried automatically, and an unclear outcome is reported, not guessed.
+  orders; OCO (one-cancels-other) exits. Orders are never retried automatically, and an unclear outcome is reported, not guessed.
 - **Market data:** instrument search, the script master, quotes, candles, option chains, option Greeks.
 - **Live streaming:** prices and order updates over a WebSocket that reconnects and resubscribes by itself.
 - **Typed results:** Pydantic models, with prices as `Decimal`.
@@ -80,6 +80,7 @@ API access, install, login, and a first order placed, checked, modified and canc
 | [Authentication](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/authentication.md) | The login command, the token file, `from_env()`, login in your own server |
 | [Orders](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/orders.md) | Every order call, validation, order status, finding an order after an unclear outcome |
 | [GTT orders](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/gtt.md) | Good-till-triggered orders |
+| [OCO orders](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/oco.md) | A target and a stop-loss in one order |
 | [Account and portfolio](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/account.md) | Profile, funds, positions, holdings, trades |
 | [Market data](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/market-data.md) | Search, script master, quotes, candles, option chains |
 | [Option Greeks and analytics](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/option-analytics.md) | Implied volatility, Greeks, chain snapshots, put-call ratio, max pain |

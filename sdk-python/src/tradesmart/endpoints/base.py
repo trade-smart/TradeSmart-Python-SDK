@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, TypeVar
 
 from tradesmart._transport.codec import OK_STATS, redact_body
 from tradesmart.errors import RequestValidationError, ResponseParseError
-from tradesmart.models.base import TradeSmartModel
+from tradesmart.models.base import TradeSmartModel, WireValue
 
 T = TypeVar("T")
 M = TypeVar("M", bound=TradeSmartModel)
@@ -31,6 +31,8 @@ class EndpointSpec(Generic[T]):
     requires_ack_id: str | None = None
     # Compare ``success_stats`` ignoring letter case only (GTT writes, spec F32).
     stats_ignore_case: bool = False
+    # ``stat`` words that are a definite rejection (``Invalid Oi``), checked before success.
+    failure_stats: frozenset[str] = frozenset()
 
     @property
     def path(self) -> str:
@@ -42,7 +44,7 @@ class Call(Generic[T]):
     """An endpoint spec bound to a wire payload, ready for a transport."""
 
     spec: EndpointSpec[T]
-    payload: dict[str, str]
+    payload: Mapping[str, WireValue]
 
 
 def invalid_field(field: str, message: str) -> RequestValidationError:

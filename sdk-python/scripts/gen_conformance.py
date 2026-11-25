@@ -49,13 +49,19 @@ from tradesmart import _token_store, round_to_tick
 from tradesmart import instruments as _instruments
 from tradesmart._client_core import (
     ACK_ID_FIELDS,
+    FAILURE_STATS,
     STATE_CHANGING_ENDPOINTS,
     SUCCESS_STATS,
     SUCCESS_STATS_IGNORE_CASE,
     build_raw_call,
 )
 from tradesmart._slicing import plan_slices
-from tradesmart._transport.codec import OK_STATS, encode_jdata, parse_response
+from tradesmart._transport.codec import (
+    OK_STATS,
+    encode_jdata,
+    encode_request_body,
+    parse_response,
+)
 from tradesmart._transport.ratelimit import RATE_LIMITS, RateLimiter
 from tradesmart._transport.retry import RetryPolicy
 from tradesmart._transport.sync_http import apply_retry_after
@@ -73,6 +79,7 @@ from tradesmart.client import TradeSmart
 from tradesmart.config import ClientConfig
 from tradesmart.endpoints.gtt import cancel_gtt_call, modify_gtt_call, place_gtt_call
 from tradesmart.endpoints.market import to_epoch
+from tradesmart.endpoints.oco import cancel_oco_call, modify_oco_call, place_oco_call
 from tradesmart.endpoints.orders import (
     cancel_order_call,
     exit_sno_order_call,
@@ -100,6 +107,8 @@ from tradesmart.greeks import (
     implied_volatility,
 )
 from tradesmart.models.base import IST, _parse_epoch, _parse_ist
+from tradesmart.models.gtt import Gtt, TriggeredGtt
+from tradesmart.models.oco import OcoLeg
 from tradesmart.stream.delivery import DeliveryBuffer
 from tradesmart.stream.protocol import format_keys, parse_message
 
@@ -108,6 +117,34 @@ from tradesmart.stream.protocol import format_keys, parse_message
 
 def _error(exc: BaseException) -> dict[str, Any]:
     return {"error": type(exc).__name__}
+
+
+class Ordered(dict[str, Any]):
+    """A JSON object whose key order is part of the contract.
+
+    ``dump`` writes every other object with sorted keys but keeps an ``Ordered`` one in
+    insertion order (nested request bodies: ``jdata_encoding.json`` and ``oco_requests.json``).
+    """
+
+
+def ordered(value: Any) -> Any:
+    """``value`` with every object (recursively) marked as ``Ordered``."""
+    if isinstance(value, dict):
+        return Ordered((key, ordered(item)) for key, item in value.items())
+    if isinstance(value, (list, tuple)):
+        return [ordered(item) for item in value]
+    return value
+
+
+def _sorted_tree(value: Any) -> Any:
+    """``value`` with the keys of every plain object sorted, ``Ordered`` ones kept as they are."""
+    if isinstance(value, Ordered):
+        return {key: _sorted_tree(item) for key, item in value.items()}
+    if isinstance(value, dict):
+        return {key: _sorted_tree(value[key]) for key in sorted(value)}
+    if isinstance(value, (list, tuple)):
+        return [_sorted_tree(item) for item in value]
+    return value
 
 
 def _hhmm(value: str | None) -> time | None:
@@ -173,6 +210,7 @@ def eval_not_ok(i: dict[str, Any]) -> dict[str, Any]:
             success_stats=i.get("success_stats", OK_STATS),
             requires_ack_id=i.get("requires_ack_id"),
             stats_ignore_case=i.get("stats_ignore_case", False),
+            failure_stats=i.get("failure_stats", frozenset()),
         )
     except APIError as exc:
         return {"error": type(exc).__name__, "emsg": exc.emsg, "message": exc.message}
@@ -1043,6 +1081,14 @@ def _price_cases() -> list[Any]:
             "bsm_negative_underlying_is_an_error",
             _price_input("bsm", "CE", -1, 100, 0.25, 0.065, 0.2),
         ),
+        (
+            "black76_rate_overflowing_the_discount_factor_is_an_error",
+            _price_input("black76", "CE", 100, 100, 0.25, -1e6, 0.2),
+        ),
+        (
+            "bsm_dividend_yield_overflowing_the_discount_factor_is_an_error",
+            _price_input("bsm", "PE", 100, 100, 0.25, 0.065, 0.2, q=-1e6),
+        ),
     ]
     for model in ("black76", "bsm"):
         for kind in ("CE", "PE"):
@@ -1128,6 +1174,12 @@ def _iv_cases() -> list[Any]:
     none("error_invalid_option_type", option_type="XX")
     none("error_invalid_model", model="heston")
     none("error_zero_strike", strike=0.0)
+    none("error_rate_overflowing_the_discount_factor", rate=-1e6)
+    none(
+        "error_bsm_dividend_yield_overflowing_the_discount_factor",
+        model="bsm",
+        dividend_yield=-1e6,
+    )
     return cases
 
 
@@ -1278,6 +1330,18 @@ def _edge_cases() -> list[Any]:
             "error_option_type_is_checked_before_a_missing_underlying",
             _edge_input(3.0, None, 100.0, 0.25, "XX"),
         ),
+        (
+            "error_rate_overflowing_the_discount_factor",
+            _edge_input(3.0, 100.0, 100.0, 0.25, rate=-1e6),
+        ),
+        (
+            "error_bsm_dividend_yield_overflowing_the_discount_factor",
+            _edge_input(3.0, 100.0, 100.0, 0.25, model="bsm", q=-1e6),
+        ),
+        (
+            "expired_never_computes_the_discount_factor",
+            _edge_input(3.0, 100.0, 90.0, -0.01, rate=-1e6),
+        ),
     ]
 
 
@@ -1396,6 +1460,16 @@ def _carry_cases() -> list[Any]:
             "2026-11-26",
             "2026-11-26",
             dividend_yield=0.03,
+        ),
+        carry("error_rate_overflowing_the_carry_factor", 24200.0, -1e6, 0.2, 0.1),
+        carry_q("error_dividend_yield_overflowing_the_carry_factor", 24200.0, 0.065, 1e6, 0.2, 0.1),
+        carry("huge_rate_underflowing_the_carry_factor_gives_zero", 24200.0, 1e6, 0.2, 0.1),
+        fwd(
+            "nfo_rate_overflowing_the_carry_factor_is_an_error",
+            "NFO",
+            "2026-11-26",
+            "2026-12-31",
+            rate=-1e6,
         ),
     ]
 
@@ -1816,12 +1890,17 @@ def _config_cases() -> list[Any]:
 
 
 def eval_jdata(i: dict[str, Any]) -> dict[str, Any]:
-    body = encode_jdata(dict(i["payload"]))
-    return {"body": body, "utf8_hex": body.encode("utf-8").hex()}
+    try:
+        raw = encode_request_body(dict(i["payload"]))
+    except RequestValidationError as exc:
+        # nested values are checked too; the error names the top-level key
+        fields = sorted({str(entry["loc"][0]) for entry in exc.errors})
+        return {"error": type(exc).__name__, "fields": fields}
+    return {"body": raw.decode("utf-8"), "utf8_hex": raw.hex()}
 
 
 def _jdata_cases() -> list[Any]:
-    def case(name: str, *pairs: tuple[str, str]) -> tuple[str, dict[str, Any]]:
+    def case(name: str, *pairs: tuple[str, Any]) -> tuple[str, dict[str, Any]]:
         return name, {"payload": [list(p) for p in pairs]}
 
     return [
@@ -1848,6 +1927,43 @@ def _jdata_cases() -> list[Any]:
         case("non_ascii_is_sent_as_utf8_not_escaped", ("remarks", "₹ नमस्ते")),
         case("astral_character_is_sent_as_utf8", ("remarks", "😀")),
         case("all_specials_together", ("remarks", "%&+=?#")),
+        # Nested values (OCO bodies): objects and lists keep their key and item order, and the
+        # escaping rules apply to every string at any depth. A lone surrogate anywhere inside a
+        # value is refused, naming the top-level key.
+        case(
+            "nested_list_of_objects_and_object_keep_order",
+            ("uid", "TESTUID"),
+            (
+                "oivariable",
+                [
+                    Ordered(var_name="x", d="1430.50"),
+                    Ordered(var_name="y", d="1170"),
+                ],
+            ),
+            (
+                "place_order_params",
+                Ordered(tsym="RELIANCE-EQ", exch="NSE", trantype="B", qty="1", prc="1440"),
+            ),
+        ),
+        case(
+            "nested_strings_percent_ampersand_plus_are_encoded",
+            ("place_order_params", Ordered(tsym="M&M-EQ", remarks="a&b+c%d=e")),
+            ("tags", ["50%", "x+y", "p&q"]),
+        ),
+        case("nested_empty_list_and_empty_object", ("items", []), ("params", Ordered())),
+        case(
+            "nested_non_ascii_and_quotes",
+            ("place_order_params", Ordered(remarks='₹ "नमस्ते"\n')),
+        ),
+        case(
+            "nested_lone_surrogate_is_refused_on_the_top_level_key",
+            ("uid", "TESTUID"),
+            ("place_order_params", Ordered(tsym="RELIANCE-EQ", remarks="a\ud800b")),
+        ),
+        case(
+            "nested_lone_surrogate_in_a_list_is_refused_on_the_top_level_key",
+            ("oivariable", [Ordered(var_name="x", d="\udfff")]),
+        ),
     ]
 
 
@@ -2449,6 +2565,12 @@ def _gtt_validation_cases() -> list[Any]:
         gtt("modify_al_id_third", "modify_gtt", trigger_value="1550"),
         gtt("cancel", "cancel_gtt", **{k: None for k in _GTT}, alert_id=_ALERT_ID),
         gtt("error_place_unknown_alert_type", alert_type="LTP_X_O"),
+        # The OCO alert types belong to place_oco / modify_oco (the docs: an OCO is changed
+        # only with the OCO endpoints), so the GTT calls refuse them.
+        gtt("error_place_oco_buy_alert_type", alert_type="LMT_BOS_O"),
+        gtt("error_place_oco_sell_alert_type", alert_type="LMT_SOB_O"),
+        gtt("error_modify_oco_buy_alert_type", "modify_gtt", alert_type="LMT_BOS_O"),
+        gtt("error_modify_oco_sell_alert_type", "modify_gtt", alert_type="LMT_SOB_O"),
         gtt("error_place_alert_validity_eos", alert_validity="EOS"),
         gtt("error_place_validity_gtt_is_not_a_retention", validity="GTT"),
         gtt("error_place_cds", exchange="CDS"),
@@ -2591,6 +2713,210 @@ def _order_validation_cases() -> list[Any]:
     ]
 
 
+# ----------------------------------------------------------------------------- OCO requests
+
+_OCO_ALERT_ID = "26111800000001"
+
+
+def _leg(trigger_value: Any, price: Any = None, **more: Any) -> dict[str, Any]:
+    """An ``OcoLeg`` as the vectors write it: absent optional keys are omitted."""
+    leg = {"trigger_value": trigger_value, "price": price, **more}
+    return {key: value for key, value in leg.items() if value is not None}
+
+
+# A buy OCO closes a short: the stop-loss trigger is above the target trigger (RELIANCE-EQ, as
+# the owner's test-environment probe). A sell OCO mirrors it.
+_OCO_BUY: dict[str, Any] = {
+    "exchange": "NSE",
+    "tradingsymbol": "RELIANCE-EQ",
+    "transaction_type": "BUY",
+    "quantity": 1,
+    "product": "CNC",
+    "stop_loss": _leg("1430", "1440", order_type="LIMIT"),
+    "target": _leg("1170", "1160", order_type="LIMIT"),
+    "validity": "DAY",
+    "alert_validity": "GTT",
+}
+_OCO_SELL: dict[str, Any] = {
+    **_OCO_BUY,
+    "transaction_type": "SELL",
+    "stop_loss": _leg("1170", "1160", order_type="LIMIT"),
+    "target": _leg("1430", "1420", order_type="LIMIT"),
+}
+
+
+def eval_oco_request(i: dict[str, Any]) -> dict[str, Any]:
+    """The endpoint and exact nested body an OCO call builds, or the validation error.
+
+    A refusal asserts that the error holds exactly one entry (a case is a single fault, so more
+    would be ambiguous) and gives its ``loc``.
+    """
+    method, uid, params = i["method"], i["uid"], dict(i["params"])
+    try:
+        if method == "cancel_oco":
+            call = cancel_oco_call(uid, i["alert_id"])
+        else:
+            for key in ("stop_loss", "target"):
+                params[key] = OcoLeg(**params[key])
+            if method == "modify_oco":
+                call = modify_oco_call(uid, i["alert_id"], **params)
+            else:
+                call = place_oco_call(uid, **params)
+    except RequestValidationError as exc:
+        assert len(exc.errors) == 1, (i, exc.errors)
+        return {"error": "RequestValidationError", "loc": list(exc.errors[0]["loc"])}
+    return {"endpoint": call.spec.name, "payload": ordered(call.payload)}
+
+
+def _oco_request_cases() -> list[Any]:
+    def case(
+        name: str,
+        method: str = "place_oco",
+        base: dict[str, Any] | None = None,
+        alert_id: Any = _OCO_ALERT_ID,
+        **changes: Any,
+    ) -> tuple[str, dict[str, Any]]:
+        params = {**(_OCO_BUY if base is None else base), **changes}
+        params = {key: value for key, value in params.items() if value is not None}
+        arguments: dict[str, Any] = {"method": method, "uid": "TESTUID"}
+        if method == "modify_oco":
+            arguments["alert_id"] = alert_id
+        arguments["params"] = params
+        return name, arguments
+
+    def cancel(name: str, alert_id: Any = _OCO_ALERT_ID) -> tuple[str, dict[str, Any]]:
+        return name, {"method": "cancel_oco", "uid": "TESTUID", "alert_id": alert_id, "params": {}}
+
+    def modify(name: str, base: dict[str, Any] | None = None, **changes: Any) -> Any:
+        return case(name, "modify_oco", base, **changes)
+
+    def refuse(name: str, method: str = "place_oco", **changes: Any) -> Any:
+        return case(f"error_{name}", method, None, **changes)
+
+    return [
+        case("place_buy_limit_limit"),
+        case("place_sell_limit_limit", base=_OCO_SELL),
+        case(
+            "place_defaults_validity_day_alert_validity_gtt_order_type_limit",
+            validity=None,
+            alert_validity=None,
+            stop_loss=_leg("1430", "1440"),
+            target=_leg("1170", "1160"),
+        ),
+        case("place_alert_validity_day_and_validity_eos", validity="EOS", alert_validity="DAY"),
+        case("place_validity_ioc", validity="IOC"),
+        case(
+            "place_sell_stop_loss_limit_leg_with_trigger_price",
+            base=_OCO_SELL,
+            stop_loss=_leg("1170", "1155", order_type="SL-LMT", trigger_price="1160"),
+        ),
+        case(
+            "place_buy_stop_loss_market_leg_price_defaults_to_0",
+            stop_loss=_leg("1430", order_type="SL-MKT", trigger_price="1435"),
+        ),
+        case(
+            "place_sell_market_target_leg_price_defaults_to_0",
+            base=_OCO_SELL,
+            target=_leg("1430", order_type="MARKET"),
+        ),
+        case(
+            "place_market_leg_explicit_price_0",
+            target=_leg("1170", "0", order_type="MKT"),
+        ),
+        case("place_tag_goes_to_both_legs", tag="exit plan"),
+        case("place_tag_is_encoded_as_given", tag="a&b+c%d"),
+        case(
+            "place_trigger_values_are_sent_as_given",
+            stop_loss=_leg("1430.50", "1440.05", order_type="LIMIT"),
+            target=_leg("1169.123", "1160", order_type="LIMIT"),
+        ),
+        case(
+            "place_json_number_trigger_values_and_prices",
+            stop_loss=_leg(1430.5, 1440, order_type="LIMIT"),
+            target=_leg(1170, 1160.25, order_type="LIMIT"),
+        ),
+        case(
+            "place_words_any_case_and_wire_codes",
+            exchange="nse",
+            transaction_type="buy",
+            product="cnc",
+            stop_loss=_leg("1430", "1440", order_type="lmt"),
+            target=_leg("1170", "1160", order_type="LMT"),
+        ),
+        case("place_nrml_on_nfo", exchange="NFO", tradingsymbol="NIFTY25NOV26FUT", product="NRML"),
+        case("place_cover_order_product", product="CO"),
+        case("place_bfo", exchange="BFO", tradingsymbol="SENSEX25NOV26FUT", product="M"),
+        case(
+            "place_mcx_quantity_in_trade_units",  # CRUDEOIL lot 100: 2 lots = 200 units
+            exchange="MCX",
+            tradingsymbol="CRUDEOIL",
+            quantity=200,
+            product="NRML",
+        ),
+        modify("modify_al_id_second_after_uid"),
+        modify("modify_sell_with_tag_and_new_triggers", _OCO_SELL, tag="exit plan"),
+        modify(
+            "modify_sends_the_whole_oco_with_validities",
+            validity="DAY",
+            alert_validity="DAY",
+            stop_loss=_leg("1425", "1435", order_type="LIMIT"),
+        ),
+        cancel("cancel_uid_then_al_id"),
+        refuse(
+            "place_buy_stop_loss_below_target",
+            stop_loss=_leg("1170", "1160"),
+            target=_leg("1430", "1440"),
+        ),
+        refuse(
+            "place_buy_stop_loss_equals_target",
+            stop_loss=_leg("1300", "1290"),
+            target=_leg("1300", "1310"),
+        ),
+        refuse(
+            "place_sell_stop_loss_above_target",
+            transaction_type="SELL",
+            stop_loss=_leg("1430", "1420"),
+            target=_leg("1170", "1160"),
+        ),
+        refuse(
+            "place_sell_stop_loss_equals_target",
+            transaction_type="SELL",
+            stop_loss=_leg("1300", "1290"),
+            target=_leg("1300", "1310"),
+        ),
+        refuse(
+            "modify_buy_stop_loss_below_target",
+            "modify_oco",
+            stop_loss=_leg("1170", "1160"),
+            target=_leg("1430", "1440"),
+        ),
+        refuse("place_mis_product", product="MIS"),
+        refuse("place_bracket_product", product="BO"),
+        refuse("place_exchange_outside_the_alert_exchanges", exchange="NCDEX"),
+        refuse("place_exchange_cds", exchange="CDS"),
+        refuse("place_zero_quantity", quantity=0),
+        refuse("place_boolean_quantity", quantity=True),
+        refuse("place_zero_stop_loss_trigger_value", stop_loss=_leg("0", "1440")),
+        refuse("place_negative_target_trigger_value", target=_leg("-1170", "1160")),
+        refuse("place_nan_trigger_value", stop_loss=_leg("nan", "1440")),
+        refuse("place_boolean_trigger_value", stop_loss=_leg(True, "1440")),
+        refuse("place_text_trigger_value", target=_leg("abc", "1160")),
+        refuse(
+            "place_stop_loss_limit_leg_without_trigger_price",
+            stop_loss=_leg("1430", "1440", order_type="SL-LMT"),
+        ),
+        refuse(
+            "place_trigger_price_on_a_limit_leg", target=_leg("1170", "1160", trigger_price="1165")
+        ),
+        refuse("place_limit_leg_without_price", target=_leg("1170", order_type="LIMIT")),
+        refuse("place_limit_stop_loss_leg_without_price", stop_loss=_leg("1430")),
+        refuse("modify_blank_alert_id", "modify_oco", alert_id=" "),
+        cancel("error_cancel_blank_alert_id", ""),
+        cancel("error_cancel_integer_alert_id", 26111800000001),
+        refuse("place_unknown_order_type", stop_loss=_leg("1430", "1440", order_type="STOP")),
+    ]
+
+
 # ----------------------------------------------------------------------------- behaviour harness
 #
 # The vectors below drive the real client, transport, script-master helper and stream buffer
@@ -2682,6 +3008,11 @@ _ORDER_ARGUMENTS: dict[str, dict[str, Any]] = {
     "place_gtt": dict(_GTT),
     "modify_gtt": {**_GTT, "alert_id": _ALERT_ID},
     "cancel_gtt": {"alert_id": _ALERT_ID},
+    # The OCO legs are plain dicts here, as in oco_requests.json: the invoker turns each into an
+    # OcoLeg before calling the client.
+    "place_oco": dict(_OCO_BUY),
+    "modify_oco": {**_OCO_BUY, "alert_id": _OCO_ALERT_ID},
+    "cancel_oco": {"alert_id": _OCO_ALERT_ID},
 }
 
 
@@ -2693,6 +3024,8 @@ def _invoke(client: TradeSmart, call: str, invalid: bool = False) -> Any:
         return client.request("placegttorder", {"exch": "NSE"}, state_changing=False)
     if call == "request_cancel_gtt":
         return client.request("CANCELGTTORDER", {"al_id": "26111200000099"}, state_changing=False)
+    if call == "request_cancel_oco":
+        return client.request("CANCELOCOORDER", {"al_id": "26111800000099"}, state_changing=False)
     if call == "request_place_iceberg":
         return client.request("placeicebergorder", {"exch": "NSE"}, state_changing=False)
     if call == "request_order_book_state_changing":
@@ -2700,6 +3033,9 @@ def _invoke(client: TradeSmart, call: str, invalid: bool = False) -> Any:
     if call == "limits":
         return client.margins()
     arguments = dict(_ORDER_ARGUMENTS[call])
+    for leg in ("stop_loss", "target"):
+        if leg in arguments:
+            arguments[leg] = OcoLeg(**arguments[leg])
     if invalid:
         arguments["quantity"] = 0
     return getattr(client, call)(**arguments)
@@ -2767,6 +3103,12 @@ def _outcome_cases() -> list[Any]:
 
     def gtt_ack(word: str) -> str:
         return json.dumps({"stat": word, "al_id": _ALERT_ID}, separators=(",", ":"))
+
+    def oco_ack(word: str) -> str:
+        return json.dumps({"stat": word, "al_id": _OCO_ALERT_ID}, separators=(",", ":"))
+
+    def invalid_oi(stat: str = "Invalid Oi", al: str = _ALERT_ID) -> str:
+        return json.dumps({"stat": stat, "al_id": al}, separators=(",", ":"))
 
     return [
         case("accepted_ack", {"body": _ACK}),
@@ -2845,7 +3187,7 @@ def _outcome_cases() -> list[Any]:
         ),
         case(
             "request_cancel_gtt_accepted",
-            {"body": '{"stat":"Oi delete success","al_id":"26111200000099"}'},
+            {"body": '{"stat":"OI deleted","al_id":"26111200000099"}'},
             call="request_cancel_gtt",
         ),
         case(
@@ -2854,8 +3196,8 @@ def _outcome_cases() -> list[Any]:
             call="request_place_gtt",
         ),
         case(
-            "request_cancel_gtt_test_env_word_oi_deleted_is_unknown",
-            {"body": '{"stat":"OI deleted","al_id":"26111200000099"}'},
+            "request_cancel_gtt_docs_word_oi_delete_success_is_unknown",
+            {"body": '{"stat":"Oi delete success","al_id":"26111200000099"}'},
             call="request_cancel_gtt",
         ),
         case(
@@ -2898,14 +3240,84 @@ def _outcome_cases() -> list[Any]:
         case("modify_gtt_read_timeout_is_unknown", {"failure": "read_timeout"}, call="modify_gtt"),
         case(
             "cancel_gtt_accepted_logs_the_al_id",
-            {"body": gtt_ack("Oi delete success")},
+            {"body": gtt_ack("OI deleted")},
             call="cancel_gtt",
         ),
         case("cancel_gtt_read_timeout_is_unknown", {"failure": "read_timeout"}, call="cancel_gtt"),
         case(
-            "cancel_gtt_test_env_word_oi_deleted_is_unknown",
-            {"body": gtt_ack("OI deleted")},
+            "cancel_gtt_docs_word_oi_delete_success_is_unknown",
+            {"body": gtt_ack("Oi delete success")},
             call="cancel_gtt",
+        ),
+        # Invalid Oi (F35 b): a definite failure on the modify / cancel writes, any letter case.
+        case("modify_gtt_invalid_oi_is_rejected", {"body": invalid_oi()}, call="modify_gtt"),
+        case("cancel_gtt_invalid_oi_is_rejected", {"body": invalid_oi()}, call="cancel_gtt"),
+        case(
+            "request_cancel_gtt_invalid_oi_is_rejected",
+            {"body": invalid_oi("INVALID OI", "26111200000099")},
+            call="request_cancel_gtt",
+        ),
+        # The OCO writes: the observed words, the same outcome lines (al_id=, pending_gtts()).
+        case(
+            "place_oco_accepted_logs_the_al_id", {"body": oco_ack("OI created")}, call="place_oco"
+        ),
+        case(
+            "place_oco_upper_case_word_is_accepted",
+            {"body": oco_ack("OI CREATED")},
+            call="place_oco",
+        ),
+        case(
+            "place_oco_ok_is_unknown",
+            {"body": '{"stat":"Ok","al_id":"' + _OCO_ALERT_ID + '"}'},
+            call="place_oco",
+        ),
+        case(
+            "place_oco_invalid_oi_is_unknown",
+            {"body": invalid_oi(al=_OCO_ALERT_ID)},
+            call="place_oco",
+        ),
+        case("place_oco_not_ok_is_rejected", {"body": not_ok}, call="place_oco"),
+        case("place_oco_read_timeout_is_unknown", {"failure": "read_timeout"}, call="place_oco"),
+        case("place_oco_connect_error_is_not_sent", {"failure": "connect_error"}, call="place_oco"),
+        case(
+            "modify_oco_accepted_logs_the_al_id",
+            {"body": oco_ack("OI replaced")},
+            call="modify_oco",
+        ),
+        case(
+            "modify_oco_invalid_oi_is_rejected",
+            {"body": invalid_oi(al=_OCO_ALERT_ID)},
+            call="modify_oco",
+        ),
+        case(
+            "modify_oco_invalid_oi_upper_case_is_rejected",
+            {"body": invalid_oi("INVALID OI", _OCO_ALERT_ID)},
+            call="modify_oco",
+        ),
+        case("modify_oco_read_timeout_is_unknown", {"failure": "read_timeout"}, call="modify_oco"),
+        case(
+            "cancel_oco_accepted_logs_the_al_id", {"body": oco_ack("OI deleted")}, call="cancel_oco"
+        ),
+        case(
+            "cancel_oco_invalid_oi_is_rejected",
+            {"body": invalid_oi(al=_OCO_ALERT_ID)},
+            call="cancel_oco",
+        ),
+        case(
+            "cancel_oco_docs_word_oi_delete_success_is_unknown",
+            {"body": oco_ack("Oi delete success")},
+            call="cancel_oco",
+        ),
+        case("cancel_oco_read_timeout_is_unknown", {"failure": "read_timeout"}, call="cancel_oco"),
+        case(
+            "request_cancel_oco_accepted",
+            {"body": '{"stat":"OI deleted","al_id":"26111800000099"}'},
+            call="request_cancel_oco",
+        ),
+        case(
+            "request_cancel_oco_invalid_oi_is_rejected",
+            {"body": invalid_oi(al="26111800000099")},
+            call="request_cancel_oco",
         ),
     ]
 
@@ -3034,11 +3446,122 @@ def _request_name_cases() -> list[Any]:
         case("place_gtt_any_case_is_state_changing", "placegttorder", ("exch", "NSE")),
         case("modify_gtt_any_case_is_state_changing", "MODIFYGTTORDER", ("al_id", "1")),
         case("cancel_gtt_any_case_is_state_changing", " /CancelGttOrder/ ", ("al_id", "1")),
+        case("place_oco_any_case_is_state_changing", "placeocoorder", ("exch", "NSE")),
+        case("modify_oco_any_case_is_state_changing", "MODIFYOCOORDER", ("al_id", "1")),
+        case("cancel_oco_any_case_is_state_changing", " /CancelOcoOrder/ ", ("al_id", "1")),
+        case(
+            "place_oco_nested_payload_is_kept_in_order",
+            "PlaceOCOOrder",
+            ("tsym", "RELIANCE-EQ"),
+            (
+                "oivariable",
+                [Ordered(var_name="x", d="1430"), Ordered(var_name="y", d="1170")],
+            ),
+            ("place_order_params", Ordered(tsym="RELIANCE-EQ", qty="1", prc="1440")),
+        ),
         case("place_iceberg_any_case_is_state_changing", "PLACEICEBERGORDER"),
         case("modify_iceberg_any_case_is_state_changing", "modifyicebergorder"),
         case("cancel_iceberg_any_case_is_state_changing", "CancelIcebergOrder"),
         case("gtt_book_read_is_sent_as_given", "GetPendingGTTOrder", expect="list"),
         case("iceberg_book_read_is_sent_as_given", "GetIceBergOrder", expect="list"),
+    ]
+
+
+FIXTURES = SDK_ROOT.parent / "specifications" / "test-fixtures"
+
+
+def _oco_leg_json(leg: Any) -> dict[str, Any] | None:
+    if leg is None:
+        return None
+    return {
+        "quantity": leg.quantity,
+        "price": _dstr(leg.price),
+        "trigger_price": _dstr(leg.trigger_price),
+    }
+
+
+def _oco_side_json(row: Any, side: Any) -> dict[str, Any] | None:
+    if side is None:
+        return None
+    slot = "first" if side.leg is row.oco_first else "second"
+    return {"leg": slot, "trigger_value": _dstr(side.trigger_value)}
+
+
+def eval_oco_row(i: dict[str, Any]) -> dict[str, Any]:
+    """Parse one OCO row of a GTT list; report the OCO fields and the derived sides."""
+    model = Gtt if i["list"] == "pending" else TriggeredGtt
+    try:
+        endpoint = "GetPendingGTTOrder" if i["list"] == "pending" else "GetTrgOi"
+        row = model.from_wire(i["row"], endpoint=endpoint)
+    except Exception as exc:
+        return _error(exc)
+    triggers = (
+        None
+        if row.oco_triggers is None
+        else [
+            {"var_name": t.var_name, "trigger_value": _dstr(t.trigger_value)}
+            for t in row.oco_triggers
+        ]
+    )
+    return {
+        "alert_id": row.alert_id,
+        "is_oco": row.is_oco,
+        "oco_first": _oco_leg_json(row.oco_first),
+        "oco_second": _oco_leg_json(row.oco_second),
+        "oco_triggers": triggers,
+        "stop_loss": _oco_side_json(row, row.stop_loss),
+        "target": _oco_side_json(row, row.target),
+    }
+
+
+def _oco_row_cases() -> list[Any]:
+    """Rows from the shared fixtures, and the same rows with one nested value broken."""
+    pending = json.loads((FIXTURES / "pending_gtts_success.json").read_text(encoding="utf-8"))
+    triggered = json.loads((FIXTURES / "triggered_gtts_success.json").read_text(encoding="utf-8"))
+    buy, sell = pending[2], pending[3]
+    cancelled_buy = triggered[1]
+    assert buy["ai_t"] == "LMT_BOS_O" and sell["ai_t"] == "LMT_SOB_O"
+    assert cancelled_buy["ai_t"] == "LMT_BOS_O"
+
+    def changed(row: dict[str, Any], path: tuple[Any, ...], value: Any) -> dict[str, Any]:
+        copy = json.loads(json.dumps(row))
+        target = copy
+        for key in path[:-1]:
+            target = target[key]
+        target[path[-1]] = value
+        return copy
+
+    return [
+        ("pending_buy_stop_loss_in_x", {"list": "pending", "row": buy}),
+        ("pending_sell_target_in_x", {"list": "pending", "row": sell}),
+        ("triggered_cancelled_buy", {"list": "triggered", "row": cancelled_buy}),
+        (
+            "first_leg_quantity_not_a_number_nulls_the_leg",
+            {"list": "pending", "row": changed(buy, ("place_order_params", "qty"), "abc")},
+        ),
+        (
+            "second_leg_price_not_a_number_nulls_the_leg",
+            {"list": "pending", "row": changed(sell, ("place_order_params_leg2", "prc"), "x")},
+        ),
+        (
+            "trigger_value_not_a_number_nulls_the_triggers",
+            {"list": "pending", "row": changed(buy, ("oivariable", 1, "d"), "zz")},
+        ),
+        (
+            "triggered_leg_quantity_not_a_number_nulls_the_leg",
+            {
+                "list": "triggered",
+                "row": changed(cancelled_buy, ("place_order_params_leg2", "qty"), "abc"),
+            },
+        ),
+        (
+            "triggered_trigger_value_not_a_number_nulls_the_triggers",
+            {"list": "triggered", "row": changed(cancelled_buy, ("oivariable", 0, "d"), "zz")},
+        ),
+        (
+            "leg_not_an_object_nulls_the_leg",
+            {"list": "pending", "row": changed(buy, ("place_order_params",), "abc")},
+        ),
     ]
 
 
@@ -3056,6 +3579,7 @@ def eval_success_word(i: dict[str, Any]) -> dict[str, Any]:
             "success_stats": SUCCESS_STATS.get(endpoint, OK_STATS),
             "requires_ack_id": ACK_ID_FIELDS.get(endpoint),
             "stats_ignore_case": endpoint in SUCCESS_STATS_IGNORE_CASE,
+            "failure_stats": FAILURE_STATS.get(endpoint, frozenset()),
         }
     )
 
@@ -3067,15 +3591,20 @@ def _success_word_cases() -> list[Any]:
         text = body if isinstance(body, str) else json.dumps(body, separators=(",", ":"))
         return name, {"endpoint": endpoint, "http_status": status, "body": text, "expect": expect}
 
+    # The documented GTT words; the cancel word is the observed one (owner decision 2026-11-18,
+    # F35 b: the docs word "Oi delete success" is no longer a success). The OCO words are the
+    # ones the test environment answers. Each success needs a non-blank al_id.
     words = {
-        "place_gtt": ("PlaceGTTOrder", "Oi created"),
-        "modify_gtt": ("ModifyGTTOrder", "Oi replaced"),
-        "cancel_gtt": ("CancelGTTOrder", "Oi delete success"),
+        "place_gtt": ("PlaceGTTOrder", "Oi created", "26111200000010"),
+        "modify_gtt": ("ModifyGTTOrder", "Oi replaced", "26111200000010"),
+        "cancel_gtt": ("CancelGTTOrder", "OI deleted", "26111200000010"),
+        "place_oco": ("PlaceOCOOrder", "OI created", "26111800000001"),
+        "modify_oco": ("ModifyOCOOrder", "OI replaced", "26111800000001"),
+        "cancel_oco": ("CancelOCOOrder", "OI deleted", "26111800000001"),
     }
     expired = {"stat": "Not_Ok", "emsg": "Session Expired :  Invalid Session Key"}
     cases = []
-    for prefix, (endpoint, word) in words.items():
-        al = "26111200000010"
+    for prefix, (endpoint, word, al) in words.items():
         cases += [
             case(f"{prefix}_word_with_al_id_is_success", endpoint, {"stat": word, "al_id": al}),
             case(
@@ -3089,7 +3618,7 @@ def _success_word_cases() -> list[Any]:
             case(
                 f"{prefix}_word_numeric_al_id_is_unknown",
                 endpoint,
-                {"stat": word, "al_id": 26111200000010},
+                {"stat": word, "al_id": int(al)},
             ),
             case(
                 f"{prefix}_word_with_emsg_is_unknown",
@@ -3131,13 +3660,106 @@ def _success_word_cases() -> list[Any]:
             {"stat": "Oi replaced", "al_id": "26111200000010"},
         )
     )
-    cases.append(
+    cases += [
         case(
-            "cancel_gtt_test_env_word_oi_deleted_is_unknown",
+            "place_oco_word_of_modify_is_unknown",
+            "PlaceOCOOrder",
+            {"stat": "OI replaced", "al_id": "26111800000001"},
+        ),
+        case(
+            "modify_oco_word_of_place_is_unknown",
+            "ModifyOCOOrder",
+            {"stat": "OI created", "al_id": "26111800000001"},
+        ),
+        # The docs word of the cancel calls is no longer a success (D3): nothing says what the
+        # server did, so the user checks pending_gtts().
+        case(
+            "cancel_gtt_docs_word_oi_delete_success_is_unknown",
             "CancelGTTOrder",
-            {"stat": "OI deleted", "al_id": "26111200000010"},
-        )
-    )
+            {"stat": "Oi delete success", "al_id": "26111200000010"},
+        ),
+        case(
+            "cancel_oco_docs_word_oi_delete_success_is_unknown",
+            "CancelOCOOrder",
+            {"stat": "Oi delete success", "al_id": "26111800000001"},
+        ),
+        case(
+            "cancel_oco_place_word_is_unknown",
+            "CancelOCOOrder",
+            {"stat": "Oi created", "al_id": "26111800000001"},
+        ),
+    ]
+    # "Invalid Oi" (any letter case) with an al_id and no emsg is a definite failure on the
+    # four modify / cancel calls (F35 b); the message is exactly "Invalid Oi" and emsg is the
+    # stat text as received.
+    # PlaceOCOOrder does not document it: unknown.
+    for endpoint, prefix, al in (
+        ("ModifyGTTOrder", "modify_gtt", "26111200000010"),
+        ("CancelGTTOrder", "cancel_gtt", "26111200000010"),
+        ("ModifyOCOOrder", "modify_oco", "26111800000001"),
+        ("CancelOCOOrder", "cancel_oco", "26111800000001"),
+    ):
+        for label, stat in (
+            ("", "Invalid Oi"),
+            ("_upper_case", "INVALID OI"),
+            ("_lower_case", "invalid oi"),
+        ):
+            cases.append(
+                case(
+                    f"{prefix}_invalid_oi{label}_is_rejected",
+                    endpoint,
+                    {"stat": stat, "al_id": al},
+                )
+            )
+        cases += [
+            case(
+                f"{prefix}_invalid_oi_with_padding_is_unknown",
+                endpoint,
+                {"stat": " Invalid Oi", "al_id": al},
+            ),
+        ]
+    # The stat alone decides: no al_id, a non-blank emsg or an error HTTP status does not
+    # change the rejection.
+    for endpoint, prefix, al in (
+        ("ModifyOCOOrder", "modify_oco", "26111800000001"),
+        ("CancelGTTOrder", "cancel_gtt", "26111200000010"),
+    ):
+        invalid = {"stat": "Invalid Oi", "al_id": al}
+        cases += [
+            case(
+                f"{prefix}_invalid_oi_without_al_id_is_rejected", endpoint, {"stat": "Invalid Oi"}
+            ),
+            case(
+                f"{prefix}_invalid_oi_with_emsg_is_rejected",
+                endpoint,
+                {"stat": "Invalid Oi", "al_id": al, "emsg": "Alert not found"},
+            ),
+            case(f"{prefix}_invalid_oi_http_401_is_rejected", endpoint, invalid, 401),
+            case(f"{prefix}_invalid_oi_http_500_is_rejected", endpoint, invalid, 500),
+        ]
+    cases += [
+        case(
+            "place_oco_invalid_oi_is_unknown",
+            "PlaceOCOOrder",
+            {"stat": "Invalid Oi", "al_id": "26111800000001"},
+        ),
+        case(
+            "place_oco_invalid_oi_upper_case_is_unknown",
+            "PlaceOCOOrder",
+            {"stat": "INVALID OI", "al_id": "26111800000001"},
+        ),
+        case(
+            "place_gtt_invalid_oi_is_unknown",
+            "PlaceGTTOrder",
+            {"stat": "Invalid Oi", "al_id": "26111200000010"},
+        ),
+        case(
+            "place_order_invalid_oi_is_unknown",
+            "PlaceOrder",
+            {"stat": "Invalid Oi", "norenordno": "1"},
+        ),
+        case("read_invalid_oi_is_a_parse_error", "Limits", {"stat": "Invalid Oi", "al_id": "1"}),
+    ]
     for prefix, endpoint in (
         ("place_iceberg", "PlaceIceBergOrder"),
         ("modify_iceberg", "ModifyIceBergOrder"),
@@ -3221,7 +3843,7 @@ def _success_word_cases() -> list[Any]:
         ),
     ]
     # Any JSON list on a GTT or iceberg write is unknown, whatever ``expect`` says.
-    for endpoint in sorted(SUCCESS_STATS):
+    for endpoint in sorted({*SUCCESS_STATS, "PlaceOCOOrder", "ModifyOCOOrder", "CancelOCOOrder"}):
         for label, body in (
             ("empty", []),
             ("ack_in_list", [{"stat": "Oi created", "al_id": "1"}]),
@@ -3868,17 +4490,25 @@ FILES: dict[str, dict[str, Any]] = {
     },
     "jdata_encoding.json": {
         "description": (
-            "REST request body. input.payload is the ordered list of [key, value] string pairs "
-            "(the wire key order is kept, never sorted). The body is jData= followed by compact "
+            "REST request body. input.payload is the ordered list of [key, value] pairs "
+            "(the wire key order is kept, never sorted). A value is a string, or a nested "
+            "object or list of such values (the OCO bodies): an object's keys and a list's "
+            "items keep the order the file gives them (in this file every object that is a "
+            "value is written in wire order, not sorted), and the rules below apply to every "
+            "string at any depth. The body is jData= followed by compact "
             'JSON (separators "," and ":", no spaces), non-ASCII characters written as UTF-8 '
             "(no \\u escapes), no HTML escaping of < > & or ', then only % & + percent-encoded, "
             "in that order (% first). Everything else, including = space / ? #, is sent as is. "
             'JSON string escapes: " and \\ as \\" and \\\\; the control characters U+0008, '
             "U+0009, U+000A, U+000C, U+000D as \\b \\t \\n \\f \\r; every other character below "
             "U+0020 as \\u00XX with lower-case hex; DEL (U+007F), U+2028 and U+2029 are sent raw "
-            "as UTF-8. expected.utf8_hex is the exact body bytes."
+            "as UTF-8. expected.utf8_hex is the exact body bytes. A lone surrogate in any key "
+            "or value at any depth cannot be encoded as UTF-8: nothing is sent and the call "
+            'is {"error": "RequestValidationError", "fields": [...]}, fields being the sorted '
+            "top-level keys that hold it (a nested value is named by its top-level key). "
+            "Such an input is written in the file with its \\uXXXX escape."
         ),
-        "source": "tradesmart._transport.codec.encode_jdata",
+        "source": "tradesmart._transport.codec.encode_request_body",
         "tolerance": {},
         "evaluate": eval_jdata,
         "cases": _jdata_cases,
@@ -4002,7 +4632,10 @@ FILES: dict[str, dict[str, Any]] = {
             "MCX too; no ordersource, no algo_id), modify_gtt (ModifyGTTOrder: the same keys "
             "with al_id third; validity and alert_validity have no defaults on modify_gtt, so "
             "every modify_gtt case gives both and both are always sent) or cancel_gtt "
-            "(CancelGTTOrder: uid, al_id); GTT case names start with gtt_. Absent optional keys "
+            "(CancelGTTOrder: uid, al_id); GTT case names start with gtt_. place_gtt and "
+            "modify_gtt refuse the OCO alert types LMT_BOS_O and LMT_SOB_O (fields ['ai_t']: "
+            "an OCO is placed and changed only with place_oco and modify_oco, see "
+            "oco_requests.json). Absent optional keys "
             'are omitted; a MARKET / SL-M order without a price is sent with prc "0".'
         ),
         "source": "tradesmart.endpoints.orders.place_order_call / modify_order_call / "
@@ -4011,6 +4644,44 @@ FILES: dict[str, dict[str, Any]] = {
         "tolerance": {},
         "evaluate": eval_order_validation,
         "cases": _order_validation_cases,
+    },
+    "oco_requests.json": {
+        "description": (
+            "OCO calls (uid TESTUID): input.method is place_oco, modify_oco or cancel_oco, "
+            "input.uid the user id, input.alert_id the alert id (modify_oco and cancel_oco), "
+            "input.params the other arguments in the Python names: exchange, tradingsymbol, "
+            "transaction_type, quantity, product, stop_loss and target (each a leg object "
+            "{trigger_value, price, order_type, trigger_price}; absent optional keys are "
+            "omitted, order_type defaults to LIMIT), tag, validity (the leg retention, default "
+            "DAY) and alert_validity (DAY or GTT, default GTT; both required on modify_oco). "
+            "expected is {endpoint, payload}: payload is the exact request body as a nested "
+            "object whose KEY ORDER IS PART OF THE CONTRACT (this file is written unsorted; "
+            "compare the encoded text, not the parsed object). PlaceOCOOrder: uid, tsym, exch, "
+            "validity (the alert_validity), ai_t (LMT_BOS_O for BUY, LMT_SOB_O for SELL), "
+            "oivariable (a list of two objects, {var_name: x, d: stop-loss trigger} then "
+            "{var_name: y, d: target trigger}), place_order_params (the stop-loss leg), "
+            "place_order_params_leg2 (the target leg). ModifyOCOOrder: the same with al_id "
+            "second, after uid. CancelOCOOrder: uid, al_id. A leg: tsym, exch, trantype (B or "
+            "S, the OCO's side), prctyp (LMT, MKT, SL-LMT, SL-MKT), prd (C, M, H), ret (the "
+            "validity), actid and uid (both the user id), qty, prc, ordersource (API), then "
+            "trgprc and remarks (the tag) when given; there is no top-level actid, remarks, "
+            "dscqty or algo_id. Every number is a string, sent as given (trigger values and "
+            "prices keep their digits); a MARKET or SL-MKT leg without a price sends prc "
+            "'0'. An error case is {error: RequestValidationError, loc: [...]}, the path of the "
+            "one error in wire names (an array index is a JSON number): a field of one leg is "
+            "under its leg key (place_order_params for the stop-loss leg, "
+            "place_order_params_leg2 for the target leg: prc, trgprc, prctyp), a trigger value "
+            "under oivariable and its index (0 stop-loss, 1 target) then d, a field both legs "
+            "share under its bare wire key (exch, prd, qty, trantype, al_id), and the side rule "
+            "(BUY: the stop-loss trigger must be above the target trigger, SELL: below it, "
+            "equal refused; checked only when both triggers are valid numbers) under "
+            "oivariable. Exchanges NSE, NFO, BSE, BFO, MCX; products CNC, NRML, CO (MIS and BO "
+            "refused)."
+        ),
+        "source": "tradesmart.endpoints.oco.place_oco_call / modify_oco_call / cancel_oco_call",
+        "tolerance": {},
+        "evaluate": eval_oco_request,
+        "cases": _oco_request_cases,
     },
     "read_payloads.json": {
         "description": (
@@ -4037,16 +4708,19 @@ FILES: dict[str, dict[str, Any]] = {
             "endpoint is trimmed of whitespace and slashes and must then be ASCII letters only "
             '(else {"error": "ConfigurationError"}); the names PlaceOrder, PlaceMultiOrder, '
             "ModifyOrder, CancelOrder, ExitSNOOrder, GenAcsTok, PlaceGTTOrder, ModifyGTTOrder, "
-            "CancelGTTOrder, PlaceIceBergOrder, ModifyIceBergOrder, CancelIceBergOrder, "
+            "CancelGTTOrder, PlaceOCOOrder, ModifyOCOOrder, CancelOCOOrder, PlaceIceBergOrder, "
+            "ModifyIceBergOrder, CancelIceBergOrder, "
             "GetQuotes, GetQuotesMultiple and TPSeries match case-insensitively and are "
             "rewritten to that spelling, every other name is sent as given. "
             "expected.state_changing is the caller's flag or a state-changing name; "
             "expected.rate_group is place_order (the orders group), quotes, tpseries or null; "
             "allow_empty is always false; expected.success_stats is the sorted list of "
-            "documented success words (['Ok'] except the GTT and iceberg writes; the GTT "
+            "success words (['Ok'] except the GTT, OCO and iceberg writes; the GTT and OCO "
             "words compare ignoring letter case, see success_words.json) and "
             "expected.requires_ack_id the field a success must carry as a non-blank string "
-            "(al_id for the GTT writes, else null). uid is appended when "
+            "(al_id for the GTT and OCO writes, else null). Values may be nested objects and "
+            "lists (the OCO bodies): their key and item order is kept, encoded as in "
+            "jdata_encoding.json. uid is appended when "
             "absent; values become wire strings (true / false as Yes / No); a null value is "
             '{"error": "TypeError"} (a programming error, nothing is sent).'
         ),
@@ -4060,10 +4734,14 @@ FILES: dict[str, dict[str, Any]] = {
             "The order outcome log (logger tradesmart.orders) of one call. input.call is an "
             "order method (place_order, modify_order, cancel_order, exit_order), a typed GTT "
             "write (place_gtt with the arguments of the order_validation.json gtt_ cases, "
-            "modify_gtt the same with alert_id 26111200000010, cancel_gtt that alert_id), "
+            "modify_gtt the same with alert_id 26111200000010, cancel_gtt that alert_id), a typed "
+            "OCO write (place_oco with the arguments of the oco_requests.json case "
+            "place_buy_limit_limit, modify_oco the same with alert_id 26111800000001, cancel_oco "
+            "that alert_id; the legs are OcoLeg values built from the case's dictionaries), "
             "request_place_order (request('placeorder', ..., state_changing=True)), "
             "request_place_gtt (request('placegttorder', {exch: NSE})), request_cancel_gtt "
-            "(request('CANCELGTTORDER', {al_id: '26111200000099'})), request_place_iceberg "
+            "(request('CANCELGTTORDER', {al_id: '26111200000099'})), request_cancel_oco "
+            "(request('CANCELOCOORDER', {al_id: '26111800000099'})), request_place_iceberg "
             "(request('placeicebergorder', {exch: NSE})), "
             "request_order_book_state_changing (not an order endpoint) or limits (a read). "
             "input.token is valid, none or expired (an AccessToken past its expiry); closed "
@@ -4073,8 +4751,11 @@ FILES: dict[str, dict[str, Any]] = {
             "the call's requests in turn: {status, body} or "
             "{failure: kind} (kinds as in transport_failures.json). expected.info is the "
             "INFO line without its time ('<Endpoint> <word> order_id=<id>', id '-' when none; "
-            "'al_id=<id>' for the GTT writes, the ack's al_id else the payload's), "
-            "expected.warning the WARNING line (it names pending_gtts() for the GTT writes, "
+            "'al_id=<id>' for the GTT and OCO writes, the ack's al_id else the payload's; "
+            "a reply with the stat Invalid Oi to a modify or cancel is a rejection, see "
+            "success_words.json), "
+            "expected.warning the WARNING line (it names pending_gtts() for the GTT and OCO "
+            "writes, "
             "orders() otherwise), both null when not logged; expected.error is "
             "the error type raised (null when the call returned) and expected.requests how "
             "many requests reached the transport."
@@ -4084,28 +4765,57 @@ FILES: dict[str, dict[str, Any]] = {
         "evaluate": eval_outcome,
         "cases": _outcome_cases,
     },
+    "oco_rows.json": {
+        "description": (
+            "One OCO row of GetPendingGTTOrder (input.list 'pending', a Gtt) or GetTrgOi "
+            "('triggered', a TriggeredGtt), input.row the wire object, parsed as a list item. "
+            "expected: alert_id, is_oco, oco_first and oco_second (the legs "
+            "place_order_params / place_order_params_leg2 as {quantity, price, trigger_price}, "
+            "or null), oco_triggers (the oivariable items as {var_name, trigger_value}, or "
+            "null), stop_loss and target ({leg: 'first' or 'second', trigger_value}, or null). "
+            "A nested record that fails to parse (a leg value, a leg that is not an object, a "
+            "trigger value) is null AS A WHOLE, not field by field: the leg (or the whole "
+            "trigger list) is null, so both sides are null, and the row itself still parses "
+            "(sdk-behaviour.md 2.9). Decimal values are compared as decimal numbers ('1430.00' "
+            "equals '1430')."
+        ),
+        "source": "tradesmart.models.gtt.Gtt / TriggeredGtt.from_wire, oco_first, oco_second, "
+        "oco_triggers, stop_loss, target",
+        "tolerance": {"decimal_abs": "0"},
+        "evaluate": eval_oco_row,
+        "cases": _oco_row_cases,
+    },
     "success_words.json": {
         "description": (
             "Per-endpoint success words. input.body is the raw reply to input.endpoint with "
             "input.http_status, for a call that expects input.expect (object or list); "
             "expected as in not_ok_classification.json ({returns} or "
             "{error, emsg, message}). Success is a stat string compared exactly "
-            "(no trimming, no normalising), except that the three GTT words compare ignoring "
+            "(no trimming, no normalising), except the GTT and OCO words, which compare ignoring "
             "letter case only (casefold on both sides; the test environment answers "
-            "'OI created'): PlaceGTTOrder 'Oi created', ModifyGTTOrder "
-            "'Oi replaced', CancelGTTOrder 'Oi delete success' (each also needs a non-blank "
-            "string al_id and no emsg other than a blank string; 'OI deleted' is another "
-            "word, not a case variant), PlaceIceBergOrder, ModifyIceBergOrder and "
-            "CancelIceBergOrder 'true' (the string, case-sensitive), every other "
-            "endpoint 'Ok'. Not_Ok keeps the classification of not_ok_classification.json; "
-            "on the three iceberg writes only, 'false' is a definite failure classified the "
-            "same way, its message from a non-blank rejreason, else emsg. Any JSON array on "
-            "these six writes, whatever expect, and anything else on them "
-            "is OrderStatusUnknownError; on a read it is a "
-            "ResponseParseError."
+            "'OI created'): PlaceGTTOrder 'Oi created', ModifyGTTOrder 'Oi replaced', "
+            "CancelGTTOrder 'OI deleted' (the word the test environment answers; the "
+            "documented 'Oi delete success' is no longer a success, it is "
+            "OrderStatusUnknownError, owner decision 2026-11-18), PlaceOCOOrder 'OI created', "
+            "ModifyOCOOrder 'OI replaced', CancelOCOOrder 'OI deleted' (each also needs a "
+            "non-blank string al_id and no emsg other than a blank string), PlaceIceBergOrder, "
+            "ModifyIceBergOrder and CancelIceBergOrder 'true' (the string, case-sensitive), "
+            "every other endpoint 'Ok'. A stat 'Invalid Oi' (casefold, nothing trimmed) on "
+            "ModifyGTTOrder, CancelGTTOrder, ModifyOCOOrder or CancelOCOOrder is a definite "
+            "failure decided by the stat alone (with or without al_id, with an emsg, at any "
+            "HTTP status): {error: OrderRejectedError, emsg: the stat "
+            "text as received (so 'INVALID OI' stays upper case), message: 'Invalid Oi'} (the "
+            "message is exactly that text, not the usual '<Endpoint> failed: ...' form); on "
+            "PlaceOCOOrder and every other endpoint it is not a failure word. Not_Ok keeps the "
+            "classification of not_ok_classification.json; on the three iceberg writes only, "
+            "'false' is a definite failure classified the same way, its message from a "
+            "non-blank rejreason, else emsg. Any JSON array on the nine writes with their own "
+            "words, whatever expect, and anything else on them is OrderStatusUnknownError; on "
+            "a read it is a ResponseParseError."
         ),
         "source": "tradesmart._transport.codec.parse_response with "
-        "tradesmart._client_core.SUCCESS_STATS, SUCCESS_STATS_IGNORE_CASE and ACK_ID_FIELDS",
+        "tradesmart._client_core.SUCCESS_STATS, SUCCESS_STATS_IGNORE_CASE, FAILURE_STATS and "
+        "ACK_ID_FIELDS",
         "tolerance": {},
         "evaluate": eval_success_word,
         "cases": _success_word_cases,
@@ -4212,14 +4922,37 @@ FILES: dict[str, dict[str, Any]] = {
 }
 
 
+def _committed_expected(name: str) -> dict[str, Any]:
+    """The ``expected`` values of the committed file, by case name (empty when no file)."""
+    path = OUT_DIR / name
+    if not path.is_file():
+        return {}
+    return {c["name"]: c["expected"] for c in json.loads(path.read_text(encoding="utf-8"))["cases"]}
+
+
+def _keep(name: str, expected: Any) -> Any:
+    """A kept expected value; request bodies keep their key order (``Ordered``)."""
+    if isinstance(expected, dict) and "payload" in expected:
+        return {**expected, "payload": ordered(expected["payload"])}
+    return expected
+
+
 def build(name: str) -> dict[str, Any]:
-    """The full JSON document of one vector file, ``expected`` computed from the SDK."""
+    """The full JSON document of one vector file, ``expected`` computed from the SDK.
+
+    A case the SDK cannot evaluate yet (``NotImplementedError`` from the evaluator) keeps its
+    committed ``expected``.
+    """
     spec = FILES[name]
+    committed = _committed_expected(name)
     cases = []
     for case_name, case_input in spec["cases"]():
-        cases.append(
-            {"name": case_name, "input": case_input, "expected": spec["evaluate"](case_input)}
-        )
+        expected: Any
+        try:
+            expected = spec["evaluate"](case_input)
+        except NotImplementedError:
+            expected = _keep(name, committed[case_name])
+        cases.append({"name": case_name, "input": case_input, "expected": expected})
     names = [c["name"] for c in cases]
     assert len(names) == len(set(names)), f"{name}: duplicate case names"
     return {
@@ -4231,10 +4964,59 @@ def build(name: str) -> dict[str, Any]:
 
 
 def dump(document: dict[str, Any]) -> str:
-    """Deterministic text: sorted keys, 2-space indent, ``repr`` floats, no NaN, final newline."""
-    return (
-        json.dumps(document, indent=2, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n"
-    )
+    """Deterministic text: sorted keys (``Ordered`` objects keep their order), 2-space indent,
+    ``repr`` floats, no NaN, final newline. A lone surrogate is written as its ``\\uXXXX`` escape
+    (it cannot be encoded as UTF-8)."""
+    text = json.dumps(_sorted_tree(document), indent=2, ensure_ascii=False, allow_nan=False)
+    text = re.sub("[\ud800-\udfff]", lambda m: f"\\u{ord(m.group()):04x}", text)
+    return text + "\n"
+
+
+OCO_TOP_KEYS = [
+    "uid",
+    "tsym",
+    "exch",
+    "validity",
+    "ai_t",
+    "oivariable",
+    "place_order_params",
+    "place_order_params_leg2",
+]
+OCO_LEG_KEYS = [
+    "tsym",
+    "exch",
+    "trantype",
+    "prctyp",
+    "prd",
+    "ret",
+    "actid",
+    "uid",
+    "qty",
+    "prc",
+    "ordersource",
+    "trgprc",
+    "remarks",
+]
+
+
+def _check_oco_key_order(name: str, method: str, expected: dict[str, Any]) -> None:
+    """The key sequences of an OCO body (the order is part of the contract; the test helper
+    that compares parsed values ignores it, so it is asserted here and in the test module)."""
+    payload = expected["payload"]
+    if method == "cancel_oco":
+        assert list(payload) == ["uid", "al_id"], name
+        return
+    top = list(OCO_TOP_KEYS)
+    if method == "modify_oco":
+        top.insert(1, "al_id")
+    assert list(payload) == top, name
+    assert [list(item) for item in payload["oivariable"]] == [["var_name", "d"]] * 2, name
+    assert [item["var_name"] for item in payload["oivariable"]] == ["x", "y"], name
+    for leg_key in ("place_order_params", "place_order_params_leg2"):
+        keys = list(payload[leg_key])
+        # the mandatory keys in order, then trgprc and remarks only when present, in that order
+        assert keys == [k for k in OCO_LEG_KEYS if k in keys], (name, leg_key)
+        assert keys[:11] == OCO_LEG_KEYS[:11], (name, leg_key)
 
 
 def _self_checks(documents: dict[str, dict[str, Any]]) -> None:
@@ -4260,8 +5042,13 @@ def _self_checks(documents: dict[str, dict[str, Any]]) -> None:
     for case in documents["order_validation.json"]["cases"]:
         failed = "error" in case["expected"]
         assert failed == case["name"].removeprefix("gtt_").startswith("error_"), case["name"]
-    # Owner decisions 2026-11-12 and 2026-11-13: only the documented words are a success (the
-    # GTT words ignoring letter case only).
+    for case in documents["oco_requests.json"]["cases"]:
+        failed = "error" in case["expected"]
+        assert failed == case["name"].startswith("error_"), case["name"]
+        if not failed:
+            _check_oco_key_order(case["name"], case["input"]["method"], case["expected"])
+    # Owner decisions 2026-11-12, 2026-11-13 and 2026-11-18: only the documented or observed
+    # words are a success (the GTT and OCO words ignoring letter case only).
     for case in documents["success_words.json"]["cases"]:
         name, expected = case["name"], case["expected"]
         if name.endswith("_is_success"):

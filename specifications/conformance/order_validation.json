@@ -1584,6 +1584,112 @@
       "expected": {
         "error": "RequestValidationError",
         "fields": [
+          "ai_t"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LMT_BOS_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_oco_buy_alert_type"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "ai_t"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_type": "LMT_SOB_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "place_gtt"
+      },
+      "name": "gtt_error_place_oco_sell_alert_type"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "ai_t"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_id": "26111200000010",
+          "alert_type": "LMT_BOS_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "modify_gtt"
+      },
+      "name": "gtt_error_modify_oco_buy_alert_type"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
+          "ai_t"
+        ]
+      },
+      "input": {
+        "arguments": {
+          "alert_id": "26111200000010",
+          "alert_type": "LMT_SOB_O",
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "order_type": "LMT",
+          "price": "1500",
+          "product": "C",
+          "quantity": 1,
+          "tag": "Buy INFY below 1500",
+          "tradingsymbol": "INFY-EQ",
+          "transaction_type": "B",
+          "trigger_value": "1500",
+          "validity": "DAY"
+        },
+        "call": "modify_gtt"
+      },
+      "name": "gtt_error_modify_oco_sell_alert_type"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "fields": [
           "validity"
         ]
       },
@@ -2129,7 +2235,7 @@
       "name": "gtt_error_cancel_integer_alert_id"
     }
   ],
-  "description": "Order-call arguments (uid TEST123) to the endpoint and the exact request body (see jdata_encoding.json), or {\"error\": \"RequestValidationError\", \"fields\": [...]} when client-side validation rejects the arguments before anything is sent; fields lists the wire keys of the field-level errors, sorted (empty when only a cross-field rule failed, such as MTF on MCX). input.call is place_order (PlaceOrder; wire key order uid, actid, exch, tsym, qty, prc, trgprc, dscqty, prd, trantype, prctyp, ret, amo, remarks, ordersource, blprc, bpprc, trailprc, mkt_protection, algo_id; amo is always sent as Yes or No), modify_order (ModifyOrder; no amo; ret only when a validity is given; algo_id last, as on PlaceOrder; algo_id must be a non-blank string when given), cancel_order (CancelOrder: uid, norenordno), exit_order (ExitSNOOrder: uid, norenordno, prd H or B), order_margin (GetOrderMargin, a read), place_gtt (PlaceGTTOrder; wire key order uid, actid, exch, tsym, ai_t, d, validity, remarks, trantype, prctyp, prd, ret, qty, prc, trgprc, dscqty; alert_type -> ai_t, trigger_value -> d, alert_validity -> validity (DAY or GTT, default GTT), validity -> ret (default DAY), tag -> remarks (required, non-blank); exchanges NSE, NFO, BSE, BFO, MCX and products CNC, NRML, CO only; quantity in the exchange's trade units, a whole multiple of the lot size, on MCX too; no ordersource, no algo_id), modify_gtt (ModifyGTTOrder: the same keys with al_id third; validity and alert_validity have no defaults on modify_gtt, so every modify_gtt case gives both and both are always sent) or cancel_gtt (CancelGTTOrder: uid, al_id); GTT case names start with gtt_. Absent optional keys are omitted; a MARKET / SL-M order without a price is sent with prc \"0\".",
+  "description": "Order-call arguments (uid TEST123) to the endpoint and the exact request body (see jdata_encoding.json), or {\"error\": \"RequestValidationError\", \"fields\": [...]} when client-side validation rejects the arguments before anything is sent; fields lists the wire keys of the field-level errors, sorted (empty when only a cross-field rule failed, such as MTF on MCX). input.call is place_order (PlaceOrder; wire key order uid, actid, exch, tsym, qty, prc, trgprc, dscqty, prd, trantype, prctyp, ret, amo, remarks, ordersource, blprc, bpprc, trailprc, mkt_protection, algo_id; amo is always sent as Yes or No), modify_order (ModifyOrder; no amo; ret only when a validity is given; algo_id last, as on PlaceOrder; algo_id must be a non-blank string when given), cancel_order (CancelOrder: uid, norenordno), exit_order (ExitSNOOrder: uid, norenordno, prd H or B), order_margin (GetOrderMargin, a read), place_gtt (PlaceGTTOrder; wire key order uid, actid, exch, tsym, ai_t, d, validity, remarks, trantype, prctyp, prd, ret, qty, prc, trgprc, dscqty; alert_type -> ai_t, trigger_value -> d, alert_validity -> validity (DAY or GTT, default GTT), validity -> ret (default DAY), tag -> remarks (required, non-blank); exchanges NSE, NFO, BSE, BFO, MCX and products CNC, NRML, CO only; quantity in the exchange's trade units, a whole multiple of the lot size, on MCX too; no ordersource, no algo_id), modify_gtt (ModifyGTTOrder: the same keys with al_id third; validity and alert_validity have no defaults on modify_gtt, so every modify_gtt case gives both and both are always sent) or cancel_gtt (CancelGTTOrder: uid, al_id); GTT case names start with gtt_. place_gtt and modify_gtt refuse the OCO alert types LMT_BOS_O and LMT_SOB_O (fields ['ai_t']: an OCO is placed and changed only with place_oco and modify_oco, see oco_requests.json). Absent optional keys are omitted; a MARKET / SL-M order without a price is sent with prc \"0\".",
   "source": "tradesmart.endpoints.orders.place_order_call / modify_order_call / cancel_order_call / exit_sno_order_call / order_margin_call; tradesmart.endpoints.gtt.place_gtt_call / modify_gtt_call / cancel_gtt_call",
   "tolerance": {}
 }

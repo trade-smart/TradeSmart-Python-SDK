@@ -35,6 +35,7 @@ from tradesmart.models.base import (
     TransactionTypeField,
     ValidityField,
 )
+from tradesmart.models.oco_rows import OcoLegRow, OcoSide, OcoTrigger
 from tradesmart.models.orders import (
     _check_price_rules,
     _check_trigger_type,
@@ -42,6 +43,9 @@ from tradesmart.models.orders import (
 )
 
 # --- responses ---------------------------------------------------------------------------------
+
+
+_OCO_TYPES = (GttAlertType.OCO_BUY, GttAlertType.OCO_SELL)
 
 
 class Gtt(TradeSmartModel):
@@ -80,6 +84,47 @@ class Gtt(TradeSmartModel):
     price_precision: Quantity = Field(default=None, alias="pp")
     lot_size: Quantity = Field(default=None, alias="ls")
     ordersource: LenientStr = None
+    oco_first: OcoLegRow | None = Field(default=None, alias="place_order_params")
+    oco_second: OcoLegRow | None = Field(default=None, alias="place_order_params_leg2")
+    oco_triggers: list[OcoTrigger] | None = Field(default=None, alias="oivariable")
+
+    @property
+    def is_oco(self) -> bool:
+        """True when ``alert_type`` is one of the two OCO codes."""
+        return self.alert_type in _OCO_TYPES
+
+    @property
+    def stop_loss(self) -> OcoSide | None:
+        """The stop-loss side of an OCO row, or ``None`` (see ``_oco_sides``)."""
+        return self._oco_sides()[0]
+
+    @property
+    def target(self) -> OcoSide | None:
+        """The target side of an OCO row, or ``None`` (see ``_oco_sides``)."""
+        return self._oco_sides()[1]
+
+    def _oco_sides(self) -> tuple[OcoSide | None, OcoSide | None]:
+        """``(stop_loss, target)``, decided by ``alert_type`` and the trigger values.
+
+        Legs pair with triggers by ``var_name`` (``x`` first leg, ``y`` second), never by list
+        position. ``OCO_BUY``: the higher trigger is the stop-loss; ``OCO_SELL``: the lower. A
+        non-OCO row, equal triggers or anything missing gives ``(None, None)``.
+        """
+        if not self.is_oco:
+            return None, None
+        names = [t.var_name for t in self.oco_triggers or []]
+        if names.count("x") > 1 or names.count("y") > 1:  # ambiguous: no side is guessed
+            return None, None
+        values = {t.var_name: t.trigger_value for t in self.oco_triggers or []}
+        first, second = self.oco_first, self.oco_second
+        x, y = values.get("x"), values.get("y")
+        if first is None or second is None or x is None or y is None or x == y:
+            return None, None
+        sides = (OcoSide(first, x), OcoSide(second, y))
+        higher, lower = (sides[0], sides[1]) if x > y else (sides[1], sides[0])
+        if self.alert_type is GttAlertType.OCO_BUY:
+            return higher, lower
+        return lower, higher
 
 
 class TriggeredGtt(Gtt):
@@ -118,6 +163,15 @@ class _GttRules(RequestModel):
     def _documented_exchange(cls, value: Exchange) -> Exchange:
         if value not in _EXCHANGES:
             raise ValueError("a GTT is offered on NSE, NFO, BSE, BFO and MCX only")
+        return value
+
+    @field_validator("ai_t", check_fields=False)
+    @classmethod
+    def _not_an_oco_code(cls, value: GttAlertType) -> GttAlertType:
+        if value in (GttAlertType.OCO_BUY, GttAlertType.OCO_SELL):
+            raise ValueError(
+                "an OCO is placed and changed with place_oco and modify_oco, not with a GTT"
+            )
         return value
 
     @field_validator("prd", check_fields=False)

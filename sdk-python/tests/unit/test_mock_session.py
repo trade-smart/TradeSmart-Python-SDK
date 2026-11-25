@@ -611,3 +611,95 @@ def test_the_mock_preflight_message_names_the_mock_session() -> None:
     assert check.refusal.startswith("mock-session preflight refused before any order")
     assert mock_session.LIMITS_ASK in check.refusal
     assert "UAT" not in check.refusal
+
+
+# -- the owner's OCO switch (design 2026-11-20 E3) ----------------------------------------------
+
+OCO = "TRADESMART_LIVE_MOCK_OCO"
+OCO_ON = {OCO: "oco in mock session 2026-11-14"}
+
+
+def test_the_oco_switch_is_on_for_the_exact_phrase_of_today() -> None:
+    assert mock_session.OCO_ENV == OCO
+    assert mock_session.oco_switch_on({**SWITCH, **OCO_ON}, SATURDAY) is True
+    assert mock_session.oco_switch_on(OCO_ON, SATURDAY) is True  # the phrase alone decides
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        pytest.param(None, id="missing"),
+        pytest.param("", id="blank"),
+        pytest.param("oco in mock session 2026-11-13", id="yesterday"),
+        pytest.param("oco in mock session 2026-11-15", id="tomorrow"),
+        pytest.param(" oco in mock session 2026-11-14", id="leading-space"),
+        pytest.param("oco in mock session 2026-11-14 ", id="trailing-space"),
+        pytest.param("oco in mock session 2026-11-14\n", id="trailing-newline"),
+        pytest.param("oco in  mock session 2026-11-14", id="inner-double-space"),
+        pytest.param("OCO in mock session 2026-11-14", id="upper-case"),
+        pytest.param("Oco In Mock Session 2026-11-14", id="title-case"),
+        pytest.param("oco in mock session 14-11-2026", id="other-date-format"),
+        pytest.param("mock session 2026-11-14", id="the-mock-phrase"),
+        pytest.param("1", id="one"),
+    ],
+)
+def test_the_oco_switch_is_never_fuzzy_matched(value: str | None) -> None:
+    """Review Focus 2: yesterday's date, extra spaces or another letter case are refused."""
+    environ = dict(SWITCH)
+    if value is not None:
+        environ[OCO] = value
+    assert mock_session.oco_switch_on(environ, SATURDAY) is False
+
+
+def test_a_mock_session_with_the_oco_switch_has_mock_oco(tmp_path: Path) -> None:
+    session = _session(_prod(), tmp_path, {**MOCK_ENV, **OCO_ON})
+    assert session.mock is True and session.mock_oco is True
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        pytest.param({}, id="missing"),
+        pytest.param({OCO: "oco in mock session 2026-11-13"}, id="yesterday"),
+        pytest.param({OCO: "oco in mock session 2026-11-14 "}, id="extra-space"),
+        pytest.param({OCO: "OCO in mock session 2026-11-14"}, id="wrong-case"),
+    ],
+)
+def test_a_mock_session_without_the_exact_oco_switch_has_no_mock_oco(
+    tmp_path: Path, extra: dict[str, str]
+) -> None:
+    session = _session(_prod(), tmp_path, {**MOCK_ENV, **extra})
+    assert session.mock is True and session.mock_oco is False
+
+
+def test_the_oco_switch_is_compared_with_the_ist_date_of_the_session(tmp_path: Path) -> None:
+    # 2026-11-13 20:00 UTC is 2026-11-14 01:30 IST: the OCO switch of 2026-11-14 is today's.
+    session = _session(
+        _prod(), tmp_path, {**MOCK_ENV, **OCO_ON}, now=datetime(2026, 11, 13, 20, 0, tzinfo=UTC)
+    )
+    assert session.mock_oco is True
+
+
+def test_a_uat_session_never_has_mock_oco_even_with_the_oco_switch(tmp_path: Path) -> None:
+    t = FakeTime()
+    env = {**MATRIX_ENV, OCO: "oco in mock session 2026-11-13"}
+    session = gate.matrix_session(
+        env, MatrixClient(), root=tmp_path,  # type: ignore[arg-type]
+        now=datetime(2026, 11, 13, 10, 0, tzinfo=IST), sleep=t.sleep, clock=t.clock,
+    )  # fmt: skip
+    assert session.uat is True and session.mock is False and session.mock_oco is False
+
+
+def test_mock_oco_outside_mock_mode_is_refused(tmp_path: Path) -> None:
+    session = _session(_prod(), tmp_path, {**MOCK_ENV, **OCO_ON})
+    with pytest.raises(Refusal, match="mock"):
+        gate.MatrixSession(
+            client=session.client,
+            run_id=session.run_id,
+            trading_day=session.trading_day,
+            run_dir=session.run_dir,
+            ledger=session.ledger,
+            guard=session.guard,
+            uat=True,
+            mock_oco=True,
+        )

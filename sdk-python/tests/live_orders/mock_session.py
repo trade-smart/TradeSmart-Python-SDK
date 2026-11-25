@@ -19,6 +19,12 @@ Each variable's value is stripped of surrounding whitespace only; nothing else i
 (case, inner spaces and other date formats refuse). The matrix gate adds the usual order opt-ins
 and the account match. The date and phrase are checked again before every state-changing call
 (``MatrixSession.mock_refusal``): a run that crosses midnight IST stops placing.
+
+AMO and GTT never run in a mock session (``NO_AMO_GTT``). OCO (owner decisions 2026-11-20
+E3-E5) runs only behind the owner's own switch on top of all of the above:
+``TRADESMART_LIVE_MOCK_OCO`` exactly ``oco in mock session YYYY-MM-DD`` with today's IST date
+(``oco_switch_on``; exact text, nothing stripped), and then only the far cases
+(``MOCK_OCO_CASES``); otherwise ``NO_OCO``.
 """
 
 from __future__ import annotations
@@ -43,6 +49,16 @@ LIMITS_ASK = "ask the RMS team to raise the mock account's limits for the sessio
 # Why the AMO and GTT families skip, and the wrappers refuse ``amo=True`` and every GTT write, in
 # mock mode: the exchanges wipe mock orders, but stored AMOs and GTTs outlive the session.
 NO_AMO_GTT = "AMO and GTT are not sent in a mock session: they are stored past it"
+# The owner's OCO switch (design 2026-11-20 E3): the OCO family runs in a mock session only when
+# ``TRADESMART_LIVE_MOCK_OCO`` is exactly this phrase with today's IST date (``oco_switch_on``).
+OCO_ENV = "TRADESMART_LIVE_MOCK_OCO"
+OCO_PHRASE = "oco in mock session {day}"
+NO_OCO = (
+    f"OCO is not sent in a mock session unless the owner's switch {OCO_ENV} is exactly "
+    "'oco in mock session <today's IST date>'"
+)
+# E5: with the switch only the far cases run (no OCO is made to fire on the production host).
+MOCK_OCO_CASES: frozenset[str] = frozenset({"oco-far-buy", "oco-far-sell", "oco-far-sl-lmt"})
 _DATE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 _WEEKEND = (5, 6)  # Saturday, Sunday (``date.weekday``)
 
@@ -113,6 +129,15 @@ def refusal(environ: Mapping[str, str], today_ist: date, base_url: str) -> str |
 def mode(environ: Mapping[str, str], today_ist: date, base_url: str) -> bool:
     """Mock mode holds: the switch is present and every check passes."""
     return requested(environ) and refusal(environ, today_ist, base_url) is None
+
+
+def oco_switch_on(environ: Mapping[str, str], today: date) -> bool:
+    """The owner's OCO switch for ``today`` (today's IST date): ``TRADESMART_LIVE_MOCK_OCO`` is
+    exactly ``oco in mock session YYYY-MM-DD`` with that date. Exact text: nothing is stripped or
+    case-folded, so a missing value, another day's date, an extra space or another letter case
+    is off (never fuzzy-matched). It opens the far OCO cases only, on top of every check of
+    ``refusal`` (``mode``), and never AMO or GTT."""
+    return environ.get(OCO_ENV) == OCO_PHRASE.format(day=today.isoformat())
 
 
 def snapshot(environ: Mapping[str, str]) -> dict[str, str]:

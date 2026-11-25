@@ -40,6 +40,7 @@ from tradesmart.errors import (
     ResponseParseError,
     TradeSmartError,
 )
+from tradesmart.models.base import WireValue
 
 T = TypeVar("T")
 _log = get_logger("transport")
@@ -142,7 +143,7 @@ def prepare_request(
     client: httpx.Client | httpx.AsyncClient,
     url: str,
     spec: EndpointSpec[Any],
-    payload: Mapping[str, str],
+    payload: Mapping[str, WireValue],
     headers: Mapping[str, str],
     timeout: httpx.Timeout,
 ) -> httpx.Request:
@@ -203,6 +204,7 @@ def finish_response(spec: EndpointSpec[T], response: httpx.Response) -> T:
                 success_stats=spec.success_stats,
                 requires_ack_id=spec.requires_ack_id,
                 stats_ignore_case=spec.stats_ignore_case,
+                failure_stats=spec.failure_stats,
             )
         except TradeSmartError as exc:
             apply_retry_after(exc, response)
@@ -224,7 +226,9 @@ def log_response(spec: EndpointSpec[Any], response: httpx.Response, ms: float) -
     _log.debug("POST %s -> HTTP %s stat=%s in %.0f ms", spec.path, response.status_code, stat, ms)
 
 
-def log_payload(config: ClientConfig, spec: EndpointSpec[Any], payload: dict[str, str]) -> None:
+def log_payload(
+    config: ClientConfig, spec: EndpointSpec[Any], payload: Mapping[str, WireValue]
+) -> None:
     if config.log_payloads:
         _log.debug("POST %s payload=%s", spec.path, redact(payload))
 

@@ -31,6 +31,7 @@ Step by step, with copy-paste code: **[Your first order in 10 minutes](getting-s
 | [Authentication](authentication.md) | The login command, the token file, `from_env()`, your own login flow in a server, token lifetime in the SDK, keeping credentials safe |
 | [Orders](orders.md) | Every order call and parameter, validation rules, the order status lifecycle, tag-based recovery, never-resend rules, rate limits, AMO, cover/bracket orders |
 | [GTT orders](gtt.md) | Good-till-triggered orders: alert types, the "fires at once" rule, validity (365 days or the contract expiry), modify with both validities, reading pending and triggered GTTs, recovery by tag |
+| [OCO orders](oco.md) | One-cancels-the-other exits: a target and a stop-loss in one order, the side rule, modify and cancel, reading OCO rows back (`is_oco`, `stop_loss`, `target`), offline testing |
 | [Account and portfolio](account.md) | Profile, funds and margins, positions (one flat `Position` per instrument and product), holdings and today's trades |
 | [Streaming](streaming.md) | `TradeSmartStream` (callbacks) and `AsyncTradeSmartStream` (`async for`), reconnects, catching up after a reconnect, message types |
 | [Market data](market-data.md) | Instrument search, the script master and when it is refreshed, quotes, candles, option chains |
@@ -45,7 +46,7 @@ Step by step, with copy-paste code: **[Your first order in 10 minutes](getting-s
 
 - [Examples](https://github.com/trade-smart/TradeSmart-Python-SDK/tree/main/sdk-python/examples):
   runnable scripts (login, first calls, a dry-run order lifecycle, market data, streams, GTT,
-  sliced orders, offline testing).
+  OCO, sliced orders, offline testing).
 - [Authentication](authentication.md), and [API access and login](../../docs/api-access.md):
   the login flow, token lifetime and security rules.
 - [Moving from another broker's SDK](migration/README.md).

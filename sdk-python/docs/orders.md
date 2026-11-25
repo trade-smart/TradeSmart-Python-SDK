@@ -21,7 +21,9 @@ An order above the exchange's freeze quantity can be sent in slices with
 `client.place_sliced_order(...)` ([Sliced orders](#sliced-orders)).
 A GTT (good till triggered) order waits on TradeSmart's server until a price or other condition
 is met and then places the order: see [GTT orders](gtt.md) (`place_gtt`, `modify_gtt`,
-`cancel_gtt`, `pending_gtts`, `triggered_gtts`, `gtt_alert_types`).
+`cancel_gtt`, `pending_gtts`, `triggered_gtts`, `gtt_alert_types`). An OCO (one cancels the other)
+is a multi-day exit with a target and a stop-loss: see [OCO orders](oco.md) (`place_oco`,
+`modify_oco`, `cancel_oco`).
 
 **An acknowledgement is not an execution.** Each call returns once TradeSmart's order system
 has *accepted the request*. Whether the order is open, filled, cancelled or rejected by the
@@ -256,9 +258,12 @@ For a running strategy prefer **live order updates** (`subscribe_orders()` on th
 ## Recovery: tag every order, never resend blindly
 
 The SDK **never retries** a `PlaceOrder`, `PlaceMultiOrder`, `ModifyOrder`, `CancelOrder`,
-`ExitSNOOrder`, GTT (`PlaceGTTOrder`, `ModifyGTTOrder`, `CancelGTTOrder`) or iceberg
+`ExitSNOOrder`, GTT (`PlaceGTTOrder`, `ModifyGTTOrder`, `CancelGTTOrder`), OCO (`PlaceOCOOrder`,
+`ModifyOCOOrder`, `CancelOCOOrder`) or iceberg
 (`PlaceIceBergOrder`, `ModifyIceBergOrder`, `CancelIceBergOrder`) request. A GTT is found again by
-its tag in `pending_gtts()` ([GTT orders](gtt.md#recovery-find-a-gtt-by-its-tag-never-resend-blindly)). When an order request may have reached TradeSmart but no definitive
+its tag in `pending_gtts()` ([GTT orders](gtt.md#recovery-find-a-gtt-by-its-tag-never-resend-blindly));
+an OCO is found in `pending_gtts()` too, by its alert id or by comparing its symbol, quantity and
+triggers ([OCO orders](oco.md)). When an order request may have reached TradeSmart but no definitive
 answer came back — a read timeout, a connection dropped after sending, a gateway error page, an
 answer that cannot be read — the call raises **`OrderStatusUnknownError`**. The order may exist.
 
@@ -483,8 +488,9 @@ returns with `result.error` set to the `RateLimitError` (never raised), as above
 
 Each order call writes one INFO line to the `tradesmart.orders` logger — for `PlaceOrder`,
 `PlaceMultiOrder`, `ModifyOrder`, `CancelOrder`, `ExitSNOOrder`, the GTT writes (`PlaceGTTOrder`,
-`ModifyGTTOrder`, `CancelGTTOrder`; the alert id as `al_id=`, and the WARNING says to check
-`pending_gtts()`) and the iceberg writes sent through `request()` only:
+`ModifyGTTOrder`, `CancelGTTOrder`) and the OCO writes (`PlaceOCOOrder`, `ModifyOCOOrder`,
+`CancelOCOOrder`) (for both, the alert id as `al_id=`, and the WARNING says to check
+`pending_gtts()`), and the iceberg writes sent through `request()` only:
 
 ```
 PlaceOrder accepted order_id=26110700000001 in 42 ms
@@ -496,7 +502,7 @@ The result is one of four words; the order id is `-` when not known:
 |---|---|
 | `accepted` | TradeSmart acknowledged the request (not a fill; check `orders()`) |
 | `rejected` | TradeSmart answered with an error (`OrderRejectedError`, `AuthenticationError`, a server 429, ...) |
-| `unknown` | The outcome is unknown (`OrderStatusUnknownError`); also one WARNING ("check orders() before acting"; for a GTT write "check pending_gtts() before acting") |
+| `unknown` | The outcome is unknown (`OrderStatusUnknownError`); also one WARNING ("check orders() before acting"; for a GTT or OCO write "check pending_gtts() before acting") |
 | `not_sent` | The request never reached TradeSmart: no or an expired token, the SDK's own rate limit, a closed client, or the connection could not be opened |
 
 The time includes any wait for the client-side rate limit. Invalid parameters

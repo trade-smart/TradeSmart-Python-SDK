@@ -138,6 +138,10 @@ order would be placed (with `Order.parent_id` = the alert id), moves the GTT to
 `triggered_gtts()` and returns the new order id. Drills work on the GTT endpoints too, e.g.
 `broker.fail_next("PlaceGTTOrder", drills.timeout_after_send())`. See [GTT orders](gtt.md).
 
+OCOs work too: `place_oco()`, `modify_oco()` and `cancel_oco()` change `pending_gtts()`, and a cancelled
+OCO is listed by `triggered_gtts()` as `CANCELLED`. **The offline broker does not simulate OCO triggering**:
+`broker.trigger_gtt()` on an OCO raises `ValueError`. See [OCO orders](oco.md).
+
 *Illustrative:*
 
 ```python

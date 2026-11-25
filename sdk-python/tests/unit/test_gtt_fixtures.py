@@ -37,7 +37,7 @@ from tradesmart.models import base
     [
         ("place_gtt_success", PLACE_GTT_ORDER, "Oi created"),
         ("modify_gtt_success", MODIFY_GTT_ORDER, "Oi replaced"),
-        ("cancel_gtt_success", CANCEL_GTT_ORDER, "Oi delete success"),
+        ("cancel_gtt_success", CANCEL_GTT_ORDER, "OI deleted"),
     ],
 )
 def test_gtt_ack_fixture_is_a_success(name: str, spec: object, word: str) -> None:
@@ -59,8 +59,8 @@ def test_gtt_ack_fixture_is_a_success(name: str, spec: object, word: str) -> Non
 
 def test_pending_gtts_fixture_parses() -> None:
     rows = GET_PENDING_GTT_ORDER.parse(fixture("pending_gtts_success"))
-    assert len(rows) == 2
-    first, second = rows
+    assert len(rows) == 4
+    first, second, *_oco = rows
     assert first.alert_id == "26111200000010"
     assert first.alert_type is GttAlertType.LTP_BELOW
     assert first.trigger_value == Decimal("1500.00")
@@ -78,7 +78,7 @@ def test_pending_gtts_fixture_parses() -> None:
 
 
 def test_triggered_gtts_fixture_parses() -> None:
-    (row,) = GET_TRG_OI.parse(fixture("triggered_gtts_success"))
+    row, *_rest = GET_TRG_OI.parse(fixture("triggered_gtts_success"))
     assert row.alert_id == "26111200000010"
     assert row.norentm == datetime(2026, 11, 13, 10, 41, 27, tzinfo=base.IST)
     assert (row.sms_flag, row.email_flag, row.push_flag) == ("0", "0", "0")

@@ -406,6 +406,62 @@
         "rate": 0.065
       },
       "name": "nfo_same_expiry_future_dividend_yield_has_no_effect"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "function": "carry_adjusted_forward",
+        "future_price": 24200.0,
+        "future_years": 0.2,
+        "option_years": 0.1,
+        "rate": -1000000.0
+      },
+      "name": "error_rate_overflowing_the_carry_factor"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "dividend_yield": 1000000.0,
+        "function": "carry_adjusted_forward",
+        "future_price": 24200.0,
+        "future_years": 0.2,
+        "option_years": 0.1,
+        "rate": 0.065
+      },
+      "name": "error_dividend_yield_overflowing_the_carry_factor"
+    },
+    {
+      "expected": {
+        "forward": 0.0
+      },
+      "input": {
+        "function": "carry_adjusted_forward",
+        "future_price": 24200.0,
+        "future_years": 0.2,
+        "option_years": 0.1,
+        "rate": 1000000.0
+      },
+      "name": "huge_rate_underflowing_the_carry_factor_gives_zero"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "exchange": "NFO",
+        "expiry_time": null,
+        "function": "option_forward",
+        "future_expiry": "2026-12-31",
+        "future_price": 24200.0,
+        "now": "2026-11-12T10:00:00+05:30",
+        "option_expiry": "2026-11-26",
+        "rate": -1000000.0
+      },
+      "name": "nfo_rate_overflowing_the_carry_factor_is_an_error"
     }
   ],
   "description": "input.function is carry_adjusted_forward (expected {\"forward\"}: F * exp(-(r - q) * (Tf - To))) or option_forward (the Black-76 forward used by option_greeks for a future of another expiry: carried on NFO/BFO/CDS/BCD, used as is on MCX or for a same-expiry future, whatever q). q is the optional input.dividend_yield (absent means 0): the index dividend yield, or the foreign interest rate for currency options. now is an ISO instant in IST.",

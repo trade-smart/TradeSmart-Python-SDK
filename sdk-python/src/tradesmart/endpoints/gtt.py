@@ -14,7 +14,12 @@ import logging
 from collections.abc import Callable
 from typing import Any
 
-from tradesmart._client_core import ACK_ID_FIELDS, SUCCESS_STATS, SUCCESS_STATS_IGNORE_CASE
+from tradesmart._client_core import (
+    ACK_ID_FIELDS,
+    FAILURE_STATS,
+    SUCCESS_STATS,
+    SUCCESS_STATS_IGNORE_CASE,
+)
 from tradesmart._logging import redact
 from tradesmart.endpoints.base import Call, EndpointSpec, parse_list
 from tradesmart.enums import (
@@ -61,7 +66,8 @@ def _alert_id(endpoint: str) -> Callable[[Any], str]:
     return _parse
 
 
-def _write(name: str) -> EndpointSpec[str]:
+def alert_write_spec(name: str) -> EndpointSpec[str]:
+    """The spec of a GTT or OCO write: the alert id is the result (``al_id``)."""
     return EndpointSpec(
         name=name,
         parse=_alert_id(name),
@@ -69,14 +75,15 @@ def _write(name: str) -> EndpointSpec[str]:
         success_stats=SUCCESS_STATS[name],
         requires_ack_id=ACK_ID_FIELDS[name],
         stats_ignore_case=name in SUCCESS_STATS_IGNORE_CASE,
+        failure_stats=FAILURE_STATS.get(name, frozenset()),
     )
 
 
 # State-changing endpoints: never retried (an ambiguous outcome raises
 # ``OrderStatusUnknownError``). Do not add retries to these specs.
-PLACE_GTT_ORDER: EndpointSpec[str] = _write("PlaceGTTOrder")
-MODIFY_GTT_ORDER: EndpointSpec[str] = _write("ModifyGTTOrder")
-CANCEL_GTT_ORDER: EndpointSpec[str] = _write("CancelGTTOrder")
+PLACE_GTT_ORDER: EndpointSpec[str] = alert_write_spec("PlaceGTTOrder")
+MODIFY_GTT_ORDER: EndpointSpec[str] = alert_write_spec("ModifyGTTOrder")
+CANCEL_GTT_ORDER: EndpointSpec[str] = alert_write_spec("CancelGTTOrder")
 
 GET_PENDING_GTT_ORDER: EndpointSpec[list[Gtt]] = EndpointSpec(
     name="GetPendingGTTOrder",

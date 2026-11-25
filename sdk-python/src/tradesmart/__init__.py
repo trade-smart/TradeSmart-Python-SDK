@@ -39,6 +39,8 @@ from tradesmart.errors import (
 )
 from tradesmart.greeks import OptionGreeks
 from tradesmart.models.gtt import Gtt, TriggeredGtt
+from tradesmart.models.oco import OcoLeg
+from tradesmart.models.oco_rows import OcoLegRow, OcoSide, OcoTrigger
 from tradesmart.models.stream import (
     ConnectAck,
     DepthAck,
@@ -77,6 +79,10 @@ __all__ = [
     "NotFoundError",
     "OptionChainSnapshot",
     "OptionGreeks",
+    "OcoLeg",
+    "OcoLegRow",
+    "OcoSide",
+    "OcoTrigger",
     "OrderRejectedError",
     "OrderStatus",
     "OrderStatusUnknownError",

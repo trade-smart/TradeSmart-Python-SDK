@@ -1,0 +1,2281 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_buy_limit_limit"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_SOB_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1170"
+            },
+            {
+              "var_name": "y",
+              "d": "1430"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "S",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "S",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1420",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1420",
+            "trigger_value": "1430"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "SELL",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_sell_limit_limit"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_defaults_validity_day_alert_validity_gtt_order_type_limit"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "DAY",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "EOS",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "EOS",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "DAY",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "EOS"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_alert_validity_day_and_validity_eos"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "IOC",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "IOC",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "IOC"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_validity_ioc"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_SOB_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1170"
+            },
+            {
+              "var_name": "y",
+              "d": "1430"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "S",
+            "prctyp": "SL-LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1155",
+            "ordersource": "API",
+            "trgprc": "1160"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "S",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1420",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "SL-LMT",
+            "price": "1155",
+            "trigger_price": "1160",
+            "trigger_value": "1170"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1420",
+            "trigger_value": "1430"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "SELL",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_sell_stop_loss_limit_leg_with_trigger_price"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "SL-MKT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "0",
+            "ordersource": "API",
+            "trgprc": "1435"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "SL-MKT",
+            "trigger_price": "1435",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_buy_stop_loss_market_leg_price_defaults_to_0"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_SOB_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1170"
+            },
+            {
+              "var_name": "y",
+              "d": "1430"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "S",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "S",
+            "prctyp": "MKT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "0",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "target": {
+            "order_type": "MARKET",
+            "trigger_value": "1430"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "SELL",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_sell_market_target_leg_price_defaults_to_0"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "MKT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "0",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "MKT",
+            "price": "0",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_market_leg_explicit_price_0"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API",
+            "remarks": "exit plan"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API",
+            "remarks": "exit plan"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "tag": "exit plan",
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_tag_goes_to_both_legs"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API",
+            "remarks": "a&b+c%d"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API",
+            "remarks": "a&b+c%d"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "tag": "a&b+c%d",
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_tag_is_encoded_as_given"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430.50"
+            },
+            {
+              "var_name": "y",
+              "d": "1169.123"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440.05",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440.05",
+            "trigger_value": "1430.50"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1169.123"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_trigger_values_are_sent_as_given"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430.5"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160.25",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": 1440,
+            "trigger_value": 1430.5
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": 1160.25,
+            "trigger_value": 1170
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_json_number_trigger_values_and_prices"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "nse",
+          "product": "cnc",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "lmt",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LMT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "buy",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_words_any_case_and_wire_codes"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "NIFTY25NOV26FUT",
+          "exch": "NFO",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "NIFTY25NOV26FUT",
+            "exch": "NFO",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "M",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "NIFTY25NOV26FUT",
+            "exch": "NFO",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "M",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NFO",
+          "product": "NRML",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "NIFTY25NOV26FUT",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_nrml_on_nfo"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "H",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "H",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CO",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_cover_order_product"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "SENSEX25NOV26FUT",
+          "exch": "BFO",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "SENSEX25NOV26FUT",
+            "exch": "BFO",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "M",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "SENSEX25NOV26FUT",
+            "exch": "BFO",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "M",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "BFO",
+          "product": "M",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "SENSEX25NOV26FUT",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_bfo"
+    },
+    {
+      "expected": {
+        "endpoint": "PlaceOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "tsym": "CRUDEOIL",
+          "exch": "MCX",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "CRUDEOIL",
+            "exch": "MCX",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "M",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "200",
+            "prc": "1440",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "CRUDEOIL",
+            "exch": "MCX",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "M",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "200",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "MCX",
+          "product": "NRML",
+          "quantity": 200,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "CRUDEOIL",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "place_mcx_quantity_in_trade_units"
+    },
+    {
+      "expected": {
+        "endpoint": "ModifyOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "al_id": "26111800000001",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1430"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1440",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "alert_id": "26111800000001",
+        "method": "modify_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "modify_al_id_second_after_uid"
+    },
+    {
+      "expected": {
+        "endpoint": "ModifyOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "al_id": "26111800000001",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "GTT",
+          "ai_t": "LMT_SOB_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1170"
+            },
+            {
+              "var_name": "y",
+              "d": "1430"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "S",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API",
+            "remarks": "exit plan"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "S",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1420",
+            "ordersource": "API",
+            "remarks": "exit plan"
+          }
+        }
+      },
+      "input": {
+        "alert_id": "26111800000001",
+        "method": "modify_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tag": "exit plan",
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1420",
+            "trigger_value": "1430"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "SELL",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "modify_sell_with_tag_and_new_triggers"
+    },
+    {
+      "expected": {
+        "endpoint": "ModifyOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "al_id": "26111800000001",
+          "tsym": "RELIANCE-EQ",
+          "exch": "NSE",
+          "validity": "DAY",
+          "ai_t": "LMT_BOS_O",
+          "oivariable": [
+            {
+              "var_name": "x",
+              "d": "1425"
+            },
+            {
+              "var_name": "y",
+              "d": "1170"
+            }
+          ],
+          "place_order_params": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1435",
+            "ordersource": "API"
+          },
+          "place_order_params_leg2": {
+            "tsym": "RELIANCE-EQ",
+            "exch": "NSE",
+            "trantype": "B",
+            "prctyp": "LMT",
+            "prd": "C",
+            "ret": "DAY",
+            "actid": "TESTUID",
+            "uid": "TESTUID",
+            "qty": "1",
+            "prc": "1160",
+            "ordersource": "API"
+          }
+        }
+      },
+      "input": {
+        "alert_id": "26111800000001",
+        "method": "modify_oco",
+        "params": {
+          "alert_validity": "DAY",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1435",
+            "trigger_value": "1425"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "modify_sends_the_whole_oco_with_validities"
+    },
+    {
+      "expected": {
+        "endpoint": "CancelOCOOrder",
+        "payload": {
+          "uid": "TESTUID",
+          "al_id": "26111800000001"
+        }
+      },
+      "input": {
+        "alert_id": "26111800000001",
+        "method": "cancel_oco",
+        "params": {},
+        "uid": "TESTUID"
+      },
+      "name": "cancel_uid_then_al_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "oivariable"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "target": {
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_buy_stop_loss_below_target"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "oivariable"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "price": "1290",
+            "trigger_value": "1300"
+          },
+          "target": {
+            "price": "1310",
+            "trigger_value": "1300"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_buy_stop_loss_equals_target"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "oivariable"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "price": "1420",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "SELL",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_sell_stop_loss_above_target"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "oivariable"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "price": "1290",
+            "trigger_value": "1300"
+          },
+          "target": {
+            "price": "1310",
+            "trigger_value": "1300"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "SELL",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_sell_stop_loss_equals_target"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "oivariable"
+        ]
+      },
+      "input": {
+        "alert_id": "26111800000001",
+        "method": "modify_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "target": {
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_modify_buy_stop_loss_below_target"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "prd"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "MIS",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_mis_product"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "prd"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "BO",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_bracket_product"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "exch"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NCDEX",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_exchange_outside_the_alert_exchanges"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "exch"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "CDS",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_exchange_cds"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "qty"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 0,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_zero_quantity"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "qty"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": true,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_boolean_quantity"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "oivariable",
+          0,
+          "d"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "price": "1440",
+            "trigger_value": "0"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_zero_stop_loss_trigger_value"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "oivariable",
+          1,
+          "d"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "price": "1160",
+            "trigger_value": "-1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_negative_target_trigger_value"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "oivariable",
+          0,
+          "d"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "price": "1440",
+            "trigger_value": "nan"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_nan_trigger_value"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "oivariable",
+          0,
+          "d"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "price": "1440",
+            "trigger_value": true
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_boolean_trigger_value"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "oivariable",
+          1,
+          "d"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "price": "1160",
+            "trigger_value": "abc"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_text_trigger_value"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "place_order_params",
+          "trgprc"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "SL-LMT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_stop_loss_limit_leg_without_trigger_price"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "place_order_params_leg2",
+          "trgprc"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "price": "1160",
+            "trigger_price": "1165",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_trigger_price_on_a_limit_leg"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "place_order_params_leg2",
+          "prc"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_limit_leg_without_price"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "place_order_params",
+          "prc"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_limit_stop_loss_leg_without_price"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "al_id"
+        ]
+      },
+      "input": {
+        "alert_id": " ",
+        "method": "modify_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "LIMIT",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_modify_blank_alert_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "al_id"
+        ]
+      },
+      "input": {
+        "alert_id": "",
+        "method": "cancel_oco",
+        "params": {},
+        "uid": "TESTUID"
+      },
+      "name": "error_cancel_blank_alert_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "al_id"
+        ]
+      },
+      "input": {
+        "alert_id": 26111800000001,
+        "method": "cancel_oco",
+        "params": {},
+        "uid": "TESTUID"
+      },
+      "name": "error_cancel_integer_alert_id"
+    },
+    {
+      "expected": {
+        "error": "RequestValidationError",
+        "loc": [
+          "place_order_params",
+          "prctyp"
+        ]
+      },
+      "input": {
+        "method": "place_oco",
+        "params": {
+          "alert_validity": "GTT",
+          "exchange": "NSE",
+          "product": "CNC",
+          "quantity": 1,
+          "stop_loss": {
+            "order_type": "STOP",
+            "price": "1440",
+            "trigger_value": "1430"
+          },
+          "target": {
+            "order_type": "LIMIT",
+            "price": "1160",
+            "trigger_value": "1170"
+          },
+          "tradingsymbol": "RELIANCE-EQ",
+          "transaction_type": "BUY",
+          "validity": "DAY"
+        },
+        "uid": "TESTUID"
+      },
+      "name": "error_place_unknown_order_type"
+    }
+  ],
+  "description": "OCO calls (uid TESTUID): input.method is place_oco, modify_oco or cancel_oco, input.uid the user id, input.alert_id the alert id (modify_oco and cancel_oco), input.params the other arguments in the Python names: exchange, tradingsymbol, transaction_type, quantity, product, stop_loss and target (each a leg object {trigger_value, price, order_type, trigger_price}; absent optional keys are omitted, order_type defaults to LIMIT), tag, validity (the leg retention, default DAY) and alert_validity (DAY or GTT, default GTT; both required on modify_oco). expected is {endpoint, payload}: payload is the exact request body as a nested object whose KEY ORDER IS PART OF THE CONTRACT (this file is written unsorted; compare the encoded text, not the parsed object). PlaceOCOOrder: uid, tsym, exch, validity (the alert_validity), ai_t (LMT_BOS_O for BUY, LMT_SOB_O for SELL), oivariable (a list of two objects, {var_name: x, d: stop-loss trigger} then {var_name: y, d: target trigger}), place_order_params (the stop-loss leg), place_order_params_leg2 (the target leg). ModifyOCOOrder: the same with al_id second, after uid. CancelOCOOrder: uid, al_id. A leg: tsym, exch, trantype (B or S, the OCO's side), prctyp (LMT, MKT, SL-LMT, SL-MKT), prd (C, M, H), ret (the validity), actid and uid (both the user id), qty, prc, ordersource (API), then trgprc and remarks (the tag) when given; there is no top-level actid, remarks, dscqty or algo_id. Every number is a string, sent as given (trigger values and prices keep their digits); a MARKET or SL-MKT leg without a price sends prc '0'. An error case is {error: RequestValidationError, loc: [...]}, the path of the one error in wire names (an array index is a JSON number): a field of one leg is under its leg key (place_order_params for the stop-loss leg, place_order_params_leg2 for the target leg: prc, trgprc, prctyp), a trigger value under oivariable and its index (0 stop-loss, 1 target) then d, a field both legs share under its bare wire key (exch, prd, qty, trantype, al_id), and the side rule (BUY: the stop-loss trigger must be above the target trigger, SELL: below it, equal refused; checked only when both triggers are valid numbers) under oivariable. Exchanges NSE, NFO, BSE, BFO, MCX; products CNC, NRML, CO (MIS and BO refused).",
+  "source": "tradesmart.endpoints.oco.place_oco_call / modify_oco_call / cancel_oco_call",
+  "tolerance": {}
+}

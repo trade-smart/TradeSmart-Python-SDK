@@ -152,9 +152,11 @@ gtt_orders = [o for o in client.orders() if o.parent_id in fired]
 ## Recovery: find a GTT by its tag, never resend blindly
 
 The GTT writes are order calls: the SDK **never retries** `PlaceGTTOrder`, `ModifyGTTOrder` or
-`CancelGTTOrder`. Success is only the documented answer (`Oi created`, `Oi replaced`,
-`Oi delete success`, each with a non-blank alert id and an `emsg` that is missing, `null` or blank); a definite error
+`CancelGTTOrder`. Success is only the expected answer (`Oi created`, `Oi replaced`,
+`OI deleted`, each with a non-blank alert id and an `emsg` that is missing, `null` or blank); a definite error
 raises `OrderRejectedError` (or `AuthenticationError` / `RateLimitError` / `NotFoundError`).
+`Invalid Oi` (observed for an alert that no longer exists, an already cancelled one) on a modify
+or a cancel is a definite refusal and also raises `OrderRejectedError`.
 When the request may have reached TradeSmart but no clear answer came back, the call raises
 **`OrderStatusUnknownError`**, and the WARNING on the `tradesmart.orders` logger says to check
 `pending_gtts()`. The GTT may exist.
@@ -162,8 +164,10 @@ When the request may have reached TradeSmart but no clear answer came back, the 
 **Letter case.** The words are compared ignoring letter case only: TradeSmart's test environment
 answers `OI created`, which is accepted. Nothing else is relaxed: extra or missing spaces, or a
 different word, is `OrderStatusUnknownError`. The test environment answers a cancel with
-`OI deleted`, a different word from the documented `Oi delete success`, so a cancel there raises
-`OrderStatusUnknownError`: confirm with `pending_gtts()` that the GTT is gone.
+`OI deleted`: that is the cancel word the SDK accepts (TradeSmart's server answers it). The
+word printed in the API documentation, `Oi delete success`, is no longer accepted: a cancel
+answered with it raises `OrderStatusUnknownError`, so confirm with `pending_gtts()` that the GTT
+is gone.
 
 *Illustrative — places a real GTT:*
 
@@ -209,11 +213,13 @@ your test calls `broker.trigger_gtt(alert_id)` (its order is placed with `parent
 [Testing your strategy offline](testing.md) and the runnable
 [`examples/gtt_alert.py`](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/examples/gtt_alert.py)
 (place, list, modify, fire; an unknown outcome found by its tag; a GTT refused because it would
-fire at once).
+fire at once). OCOs work offline too, see [OCO orders](oco.md).
 
 ## Not available
 
-- **OCO (one-cancels-other) GTTs**: TradeSmart supports them, but their request fields and
-  replies are not documented yet, so the SDK has no method for them.
+- **OCO (one-cancels-other) orders** are not GTTs to the SDK's methods: place, modify and cancel
+  them with `place_oco`, `modify_oco` and `cancel_oco` ([OCO orders](oco.md)). `modify_gtt` and
+  `cancel_gtt` are not for OCOs. An OCO is listed by `pending_gtts()` like a GTT row
+  (`Gtt.is_oco`).
 - **Iceberg orders**: the SDK does not offer iceberg orders; `request()` can reach them (never
   retried). To send a large order in pieces, use [`place_sliced_order`](orders.md#sliced-orders).

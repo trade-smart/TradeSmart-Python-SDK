@@ -43,7 +43,7 @@ with TradeSmart.from_env() as client:  # uses the saved login
 
 - **[Your first order in 10 minutes](sdk-python/docs/getting-started.md)**: API access, login, and a
   first order placed, checked, modified and cancelled.
-- [User guide](sdk-python/docs/README.md): orders, GTT orders, streaming, market data, option Greeks,
+- [User guide](sdk-python/docs/README.md): orders, GTT and OCO orders, streaming, market data, option Greeks,
   offline testing, configuration.
 - [Reference](sdk-python/docs/reference.md): every method, model, enum and error.
 - [Troubleshooting](sdk-python/docs/troubleshooting.md) and [examples](sdk-python/examples/).

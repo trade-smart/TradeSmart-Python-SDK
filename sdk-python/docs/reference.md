@@ -173,11 +173,12 @@ open, filled, cancelled or rejected by the exchange must be confirmed with `orde
 
 **Never blindly retry an order.** State-changing calls (`PlaceOrder`, `PlaceMultiOrder`,
 `ModifyOrder`, `CancelOrder`, `ExitSNOOrder`, `GenAcsTok`, the GTT writes `PlaceGTTOrder`,
-`ModifyGTTOrder`, `CancelGTTOrder`, and the iceberg writes `PlaceIceBergOrder`,
+`ModifyGTTOrder`, `CancelGTTOrder`, the OCO writes `PlaceOCOOrder`, `ModifyOCOOrder`,
+`CancelOCOOrder`, and the iceberg writes `PlaceIceBergOrder`,
 `ModifyIceBergOrder`, `CancelIceBergOrder`) are **never retried** by the SDK — also not
-through the low-level `request()`, whatever `state_changing` says. The GTT and iceberg writes
-succeed only on their documented `stat` word (`Oi created`, `Oi replaced`,
-`Oi delete success`, compared ignoring letter case only, with a non-blank alert id and an `emsg` that is missing, `null` or blank; iceberg `true`, exact); any other answer is
+through the low-level `request()`, whatever `state_changing` says. The GTT, OCO and iceberg writes
+succeed only on their expected `stat` word (`Oi created`, `Oi replaced`,
+`OI deleted` for a GTT cancel; the OCO writes `OI created`, `OI replaced`, `OI deleted`; compared ignoring letter case only, with a non-blank alert id and an `emsg` that is missing, `null` or blank; iceberg `true`, exact; the documented GTT cancel word `Oi delete success` is no longer accepted); any other answer is
 `OrderStatusUnknownError` (see [GTT orders](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/gtt.md)). If the request may have
 reached the server but no definitive answer arrived (read timeout, connection dropped after
 sending, protocol or decoding error, or a response that is not a JSON `stat` answer — e.g. a
@@ -367,11 +368,15 @@ rows = instruments.load(path)  # parse a downloaded file yourself
   returned with one WARNING per failed re-check, and the server is asked again at most once per
   `script_master_recheck_minutes`; a first or `force=True` download still raises. The rows are
   re-parsed on every call. `download_instruments(exchange, dest_dir=None, *, force=False)` only
-  downloads and returns the `pathlib.Path`. The column layout is undocumented, so parsing is
-  purely header-driven (first non-blank row; delimiter detected among `,` `|` tab `;`).
+  downloads and returns the `pathlib.Path` (into `dest_dir`, `~` expanded, else
+  `ClientConfig.instruments_dir`); it does not parse the file. The column layout is undocumented,
+  so parsing is purely header-driven (first non-blank row; delimiter detected among `,` `|` tab `;`).
   Script-master errors: HTTP 401/403 → `AuthenticationError`, 404 → `NotFoundError`, 429 →
-  `RateLimitError`, 5xx → `ServerError`, other ≥ 400 → `APIError`; not a zip / no `.txt` member
-  → `ResponseParseError`; network failures → `NetworkError` / `RequestTimeoutError`. An unknown
+  `RateLimitError`, 5xx → `ServerError`, other ≥ 400 → `APIError`; a redirect (never followed) or
+  another non-200 success status, not a zip / no `.txt` member → `ResponseParseError`; a file that
+  is not valid UTF-8 text or not valid CSV (a NUL byte, an oversized field) →
+  `ResponseParseError` from `instruments()` and `instruments.load()` (delete the file and call
+  again); network failures → `NetworkError` / `RequestTimeoutError`. An unknown
   exchange raises `ValueError` before a URL or path is built. Downloads are not retried or
   rate-limited.
 
@@ -481,13 +486,14 @@ TradeSmartError
 | `RateLimitError` | HTTP 429; the client-side limiter in `"raise"` mode; or, in `"wait"` mode, an order that would wait longer than `order_rate_limit_max_wait` (nothing sent). | as `APIError` + `retry_after` (seconds or `None`) |
 | `NotFoundError` | HTTP 404 that is not a "no data" result (and script-master 404). | as `APIError` |
 | `ServerError` | HTTP 5xx on read endpoints (including non-JSON gateway pages and a JSON `stat: Not_Ok`). On state-changing endpoints a JSON `Not_Ok` on 5xx is `OrderRejectedError` and a non-JSON 5xx is `OrderStatusUnknownError`. | as `APIError` |
-| `OrderRejectedError` | `stat: Not_Ok` from `PlaceOrder` / `ModifyOrder` / `CancelOrder` / `ExitSNOOrder` / `PlaceGTTOrder` / `ModifyGTTOrder` / `CancelGTTOrder` (and `PlaceMultiOrder` through `request()`; an iceberg write answering `false` through `request()`) (e.g. `Rejected : ...`), also on HTTP 5xx (`http_status` set), unless it is an authentication, rate-limit or 404 error. | as `APIError` |
+| `OrderRejectedError` | `stat: Not_Ok` from `PlaceOrder` / `ModifyOrder` / `CancelOrder` / `ExitSNOOrder` / `PlaceGTTOrder` / `ModifyGTTOrder` / `CancelGTTOrder` / `PlaceOCOOrder` / `ModifyOCOOrder` / `CancelOCOOrder` (also `Invalid Oi` on a GTT or OCO modify or cancel) (and `PlaceMultiOrder` through `request()`; an iceberg write answering `false` through `request()`) (e.g. `Rejected : ...`), also on HTTP 5xx (`http_status` set), unless it is an authentication, rate-limit or 404 error. | as `APIError` |
 | `ResponseParseError` | On read endpoints: body is not JSON (and status is not 401/403/429/5xx) or has an unexpected shape; on any read endpoint: a value fails model validation. (State-changing endpoints raise `OrderStatusUnknownError` for unexpected bodies; `GenAcsTok` raises `AuthenticationError`.) | `message`, `endpoint`, `http_status`, `body` (first 2,000 chars, secrets masked) |
 
 Outside the hierarchy: `instruments()` / `download_instruments()` raise `ValueError` for an unknown exchange; the
 low-level `request()` raises `TypeError` for an unsupported payload value; `option_greeks()` and
 the `tradesmart.greeks` functions raise `ValueError` for an unknown option, a missing underlying
-future or a value that is not a finite number (see the Greeks guide); `TradeSmartStream` raises
+future, a value that is not a finite number, or a `rate` / `dividend_yield` so extreme that a
+discount or carry factor overflows a float (see the Greeks guide); `TradeSmartStream` raises
 `TypeError` at construction for an `async def` callback.
 
 **How responses are classified:** the body is always
@@ -570,8 +576,9 @@ logging.getLogger("tradesmart").setLevel(logging.DEBUG)  # per-request lines
   `ClientConfig(log_payloads=True)`, and then redacted. Stream state changes.
 - INFO (`tradesmart.orders`): one line per order call (`PlaceOrder`, `PlaceMultiOrder`,
   `ModifyOrder`, `CancelOrder`, `ExitSNOOrder`, the GTT writes `PlaceGTTOrder`, `ModifyGTTOrder`,
-  `CancelGTTOrder`, and the iceberg writes through `request()`; a GTT line carries the alert id
-  as `al_id=` instead of `order_id=`):
+  `CancelGTTOrder`, the OCO writes `PlaceOCOOrder`, `ModifyOCOOrder`, `CancelOCOOrder`, and the
+  iceberg writes through `request()`; a GTT or OCO line carries the alert id as `al_id=` instead
+  of `order_id=`):
   `PlaceOrder accepted order_id=26110700000001 in 42 ms` — the result is `accepted`, `rejected`
   (the server answered with an error), `unknown` (`OrderStatusUnknownError`) or `not_sent` (never
   reached the server: no or an expired token, the client-side rate limit, a closed client, or a
@@ -580,7 +587,7 @@ logging.getLogger("tradesmart").setLevel(logging.DEBUG)  # per-request lines
   prices or tokens. Only these order endpoints get the line: a low-level
   `request(..., state_changing=True)` to any other endpoint is never retried but logs no outcome.
 - WARNING (`tradesmart.orders`): every `OrderStatusUnknownError` (once per call: "check
-  orders() before acting"; for a GTT write "check pending_gtts() before acting"), and an async order call whose task was cancelled (e.g. by
+  orders() before acting"; for a GTT or OCO write "check pending_gtts() before acting"), and an async order call whose task was cancelled (e.g. by
   `asyncio.wait_for`) after the request may already have been sent ("<endpoint>: outcome
   unknown - check orders()"; the cancellation is re-raised unchanged).
 - WARNING: a cached script master used after a failed re-check (once per re-check, not per
@@ -622,7 +629,7 @@ logging.getLogger("tradesmart").setLevel(logging.DEBUG)  # per-request lines
 | `order_rate_limit_per_second` | `10` | Orders per second the client sends (integer 1 to 30). Most TradeSmart accounts are limited to 10; a higher rate needs an exchange-approved strategy and its algo ID, so a value above 10 requires `algo_id` (else `ConfigurationError`). |
 | `order_rate_limit_per_minute` | `200` | PlaceOrder calls per rolling 60 seconds (integer 1 to 600, at least `order_rate_limit_per_second`). TradeSmart documents 600, but production refused an order once 200 had been received in the current minute, so the default is 200. A call that would wait longer than `order_rate_limit_max_wait` for this window raises `RateLimitError` and sends nothing. |
 | `algo_id` | `None` | Exchange-approved algo ID, sent as `algo_id` on every `PlaceOrder` and `ModifyOrder` (so on every `place_sliced_order` slice); the per-call `algo_id=` of `place_order`, `modify_order` and `place_sliced_order` overrides it. TradeSmart requires it for more than 10 orders per second. A non-blank string or `None`. Not sent on any other endpoint. |
-| `user_agent` | `"tradesmart-python/2.0.0"` | `User-Agent` for REST, script-master and WebSocket requests. The SDK token `tradesmart-python/<version>` is always sent: a value without it is sent as `"<your value> tradesmart-python/<version>"`. Printable ASCII only: control characters (CR, LF, tab, ...) and non-ASCII text are rejected with `ConfigurationError`. |
+| `user_agent` | `"tradesmart-python/2.1.0"` | `User-Agent` for REST, script-master and WebSocket requests. The SDK token `tradesmart-python/<version>` is always sent: a value without it is sent as `"<your value> tradesmart-python/<version>"`. Printable ASCII only: control characters (CR, LF, tab, ...) and non-ASCII text are rejected with `ConfigurationError`. |
 | `log_payloads` | `False` | Log (redacted) request payloads at DEBUG. |
 | `check_token_expiry` | `True` | Raise `AuthenticationError` locally when the held `AccessToken` has passed `expires_at` (TradeSmart's 06:00 IST rule). `False` lets the server decide. |
 | `heartbeat_interval` | `30.0` | Seconds between stream heartbeats; `2×` this is the dead-socket timeout and the "stable connection" time. |
@@ -707,6 +714,9 @@ the enum member, the common word (any case) or TradeSmart's code (`TransactionTy
 | `TradeSmart.place_gtt(*, exchange, tradingsymbol, alert_type, trigger_value, quantity, transaction_type, product, order_type, tag, price=None, trigger_price=None, validity=Validity.DAY, alert_validity=GttValidity.GTT, disclosed_quantity=None)` | `PlaceGTTOrder` (**state-changing**, never retried; a GTT whose condition is already true fires at once; products CNC, NRML, CO; `tag` required; `alert_validity=GTT` lasts at most 365 days or the contract expiry, whichever is earlier; guide `docs/gtt.md`) | alert id `str` (`al_id`) |
 | `TradeSmart.modify_gtt(alert_id, *, exchange, tradingsymbol, alert_type, trigger_value, quantity, transaction_type, product, order_type, tag, price=None, trigger_price=None, validity, alert_validity, disclosed_quantity=None)` | `ModifyGTTOrder` (**state-changing**; every field sent again; `validity` and `alert_validity` required, no defaults; a modify that makes the condition true fires at once) | the server's alert id `str` (may differ from `alert_id`) |
 | `TradeSmart.cancel_gtt(alert_id)` | `CancelGTTOrder` (**state-changing**) | the server's alert id `str` (may differ from `alert_id`) |
+| `TradeSmart.place_oco(*, exchange, tradingsymbol, transaction_type, quantity, product, stop_loss, target, tag=None, validity=Validity.DAY, alert_validity=GttValidity.GTT)` | `PlaceOCOOrder` (**state-changing**, never retried; `stop_loss` and `target` are an `OcoLeg` each; a BUY OCO needs the stop-loss trigger above the target trigger, a SELL OCO below it; a trigger already crossed may fire at once; products CNC, NRML, CO; guide `docs/oco.md`) | alert id `str` (`al_id`) |
+| `TradeSmart.modify_oco(alert_id, *, exchange, tradingsymbol, transaction_type, quantity, product, stop_loss, target, tag=None, validity, alert_validity)` | `ModifyOCOOrder` (**state-changing**; everything sent again; `validity` and `alert_validity` required, no defaults; `Invalid Oi` raises `OrderRejectedError`) | the server's alert id `str` (may differ from `alert_id`) |
+| `TradeSmart.cancel_oco(alert_id)` | `CancelOCOOrder` (**state-changing**; `Invalid Oi` raises `OrderRejectedError`) | the server's alert id `str` (may differ from `alert_id`) |
 | `TradeSmart.pending_gtts()` | `GetPendingGTTOrder` | `list[Gtt]` |
 | `TradeSmart.triggered_gtts()` | `GetTrgOi` | `list[TriggeredGtt]` |
 | `TradeSmart.gtt_alert_types()` | `GetEnabledGTTs` | `list[str]` (alert families, e.g. `["ATP", "LTP"]`) |
@@ -742,6 +752,7 @@ other method is a coroutine:
 `AsyncTradeSmart.cancel_order()`, `AsyncTradeSmart.exit_order()`, `AsyncTradeSmart.orders()`,
 `AsyncTradeSmart.order_history()`, `AsyncTradeSmart.trades()`, `AsyncTradeSmart.order_margin()`,
 `AsyncTradeSmart.place_gtt()`, `AsyncTradeSmart.modify_gtt()`, `AsyncTradeSmart.cancel_gtt()`,
+`AsyncTradeSmart.place_oco()`, `AsyncTradeSmart.modify_oco()`, `AsyncTradeSmart.cancel_oco()`,
 `AsyncTradeSmart.pending_gtts()`, `AsyncTradeSmart.triggered_gtts()`,
 `AsyncTradeSmart.gtt_alert_types()`,
 `AsyncTradeSmart.search_instruments()`, `AsyncTradeSmart.quote()`,
@@ -851,8 +862,11 @@ Response models live in `tradesmart.models.<area>` (stream models are also expor
 | `OrderHistoryEntry` (`models.orders`) | `order_history` | everything in `Order` plus `pan`, `rpt`, `introp_exch` |
 | `Trade` (`models.orders`) | `trades` | `order_id`, `exchange`, `tradingsymbol`, `quantity`, `filled_quantity`, `average_price`, `order_type`, `product`, `transaction_type`, `flid`, `flqty`, `flprc`, `fltm`, `exchange_order_id`, `tag`, `snoordt`, … |
 | `OrderMargin` (`models.orders`) | `order_margin` | `cash`, `marginused`, `ordermargin`, `marginusedprev`, `remarks`, `request_time` |
-| `Gtt` (`tradesmart`) | `pending_gtts` | `alert_id` (`al_id`), `alert_type` (`GttAlertType`), `trigger_value` (`d`), `alert_validity` (`GttValidity`, wire `validity`), `exchange`, `tradingsymbol`, `token`, `tag`, `transaction_type`, `order_type`, `product`, `validity` (`ret`), `quantity`, `price`, `trigger_price`, … |
+| `Gtt` (`tradesmart`) | `pending_gtts` | `alert_id` (`al_id`), `alert_type` (`GttAlertType`), `trigger_value` (`d`), `alert_validity` (`GttValidity`, wire `validity`), `exchange`, `tradingsymbol`, `token`, `tag`, `transaction_type`, `order_type`, `product`, `validity` (`ret`), `quantity`, `price`, `trigger_price`, …; on an OCO row also `is_oco`, `stop_loss` and `target` (an `OcoSide` each, `None` when the row is ambiguous) and the raw parts `oco_first` (`place_order_params`), `oco_second` (`place_order_params_leg2`), `oco_triggers` (`oivariable`) |
 | `TriggeredGtt` (`tradesmart`) | `triggered_gtts` | everything in `Gtt` plus `norentm`, `sms_flag`, `email_flag`, `push_flag` |
+| `OcoLeg` (`tradesmart`; input) | `place_oco`, `modify_oco` | `trigger_value` (the OCO trigger), `price`, `order_type` (default `LIMIT`), `trigger_price` (the leg order's own, for `SL` / `SL_M`) |
+| `OcoSide` (`tradesmart`) | `Gtt.stop_loss`, `Gtt.target` | `leg` (`OcoLegRow`), `trigger_value` |
+| `OcoLegRow`, `OcoTrigger` (`tradesmart`) | OCO rows of `pending_gtts` / `triggered_gtts` | `OcoLegRow`: `transaction_type`, `order_type`, `quantity`, `price`, `trigger_price`, `product`, `tag`, …; `OcoTrigger`: `var_name`, `trigger_value` (`d`) |
 | `SlicedOrderResult` (`tradesmart`; a frozen dataclass) | `place_sliced_order` | `requested_quantity`, `slice_quantities`, `order_ids`, `placed_quantity`, `unsent_quantity`, `complete`, `error` |
 | `TouchlineAck` / `TouchlineFeed` (`tradesmart`) | stream `tk` / `tf` | `key` (`EXCH\|TOKEN`), `exchange` (`e`), `token` (`tk`), `tradingsymbol` (`ts`), `last_price`, `percent_change`, `volume`, `open`/`high`/`low`/`close`, `average_trade_price`, `open_interest`, `bp1`/`bq1`/`sp1`/`sq1`, `ft` |
 | `DepthAck` / `DepthFeed` (`tradesmart`) | stream `dk` / `df` | touchline fields plus five levels `bp1..5`, `bq1..5`, `bo1..5`, `sp1..5`, `sq1..5`, `so1..5`, `tbq`/`tsq`, `ltq`, `ltt`, `uc`/`lc`, `high_52w` (`52h`), `low_52w` (`52l`) |
@@ -898,7 +912,7 @@ rows = client.request("OrderBook", {}, state_changing=False, expect="list")
 
 - `state_changing=True` → never retried; an ambiguous failure raises `OrderStatusUnknownError`.
   `PlaceOrder`, `PlaceMultiOrder`, `ModifyOrder`, `CancelOrder`, `ExitSNOOrder`, `GenAcsTok`, the
-  GTT writes and the iceberg writes are **always** treated as state-changing, even with `state_changing=False`. Pass `True` for
+  GTT writes, the OCO writes and the iceberg writes are **always** treated as state-changing, even with `state_changing=False`. Pass `True` for
   anything else that can create, change or cancel an order.
 - The endpoint name is normalised first: surrounding whitespace and `/` are removed and the rest
   must be ASCII letters only (`"Place/Order"`, `"../x"` or `""` raise `ConfigurationError`;
@@ -907,7 +921,8 @@ rows = client.request("OrderBook", {}, state_changing=False, expect="list")
   state-changing and rate-limited.
 - `uid` is added (= `client_id`) when absent; `actid` is not added.
 - Payload values must be `str`, `int`, `float`, `Decimal`, `bool` (→ `"Yes"`/`"No"`) or an enum
-  (→ its value); anything else (including `None`) raises `TypeError`.
+  (→ its value), or a `dict` (string keys) or `list` of such values, nested (sent as nested JSON,
+  as the OCO bodies need); anything else (including `None`) raises `TypeError`.
 - Returns the parsed JSON body (`dict` for `expect="object"`, `list` for `expect="list"`), with
   the same shape checks as typed endpoints. "No data" is **not** turned into `[]` here: it raises
   `APIError` (or a subclass, e.g. `NotFoundError` for an HTTP 404).
@@ -919,7 +934,7 @@ rows = client.request("OrderBook", {}, state_changing=False, expect="list")
 | `ConfigurationError: ... run python -m tradesmart login` | No usable saved login. Run `python -m tradesmart login` (again after 06:00 IST). |
 | `AuthenticationError: ... expired ...` / `Session Expired : Invalid Session Key` | TradeSmart tokens end at the next 06:00 IST. Log in again. |
 | HTTP **403** / `AuthenticationError` although the token is fresh | Compare the machine's public IP with the **Primary** and **Secondary Static IP** of your app on the API Dashboard (changeable at most 2 times per day). An IPv6 machine: use IPv4 for now. Last resort: `support@tradesmartonline.in`. |
-| `OrderStatusUnknownError` | The order (or GTT) may or may not exist. **Do not resend.** Find it by its `tag` in `orders()` (a GTT: in `pending_gtts()`). |
+| `OrderStatusUnknownError` | The order (or GTT) may or may not exist. **Do not resend.** Find it by its `tag` in `orders()` (a GTT or OCO: in `pending_gtts()`; an OCO row may not show the tag, so compare its symbol, quantity and triggers too). |
 | `OrderRejectedError` | Read `exc.emsg` (margin, price band, MKT not allowed for API orders, …); fix the request instead of retrying. |
 | `OrderRejectedError` "CTCLID not assigned" on an `MCX` order | MCX orders through the API are not yet enabled for TradeSmart; nothing to fix on your side. |
 | `RateLimitError` with `http_status=None` | The SDK's own limiter: wait `exc.retry_after` seconds; nothing was sent. |
@@ -958,6 +973,7 @@ ones that call TradeSmart use the login saved by `python -m tradesmart login` (o
 | [`place_order.py`](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/examples/place_order.py) | **dry run by default** (prints the `PlaceOrder` payload); real order only with `--i-understand-this-places-a-real-order`; every order carries a unique tag, used to find it after an unknown outcome (never resends) |
 | [`sliced_order.py`](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/examples/sliced_order.py) | `place_sliced_order` on the offline broker (no login): an order above the freeze quantity in three slices, a rejected slice that stops the order, and an unknown outcome found by its tag (looked up a few times, never resent) |
 | [`gtt_alert.py`](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/examples/gtt_alert.py) | GTT orders on the offline broker (no login): a fresh last price checked first (a GTT already true fires at once), place, list, move the trigger with `modify_gtt` (both validities from the GTT's own row), fire it and find its order by `parent_id`; an unknown outcome found by its tag in `pending_gtts()` (never resent) and cancelled |
+| [`oco_exit.py`](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/examples/oco_exit.py) | an OCO exit on the offline broker (no login): a fresh last price checked to lie between the two triggers, a SELL OCO with LIMIT legs, the stop-loss moved with `modify_oco` (read back with `stop_loss` / `target`), an unknown outcome looked up in `pending_gtts()` (never resent), cancelled |
 | [`offline_strategy_test.py`](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/examples/offline_strategy_test.py) | a strategy and its tests on the offline broker (no login): a fill, a rejection, a lost reply found by its tag, a dropped stream |
 | [`first_call.py`](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/examples/first_call.py) | profile, funds, positions, order book |
 | [`market_data.py`](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/examples/market_data.py) | search, quote, security info, intraday and daily candles, script master |
@@ -974,8 +990,8 @@ ones that call TradeSmart use the login saved by `python -m tradesmart login` (o
   follow once TradeSmart supplies the schema.
 - **Iceberg orders**: the SDK does not offer iceberg orders; `request()` can reach them (never
   retried, success only on the documented word). Use `place_sliced_order` to send a large order
-  in pieces. **OCO (one-cancels-other) GTTs**: supported by TradeSmart, but their request fields
-  and replies are not documented yet, so there is no method for them. Plain GTTs: see
+  in pieces. **OCO (one-cancels-other) orders** have their own methods (`place_oco`, `modify_oco`,
+  `cancel_oco`, see [OCO orders](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/oco.md)). Plain GTTs: see
   [GTT orders](https://github.com/trade-smart/TradeSmart-Python-SDK/blob/main/sdk-python/docs/gtt.md).
 - **MCX orders through the API are not yet enabled** for TradeSmart: they are rejected with
   "CTCLID not assigned" (or acknowledged and then `REJECTED` with that reason). Nothing to fix on

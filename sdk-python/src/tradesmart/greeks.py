@@ -187,6 +187,28 @@ def _require_finite(name: str, value: float) -> None:
         raise ValueError(f"{name} must be a finite number, got {value!r}")
 
 
+def _exp_or_value_error(exponent: float, message: Callable[[], str]) -> float:
+    """``exp(exponent)``; a result too large for a float raises ``ValueError(message())``."""
+    try:
+        factor = math.exp(exponent)
+    except OverflowError:
+        factor = math.inf
+    if math.isinf(factor):
+        raise ValueError(message())
+    return factor
+
+
+def _discount(name: str, value: float, years: float) -> float:
+    """``exp(-value * years)``; an absurd finite ``rate`` or yield is a ``ValueError``."""
+    return _exp_or_value_error(
+        -value * years,
+        lambda: (
+            f"{name} is out of range: exp(-{name} * years) overflows a float "
+            f"({name}={value!r}, years={years!r})"
+        ),
+    )
+
+
 def _cdf(x: float) -> float:
     return 0.5 * math.erfc(-x / _SQRT_2)
 
@@ -266,9 +288,9 @@ def _value(
     """
     sqrt_t = math.sqrt(t)
     sig_t = vol * sqrt_t
-    disc_k = math.exp(-rate * t)
+    disc_k = _discount("rate", rate, t)
     yield_ = q if bsm else rate
-    disc_u = math.exp(-yield_ * t)
+    disc_u = _discount("dividend_yield", q, t) if bsm else disc_k
     drift = math.log(underlying / strike) + (rate - yield_ + 0.5 * vol * vol) * t
     limit = math.copysign(_D_CLAMP, drift) if drift else 0.0  # d1 as sigma*sqrt(t) -> 0
     d1 = _clamp(drift / sig_t) if sig_t > 0 else limit
@@ -521,8 +543,8 @@ def greeks_from_price(
         return no_price()
 
     t = max(years, MIN_YEARS)
-    disc_k = math.exp(-rate * t)
-    disc_u = math.exp(-(dividend_yield if bsm else rate) * t)
+    disc_k = _discount("rate", rate, t)
+    disc_u = _discount("dividend_yield", dividend_yield, t) if bsm else disc_k
     forward_value = underlying * disc_u - strike * disc_k
     intrinsic = max(forward_value, 0.0) if is_call else max(-forward_value, 0.0)
 

@@ -32,6 +32,7 @@ from tests.live_orders.uat_matrix import (
     cases,
     cases_gtt,
     cases_mcx,
+    cases_oco,
     family,
     gate,
 )
@@ -326,3 +327,177 @@ def test_a_family_module_batch_runs_outside_hours_in_mock_mode(
         pytest.fail(f"skipped in mock mode: {skipped}")
     assert results == {}
     assert ran == [[]]
+
+
+# -- OCO: only behind the owner's switch, far cases only (design 2026-11-20 E3-E5) -----------------
+
+OCO_SWITCH = {"TRADESMART_LIVE_MOCK_OCO": "oco in mock session 2026-11-14"}
+MOCK_OCO_ENV = {**MOCK_ENV, **OCO_SWITCH}
+FAR_IDS = ("oco-far-buy", "oco-far-sell", "oco-far-sl-lmt")
+FIRES_IDS = ("oco-fires-buy", "oco-fires-sell", "oco-slots-reversed")
+
+
+def test_the_amo_and_gtt_families_are_the_only_markers_skipped_whatever_the_switch() -> None:
+    assert frozenset({"m_amo", "m_gtt"}) == gate.MOCK_SKIPPED_MARKERS
+
+
+def test_the_mock_oco_cases_are_the_three_far_cases() -> None:
+    assert frozenset(FAR_IDS) == mock_session.MOCK_OCO_CASES
+    assert set(cases_oco.FAR_CASES) == set(mock_session.MOCK_OCO_CASES)
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        pytest.param(None, id="missing"),
+        pytest.param("oco in mock session 2026-11-13", id="yesterday"),
+        pytest.param("oco in mock session 2026-11-14 ", id="extra-space"),
+        pytest.param("oco  in mock session 2026-11-14", id="inner-space"),
+        pytest.param("OCO in mock session 2026-11-14", id="wrong-case"),
+    ],
+)
+@pytest.mark.parametrize("case_id", [*FAR_IDS, *FIRES_IDS, None])
+def test_without_the_exact_oco_switch_the_oco_family_skips_at_collection(
+    value: str | None, case_id: str | None
+) -> None:
+    """Review Focus 2: refused (skip), never fuzzy-matched."""
+    env = dict(MOCK_ENV)
+    if value is not None:
+        env[mock_session.OCO_ENV] = value
+    reason = gate.mock_family_refusal(env, ["m_oco", "smoke"], case_id=case_id, today=SATURDAY)
+    assert reason == mock_session.NO_OCO
+
+
+@pytest.mark.parametrize("case_id", FAR_IDS)
+def test_with_the_oco_switch_the_far_cases_are_collected(case_id: str) -> None:
+    assert (
+        gate.mock_family_refusal(MOCK_OCO_ENV, ["m_oco"], case_id=case_id, today=SATURDAY) is None
+    )
+
+
+@pytest.mark.parametrize("case_id", [*FIRES_IDS, None, "oco-something-new"])
+def test_with_the_oco_switch_the_fires_and_slots_cases_still_skip(case_id: str | None) -> None:
+    reason = gate.mock_family_refusal(MOCK_OCO_ENV, ["m_oco"], case_id=case_id, today=SATURDAY)
+    assert reason == calls.MOCK_NO_FIRE
+
+
+def test_the_oco_switch_is_compared_with_today_at_collection() -> None:
+    reason = gate.mock_family_refusal(MOCK_OCO_ENV, ["m_oco"], case_id="oco-far-buy", today=SUNDAY)
+    assert reason == mock_session.NO_OCO
+
+
+@pytest.mark.parametrize("marker", ["m_amo", "m_gtt"])
+def test_the_oco_switch_never_opens_amo_or_gtt(marker: str) -> None:
+    reason = gate.mock_family_refusal(
+        MOCK_OCO_ENV, [marker, "m_oco"], case_id="oco-far-buy", today=SATURDAY
+    )
+    assert reason == NO_AMO_GTT
+    assert gate.mock_family_refusal(MOCK_OCO_ENV, [marker], today=SATURDAY) == NO_AMO_GTT
+
+
+def test_outside_a_mock_session_the_oco_family_is_never_skipped_by_the_rule() -> None:
+    uat = {k: v for k, v in MOCK_ENV.items() if k not in (mock_session.SESSION_ENV,
+                                                          mock_session.CONFIRM_ENV)}  # fmt: skip
+    assert gate.mock_family_refusal(uat, ["m_oco"], case_id="oco-fires-buy") is None
+
+
+def test_the_oco_write_rule_follows_the_switch_in_mock_mode() -> None:
+    assert cases_oco.write_refusal({}, SAT_11, mock=True) == mock_session.NO_OCO
+    assert cases_oco.write_refusal({}, SAT_11, mock=True, mock_oco=False) == mock_session.NO_OCO
+    assert cases_oco.write_refusal({}, SAT_16, mock=True, mock_oco=True) is None  # no hours
+    assert cases_gtt.write_refusal({}, SAT_11, mock=True) == NO_AMO_GTT  # GTT: unchanged
+
+
+def test_with_the_oco_switch_on_gtt_and_amo_writes_are_still_refused(tmp_path: Path) -> None:
+    session, client = _mock(tmp_path)
+    session.mock_oco = True
+    before = _sdk_calls(client)
+    plan = {"exchange": "NSE", "tradingsymbol": "ITC-EQ", "quantity": 1}
+    session.guard.reserve(NSE.case_id, 2)
+    with pytest.raises(Refusal, match=NO_AMO_GTT):
+        calls.gtt_place(session, plan, NSE)
+    with pytest.raises(Refusal, match=NO_AMO_GTT):
+        calls.gtt_modify(session, "26111400001", NSE, trigger_value=Decimal("500"))
+    with pytest.raises(Refusal, match=NO_AMO_GTT):
+        calls.gtt_cancel(session, "26111400001", NSE)
+    with pytest.raises(Refusal, match=NO_AMO_GTT):
+        calls.place(session, {**PLAN, "amo": True}, NSE)
+    assert _sdk_calls(client) == before
+
+
+def test_without_the_oco_switch_every_oco_write_is_refused_with_no_call(tmp_path: Path) -> None:
+    from tradesmart import OcoLeg
+
+    session, client = _mock(tmp_path)
+    assert session.mock_oco is False
+    before = _sdk_calls(client)
+    leg = OcoLeg(trigger_value=Decimal("440"), price=Decimal("360"))
+    fields = {"exchange": "NSE", "tradingsymbol": "ITC-EQ", "quantity": 1, "product": "CNC",
+              "validity": "DAY", "alert_validity": "DAY"}  # fmt: skip
+    session.guard.reserve(NSE.case_id, 1)
+    with pytest.raises(Refusal, match=mock_session.OCO_ENV):
+        calls.oco_place(session, NSE, stop_loss=leg, target=leg, transaction_type="BUY", **fields)
+    with pytest.raises(Refusal, match=mock_session.OCO_ENV):
+        calls.oco_cancel(session, NSE, "26111400001")
+    assert _sdk_calls(client) == before
+
+
+class _Item:
+    """A collected item: its markers, and the parametrized case (``callspec``) when given."""
+
+    def __init__(self, nodeid: str, names: list[str], callspec: Any = None) -> None:
+        self.nodeid = nodeid
+        self.names = names
+        if callspec is not None:
+            self.callspec = callspec
+        self.skips: list[str] = []
+
+    def iter_markers(self) -> list[Any]:
+        return [SimpleNamespace(name=name) for name in self.names]
+
+    def add_marker(self, marker: Any) -> None:
+        self.skips.append(marker.kwargs["reason"])
+
+
+class _Config:
+    class option:  # noqa: N801 - pytest's config.option namespace
+        markexpr = "uat_matrix"  # the matrix selected explicitly (else it is deselected)
+
+
+def _oco_item(case_id: str, *names: str) -> _Item:
+    return _Item(
+        f"tests/live_orders/uat_matrix/test_oco.py::test_oco_case[{case_id}]",
+        ["m_oco", *names],
+        SimpleNamespace(params={"case": SimpleNamespace(id=case_id)}),
+    )
+
+
+def test_the_collection_hook_opens_only_the_far_oco_cases_with_the_switch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tests.live_orders.uat_matrix import conftest as matrix_conftest
+
+    for name, value in {**MOCK_OCO_ENV, "TRADESMART_LIVE_ORDER_UAT_MATRIX": "1"}.items():
+        monkeypatch.setenv(name, value)
+    for name in ("TRADESMART_ENV", "TRADESMART_LIVE_ORDER_FUNDED", "PYTEST_XDIST_WORKER"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setattr(gate, "today_ist", lambda: SATURDAY)
+    far, fires = _oco_item("oco-far-buy", "smoke"), _oco_item("oco-fires-buy")
+    gtt = _Item("tests/live_orders/uat_matrix/test_gtt.py::test_gtt_case[gtt-far]", ["m_gtt"])
+    matrix_conftest.pytest_collection_modifyitems(_Config(), [far, fires, gtt])  # type: ignore[arg-type,list-item]
+    assert far.skips == []
+    assert fires.skips == [calls.MOCK_NO_FIRE]
+    assert gtt.skips == [NO_AMO_GTT]
+    monkeypatch.setenv(mock_session.OCO_ENV, "oco in mock session 2026-11-13")  # yesterday's
+    far = _oco_item("oco-far-buy", "smoke")
+    matrix_conftest.pytest_collection_modifyitems(_Config(), [far])  # type: ignore[arg-type,list-item]
+    assert far.skips == [mock_session.NO_OCO]
+
+
+def test_compose_passes_the_oco_switch_through() -> None:
+    """The owner's switch reaches ``docker compose run`` (bare ``- NAME``: passed only when set
+    on the host); without it a mock run skips the OCO family (fails closed)."""
+    compose = Path(__file__).resolve().parents[2] / "compose.yaml"
+    lines = [line.strip() for line in compose.read_text(encoding="utf-8").splitlines()]
+    assert f"- {mock_session.OCO_ENV}" in lines
+    assert not any(line.startswith(f"- {mock_session.OCO_ENV}=") for line in lines)

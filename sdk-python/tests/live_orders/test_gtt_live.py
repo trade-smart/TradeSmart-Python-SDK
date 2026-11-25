@@ -1,4 +1,4 @@
-"""The GTT live test, on UAT or on the zero-funds production account only (README.md).
+"""The GTT and OCO live tests, on UAT or on the zero-funds production account only (README.md).
 
 It skips unless both order opt-ins are set in a serial run, and always in funded mode
 (``TRADESMART_LIVE_ORDER_FUNDED`` set to any value): a GTT whose condition is already true when
@@ -142,3 +142,41 @@ def test_triggered_gtts_are_readable(gtt_session: OrderSession, gtt_record: dict
         g.tag for g in triggered if (g.tag or "").startswith(gtt.GTT_TAG_PREFIX)
     ]
     assert isinstance(triggered, list)
+
+
+def test_oco_lifecycle(gtt_session: OrderSession, gtt_record: dict[str, Any]) -> None:
+    """A BUY OCO of 1 ITC-EQ (CNC, LIMIT legs): stop-loss trigger 1.10 x and target trigger 0.90 x
+    a fresh last price, placed, read back by alert id, its stop-loss modified once, cancelled; on
+    UAT one more modify on the cancelled id must be rejected (``Invalid Oi``). On production it is
+    three writes (no probe) and needs the whole run budget: run it alone with ``-k oco``."""
+    session, record = gtt_session, gtt_record
+    session.test_budget = OrderBudget(gtt.oco_calls_needed(session))
+    plan = _plan(session, record)
+    try:
+        outcome = gtt.run_oco_lifecycle(session, plan, record)
+    except Refusal as exc:
+        _skip(record, exc.reason)
+    if outcome.place == "rejected":
+        _skip(record, f"the server rejected the OCO ({outcome.exception}); recorded")
+    assert outcome.place == "accepted", (
+        f"PlaceOCOOrder outcome {outcome.place} ({outcome.exception}); tag {plan.tag}: seen in "
+        f"pending_gtts() as {outcome.seen or 'none'}, cancelled {outcome.cancelled or 'none'}"
+    )
+    row = outcome.placed_row
+    assert row is not None, (
+        f"the OCO (tag {plan.tag}) is not once in pending_gtts(): {outcome.seen}"
+    )
+    assert row.is_oco, f"alert type {row.alert_type}"
+    assert row.stop_loss is not None and row.target is not None, "stop_loss / target not readable"
+    assert row.stop_loss.trigger_value == outcome.stop_loss, f"stop-loss {row.stop_loss}"
+    assert row.target.trigger_value == outcome.target, f"target {row.target}"
+    if outcome.modify == "refused":
+        _skip(record, f"modify not sent: {outcome.refusal} (the OCO was cancelled)")
+    assert outcome.modify == "accepted", f"ModifyOCOOrder outcome {outcome.modify}"
+    modified = outcome.modified_row
+    assert modified is not None and modified.stop_loss is not None, "modified OCO not readable"
+    assert modified.stop_loss.trigger_value == outcome.modified_stop_loss
+    assert outcome.cancelled, "no cancel was accepted"
+    assert outcome.left_pending == []
+    if session.uat:
+        assert outcome.probe == "rejected", f"modify on the cancelled id: {outcome.probe}"

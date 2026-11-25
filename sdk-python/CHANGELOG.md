@@ -4,6 +4,41 @@ All notable changes to the `tradesmart` Python SDK are documented here. The form
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [2.1.0] — Unreleased
+
+Default `User-Agent`: `tradesmart-python/2.1.0`. A minor release: OCO orders, plus one behaviour
+change to the GTT cancel (see "Changed").
+
+### Added
+
+- **OCO (one cancels the other) orders**: `place_oco`, `modify_oco` and `cancel_oco` on both
+  clients (`PlaceOCOOrder`, `ModifyOCOOrder`, `CancelOCOOrder`; never retried). `stop_loss` and
+  `target` are an `OcoLeg` each (exported from `tradesmart`); a BUY OCO needs the stop-loss
+  trigger above the target trigger, a SELL OCO below it. Guide: `docs/oco.md`, example
+  `examples/oco_exit.py`.
+- OCO fields on the rows of `pending_gtts()` and `triggered_gtts()`: `Gtt.is_oco`,
+  `Gtt.stop_loss` and `Gtt.target` (an `OcoSide` with its `leg` and `trigger_value`; `None` when
+  the row is ambiguous), with the row types `OcoLegRow`, `OcoTrigger` and `OcoSide`.
+- `tradesmart.testing.OfflineBroker` supports the OCO endpoints. It does not simulate OCO
+  triggering: `trigger_gtt()` on an OCO raises `ValueError`.
+
+### Changed
+
+- **`cancel_gtt` now succeeds on the reply `OI deleted`**, the word TradeSmart's server answers.
+  The documented `Oi delete success` now raises `OrderStatusUnknownError` (confirm with
+  `pending_gtts()`).
+- `Invalid Oi` on `modify_gtt` and `cancel_gtt` is now `OrderRejectedError` (was
+  `OrderStatusUnknownError`), decided by that answer alone; TradeSmart's test environment answers it
+  for an alert that no longer exists (an already cancelled one).
+- `request()` accepts nested dict and list values in the request body.
+
+### Fixed
+
+- An absurd but finite `rate` or `dividend_yield` (for example `-1e6`) that makes a discount or
+  carry factor too large for a float now raises `ValueError` naming the parameter (was
+  `OverflowError`) in `black76`, `black_scholes`, `implied_volatility`, `greeks_from_price` and
+  `option_greeks()` (spec 10.3).
+
 ## [2.0.0] — 2026-11-15
 
 **The first public release**, on PyPI: `pip install tradesmart`. Version numbers 0.1.0

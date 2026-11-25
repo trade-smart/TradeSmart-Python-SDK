@@ -50,6 +50,7 @@ GUIDE_PAGES = [
     "option-analytics.md",
     "testing.md",
     "gtt.md",
+    "oco.md",
     "account.md",
     "reference.md",
 ]
@@ -79,6 +80,7 @@ EXAMPLES = [
     "offline_strategy_test.py",
     "sliced_order.py",
     "gtt_alert.py",
+    "oco_exit.py",
 ]
 SAFETY_FLAG = "--i-understand-this-places-a-real-order"
 _SECRET_ATTRS = {"access_token", "susertoken", "refresh_token", "get_secret_value"}

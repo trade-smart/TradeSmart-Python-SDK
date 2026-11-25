@@ -493,3 +493,54 @@ def test_error_status_list_raw_is_redacted():
     with pytest.raises(APIError) as info:
         _parse('[{"access_token":"SECRET-XYZ"}]', 400, state_changing=False, expect="list")
     assert "SECRET-XYZ" not in str(info.value.raw)
+
+
+def test_encode_jdata_nested_keeps_order_and_escapes():
+    payload = {
+        "tsym": "M&M-EQ",
+        "oivariable": [{"var_name": "x", "d": "1+2"}, {"var_name": "y", "d": "50%"}],
+        "place_order_params": {"remarks": '₹ "a"\n', "qty": "1"},
+        "empty": [],
+        "none": {},
+    }
+    assert encode_jdata(payload) == (
+        'jData={"tsym":"M%26M-EQ","oivariable":[{"var_name":"x","d":"1%2B2"},'
+        '{"var_name":"y","d":"50%25"}],"place_order_params":{"remarks":"₹ \\"a\\"\\n","qty":"1"},'
+        '"empty":[],"none":{}}'
+    )
+
+
+def test_nested_lone_surrogate_refused_on_top_key():
+    from tradesmart._transport.codec import encode_request_body
+    from tradesmart.errors import RequestValidationError
+
+    payload = {
+        "uid": "TEST123",
+        "place_order_params": {"remarks": "\ud800"},
+        "oivariable": [{"d": "\udc00"}, {"d": "\ud800"}],
+    }
+    with pytest.raises(RequestValidationError) as ei:
+        encode_request_body(payload)
+    assert [e["loc"] for e in ei.value.errors] == [("oivariable",), ("place_order_params",)]
+    assert "\ud800" not in str(ei.value) and "remarks" not in str(ei.value)
+
+
+def test_nested_lone_surrogate_in_nested_key_refused_on_top_key():
+    from tradesmart._transport.codec import encode_request_body
+    from tradesmart.errors import RequestValidationError
+
+    with pytest.raises(RequestValidationError) as ei:
+        encode_request_body({"p": {"\ud800": "x"}})
+    assert [e["loc"] for e in ei.value.errors] == [("p",)]
+
+
+def test_build_raw_call_nested_none_is_type_error_naming_top_key_only():
+    with pytest.raises(TypeError) as ei:
+        build_raw_call(
+            "TEST123",
+            "GetQuotes",
+            {"x": [{"y": None, "secret": "S3CR3T"}]},
+            state_changing=False,
+            expect="object",
+        )
+    assert "x" in str(ei.value) and "secret" not in str(ei.value) and "S3CR3T" not in str(ei.value)

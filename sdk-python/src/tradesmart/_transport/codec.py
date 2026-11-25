@@ -19,6 +19,7 @@ from tradesmart.errors import (
     ResponseParseError,
     ServerError,
 )
+from tradesmart.models.base import WireValue
 
 _AUTH_EMSG = re.compile(
     r"session expired|invalid access token|invalid session|invalid user id|invalid acct id",
@@ -29,8 +30,17 @@ TOO_DEEP = "<response nested too deeply to show>"
 
 # The success ``stat`` of every endpoint without its own documented word.
 OK_STATS: frozenset[str] = frozenset({"Ok"})
-# The GTT write endpoints: an unknown outcome is checked with pending_gtts(), not orders().
-GTT_WRITE_ENDPOINTS = frozenset({"PlaceGTTOrder", "ModifyGTTOrder", "CancelGTTOrder"})
+# The GTT and OCO write endpoints: an unknown outcome is checked with pending_gtts(), not orders().
+ALERT_WRITE_ENDPOINTS = frozenset(
+    {
+        "PlaceGTTOrder",
+        "ModifyGTTOrder",
+        "CancelGTTOrder",
+        "PlaceOCOOrder",
+        "ModifyOCOOrder",
+        "CancelOCOOrder",
+    }
+)
 # The iceberg write endpoints answer ``true`` / ``false``: ``false`` is a definite rejection
 # (reason in ``rejreason``) for these names only, never for another endpoint whose word is "true".
 ICEBERG_WRITE_ENDPOINTS = frozenset(
@@ -41,7 +51,7 @@ _ICEBERG_FAILURE_STAT = "false"
 
 def check_hint(endpoint: str) -> str:
     """The read a caller uses to find out what an ambiguous call did."""
-    return "pending_gtts()" if endpoint in GTT_WRITE_ENDPOINTS else "orders()"
+    return "pending_gtts()" if endpoint in ALERT_WRITE_ENDPOINTS else "orders()"
 
 
 def _redact_body(text: str) -> str:
@@ -81,7 +91,7 @@ def _redact_raw(raw: Any) -> Any:
         return TOO_DEEP
 
 
-def encode_jdata(payload: Mapping[str, str]) -> str:
+def encode_jdata(payload: Mapping[str, WireValue]) -> str:
     """Encode ``payload`` as the ``jData=<json>`` form body.
 
     Only ``%``, ``&`` and ``+`` are escaped (in that order); everything else is sent as-is.
@@ -91,20 +101,33 @@ def encode_jdata(payload: Mapping[str, str]) -> str:
     return "jData=" + text
 
 
-def _is_utf8(text: str) -> bool:
-    try:
-        text.encode("utf-8")
-    except UnicodeEncodeError:  # a lone surrogate, e.g. from a mis-decoded file name
-        return False
+def _is_utf8(value: WireValue) -> bool:
+    """Whether every key and string at any depth of ``value`` encodes as UTF-8."""
+    stack: list[object] = [value]
+    while stack:
+        current = stack.pop()
+        if isinstance(current, str):
+            try:
+                current.encode("utf-8")
+            except UnicodeEncodeError:  # a lone surrogate, e.g. from a mis-decoded file name
+                return False
+        elif isinstance(current, dict):
+            for key, item in current.items():
+                stack.append(key)
+                stack.append(item)
+        elif isinstance(current, list):
+            stack.extend(current)
+        else:  # not a wire value: invalid, never iterated
+            return False
     return True
 
 
-def encode_request_body(payload: Mapping[str, str]) -> bytes:
+def encode_request_body(payload: Mapping[str, WireValue]) -> bytes:
     """The UTF-8 bytes of the ``jData`` body, encoded before anything is sent.
 
-    Raises ``RequestValidationError`` naming each field whose key or value cannot be
-    encoded as UTF-8 (a lone surrogate), so the failure is definitive: nothing was sent.
-    The value is never echoed.
+    Raises ``RequestValidationError`` naming each top-level field whose key or value (at any
+    depth) cannot be encoded as UTF-8 (a lone surrogate), so the failure is definitive:
+    nothing was sent. The value is never echoed.
     """
     bad = sorted(
         str(key) for key, value in payload.items() if not (_is_utf8(key) and _is_utf8(value))
@@ -213,13 +236,16 @@ def parse_response(
     success_stats: frozenset[str] = OK_STATS,
     requires_ack_id: str | None = None,
     stats_ignore_case: bool = False,
+    failure_stats: frozenset[str] = frozenset(),
 ) -> Any:
     """Parse and classify a response body; return a ``dict`` or ``list`` or raise.
 
     Success is a ``stat`` string in ``success_stats`` (compared exactly: ``Ok`` for most
     endpoints, the documented word for the GTT and iceberg write endpoints; with
     ``stats_ignore_case`` only letter case is ignored, ``casefold()`` on both sides, nothing
-    trimmed or normalised: the GTT writes, spec F32); with
+    trimmed or normalised: the GTT and OCO writes, spec F32); a ``stat`` in ``failure_stats``
+    (``Invalid Oi``, compared with ``casefold()``) is checked first and raises
+    ``OrderRejectedError`` whatever else the body holds; with
     ``requires_ack_id`` the success object must also carry that field as a non-blank string
     and no ``emsg`` other than a blank string. ``Not_Ok`` (and ``false`` on the iceberg write
     endpoints, its message from ``rejreason``, else ``emsg``) is a definite failure; any JSON
@@ -274,6 +300,25 @@ def parse_response(
     what = "unexpected response shape"
     if isinstance(data, dict):
         stat = data.get("stat")
+        # A documented-by-observation rejection word (``Invalid Oi`` on the alert modify and
+        # cancel writes): a definite rejection, checked before the success words; ``stat`` is
+        # compared with ``casefold()`` only (nothing trimmed), so a padded word stays unknown.
+        if (
+            isinstance(stat, str)
+            and failure_stats
+            and stat.casefold() in {word.casefold() for word in failure_stats}
+        ):
+            raise _status_error(
+                OrderRejectedError,
+                message="Invalid Oi",
+                endpoint=endpoint,
+                status_code=status_code,
+                emsg=stat,
+                request_time=(
+                    data["request_time"] if isinstance(data.get("request_time"), str) else None
+                ),
+                raw=data,
+            )
         # isinstance first: a list or object ``stat`` cannot be looked up in a set.
         success = isinstance(stat, str) and (
             stat in success_stats

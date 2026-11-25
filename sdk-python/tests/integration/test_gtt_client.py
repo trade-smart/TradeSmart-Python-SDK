@@ -354,7 +354,7 @@ async def test_config_algo_id_is_never_sent_on_gtt(rig: Rig) -> None:
         ("place_gtt", "PlaceGTTOrder", "OI created"),  # the UAT answer (spec F32)
         ("place_gtt", "PlaceGTTOrder", "oi CREATED"),
         ("modify_gtt", "ModifyGTTOrder", "OI replaced"),
-        ("cancel_gtt", "CancelGTTOrder", "OI DELETE SUCCESS"),
+        ("cancel_gtt", "CancelGTTOrder", "OI DELETED"),
     ],
 )
 async def test_word_in_another_letter_case_is_success_and_sent_once(
@@ -367,11 +367,34 @@ async def test_word_in_another_letter_case_is_success_and_sent_once(
     assert len(rig.sent(endpoint)) == 1
 
 
-async def test_uat_cancel_word_oi_deleted_is_unknown_and_sent_once(rig: Rig) -> None:
-    # UAT answers "OI deleted": a different word from "Oi delete success", not just case.
+async def test_cancel_gtt_oi_deleted_is_success_and_sent_once(rig: Rig) -> None:
+    # UAT answers "OI deleted" (observed 2026-11-18): that is the cancel success word.
     rig.broker.set_reply("CancelGTTOrder", {"stat": "OI deleted", "al_id": "26111300000001"})
+    assert await rig.run(rig.client(), "cancel_gtt", "26111300000001") == "26111300000001"
+    assert len(rig.sent("CancelGTTOrder")) == 1
+
+
+async def test_cancel_gtt_docs_word_is_unknown(rig: Rig) -> None:
+    # The documented "Oi delete success" is not what the server answers: unknown, sent once.
+    rig.broker.set_reply("CancelGTTOrder", {"stat": "Oi delete success", "al_id": "26111300000001"})
     with pytest.raises(OrderStatusUnknownError, match=r"pending_gtts\(\)"):
         await rig.run(rig.client(), "cancel_gtt", "26111300000001")
+    assert len(rig.sent("CancelGTTOrder")) == 1
+
+
+async def test_modify_gtt_invalid_oi_is_rejected(rig: Rig) -> None:
+    rig.broker.set_reply("ModifyGTTOrder", {"stat": "Invalid Oi", "al_id": "1"})
+    with pytest.raises(OrderRejectedError) as info:
+        await rig.run(rig.client(), "modify_gtt", "1", **_MODIFY)
+    assert info.value.emsg == "Invalid Oi"
+    assert len(rig.sent("ModifyGTTOrder")) == 1
+
+
+async def test_cancel_gtt_invalid_oi_is_rejected(rig: Rig) -> None:
+    rig.broker.set_reply("CancelGTTOrder", {"stat": "Invalid Oi", "al_id": "1"})
+    with pytest.raises(OrderRejectedError) as info:
+        await rig.run(rig.client(), "cancel_gtt", "1")
+    assert info.value.emsg == "Invalid Oi"
     assert len(rig.sent("CancelGTTOrder")) == 1
 
 
@@ -519,7 +542,7 @@ async def test_modify_sends_the_validities_given(rig: Rig) -> None:
     ("method", "endpoint", "word"),
     [
         ("modify_gtt", "ModifyGTTOrder", "Oi replaced"),
-        ("cancel_gtt", "CancelGTTOrder", "Oi delete success"),
+        ("cancel_gtt", "CancelGTTOrder", "OI deleted"),
     ],
 )
 @pytest.mark.parametrize("returned", ["26111299999999", " 26111200000010 "])
@@ -548,7 +571,7 @@ async def test_a_different_returned_alert_id_is_kept_and_logged_at_debug(
     ("method", "endpoint", "word"),
     [
         ("modify_gtt", "ModifyGTTOrder", "Oi replaced"),
-        ("cancel_gtt", "CancelGTTOrder", "Oi delete success"),
+        ("cancel_gtt", "CancelGTTOrder", "OI deleted"),
     ],
 )
 async def test_the_same_returned_alert_id_logs_nothing(

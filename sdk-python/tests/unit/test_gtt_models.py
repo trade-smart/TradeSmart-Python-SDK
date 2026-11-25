@@ -66,7 +66,7 @@ ENABLED_BODY = {
 # --- enums ---------------------------------------------------------------------------------
 
 
-def test_alert_type_has_the_13_documented_codes() -> None:
+def test_alert_type_has_the_13_documented_codes_and_the_two_oco_codes() -> None:
     assert {m.value for m in GttAlertType} == {
         "LTP_A_O",
         "LTP_B_O",
@@ -81,8 +81,10 @@ def test_alert_type_has_the_13_documented_codes() -> None:
         "LTP_A_52HIGH_O",
         "LTP_B_52HIGH_O",
         "VOLUME_A_O",
+        "LMT_BOS_O",
+        "LMT_SOB_O",
     }
-    assert len(GttAlertType) == 13
+    assert len(GttAlertType) == 15
 
 
 def test_alert_type_lookup() -> None:

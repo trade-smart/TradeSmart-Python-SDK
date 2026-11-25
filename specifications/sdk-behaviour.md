@@ -1,7 +1,7 @@
 # TradeSmart SDK behaviour contract
 
 Language-neutral contract for every TradeSmart API V2 SDK. An SDK that follows this document
-behaves like the reference implementation, the Python SDK 2.0.0 (`sdk-python/`), without its code
+behaves like the reference implementation, the Python SDK 2.1.0 (`sdk-python/`), without its code
 being read. Python names are used for examples; other languages translate them (section 2).
 
 Keywords: **must** = required for conformance; **should** = recommended; **may** = optional.
@@ -57,18 +57,20 @@ encoding"). An SDK test suite should load each file and assert every case.
 | `buildup.json` | Recommended | Buildup classification (11.3) |
 | `ws_connect_ack.json` | Required | Connect-ack acceptance (9.1) |
 | `config_defaults.json` | Required | Configuration defaults (12) |
-| `jdata_encoding.json` | Required | Exact request body bytes (3.2) |
+| `jdata_encoding.json` | Required | Exact request body bytes, nested values included (3.2) |
 | `token_expiry.json` | Required | Token expiry at 06:00 IST and the `is_expired` boundary (6.3) |
 | `token_file.json` | Recommended | Token-file timestamp format, accepted forms and expiry cap (6.5) |
 | `scrip_keys.json` | Required | Stream subscription keys (2.6, 9.4) |
 | `time_conversion.json` | Required | Request times and response time formats (2.3, 7.1) |
 | `round_to_tick.json` | Required | `round_to_tick` (2.7) |
 | `retry_schedule.json` | Required | Read retries, back-off and `Retry-After` (5.1) |
-| `order_validation.json` | Required | Wire payloads and validation of `place_order`, `modify_order`, `cancel_order`, `exit_order`, `order_margin`, `place_gtt`, `modify_gtt`, `cancel_gtt`, with the wire keys a validation error names (2.3, 2.4, 2.8, 4.1) |
+| `order_validation.json` | Required | Wire payloads and validation of `place_order`, `modify_order`, `cancel_order`, `exit_order`, `order_margin`, `place_gtt`, `modify_gtt`, `cancel_gtt` (the GTT calls refuse the OCO alert types), with the wire keys a validation error names (2.3, 2.4, 2.8, 4.1) |
+| `oco_requests.json` | Required | Wire payloads (exact nested bodies, key order significant) and validation of `place_oco`, `modify_oco`, `cancel_oco` (2.9) |
+| `oco_rows.json` | Required | OCO list rows: legs, triggers, `stop_loss` / `target`, a failing nested record `null` as a whole (2.9) |
 | `read_payloads.json` | Required | Wire payloads and validation of every read method (2.3) |
 | `request_names.json` | Required | `request()` name canonicalisation, state-changing flag and rate group (2.5) |
 | `outcome_words.json` | Required | Order outcome log word and WARNING per result (5.6) |
-| `success_words.json` | Required | Per-endpoint success words: GTT and iceberg writes (4.2.1) |
+| `success_words.json` | Required | Per-endpoint success words: GTT, OCO and iceberg writes, and `Invalid Oi` (4.2.1) |
 | `transport_failures.json` | Required | Send-time failure mapping and retries per failure kind (5.1, 5.2) |
 | `script_master_parse.json` | Required | Script-master parsing (8.3) |
 | `script_master_freshness.json` | Required | Script-master cache and re-check decisions (8.2) |
@@ -143,6 +145,9 @@ client id. "List" returns are empty lists for the "no data" signal (4.3).
 | `place_gtt(...)` | `PlaceGTTOrder` | see 2.8 | see 2.8 | `str` alert id (`al_id`) |
 | `modify_gtt(alert_id, ...)` | `ModifyGTTOrder` | see 2.8 | see 2.8 | `str` alert id |
 | `cancel_gtt(alert_id)` | `CancelGTTOrder` | `alert_id: str` (non-blank) | `uid`, `al_id` (no `actid`, as documented) | `str` alert id |
+| `place_oco(...)` | `PlaceOCOOrder` | see 2.9 | see 2.9 | `str` alert id (`al_id`) |
+| `modify_oco(alert_id, ...)` | `ModifyOCOOrder` | see 2.9 | see 2.9 | `str` alert id |
+| `cancel_oco(alert_id)` | `CancelOCOOrder` | `alert_id: str` (non-blank) | `uid`, `al_id` | `str` alert id |
 | `pending_gtts()` | `GetPendingGTTOrder` | — | `uid` | `list[Gtt]` |
 | `triggered_gtts()` | `GetTrgOi` | — | `uid`, `actid` | `list[TriggeredGtt]` |
 | `gtt_alert_types()` | `GetEnabledGTTs` | — | `uid` | `list[str]`: the `ai_ts[].ai_t` values (alert families such as `LTP`), in the server's order |
@@ -232,11 +237,14 @@ Validation (raises `RequestValidationError`, nothing is sent):
 - `endpoint` is trimmed of whitespace and slashes and must then be ASCII letters only, else
   `ConfigurationError`. The names the safety and rate-limit rules know (`PlaceOrder`,
   `PlaceMultiOrder`, `ModifyOrder`, `CancelOrder`, `ExitSNOOrder`, `GenAcsTok`, `PlaceGTTOrder`,
-  `ModifyGTTOrder`, `CancelGTTOrder`, `PlaceIceBergOrder`, `ModifyIceBergOrder`,
+  `ModifyGTTOrder`, `CancelGTTOrder`, `PlaceOCOOrder`, `ModifyOCOOrder`, `CancelOCOOrder`,
+  `PlaceIceBergOrder`, `ModifyIceBergOrder`,
   `CancelIceBergOrder`, `GetQuotes`, `GetQuotesMultiple`, `TPSeries`) match case-insensitively and are rewritten to that spelling
   (`placeorder` → `PlaceOrder`) so the rules cannot be bypassed. Every other name is sent as
   given (`limits` stays `limits`).
-- `uid` is added when absent; values are converted to wire strings (7.3). A `None` value is not
+- `uid` is added when absent; values are converted to wire strings (7.3). A value may also be a
+  nested object or list of such values (the OCO bodies, 2.9): the key and item order is kept and
+  the body is encoded as in 3.2. A `None` value, at any depth, is not
   allowed: it raises `TypeError` (a programming error, not an SDK error) and nothing is sent.
 - The call is always authenticated (`Authorization: Bearer`, even for `GenAcsTok`, so use
   `generate_session()` for the login) and always uses `allow_empty=False`: a `Not_Ok` "no data"
@@ -247,11 +255,12 @@ Validation (raises `RequestValidationError`, nothing is sent):
   expected is unknown too (4.2 rows 4 and 9). Reads keep `ResponseParseError` for a wrong shape.
 - The call is state-changing if `state_changing=True` **or** the name is one of `PlaceOrder`,
   `PlaceMultiOrder`, `ModifyOrder`, `CancelOrder`, `ExitSNOOrder`, `GenAcsTok`, `PlaceGTTOrder`,
-  `ModifyGTTOrder`, `CancelGTTOrder`, `PlaceIceBergOrder`, `ModifyIceBergOrder`,
-  `CancelIceBergOrder`.
-- Success words by name (4.2.1): the GTT and iceberg writes succeed only on their documented
-  `stat` word (and, for GTT, a non-blank `al_id`); every other name succeeds only on `Ok`. The
-  GTT and iceberg writes have no rate group (the docs list none).
+  `ModifyGTTOrder`, `CancelGTTOrder`, `PlaceOCOOrder`, `ModifyOCOOrder`, `CancelOCOOrder`,
+  `PlaceIceBergOrder`, `ModifyIceBergOrder`, `CancelIceBergOrder`.
+- Success words by name (4.2.1): the GTT, OCO and iceberg writes succeed only on their
+  documented or observed `stat` word (and, for GTT and OCO, a non-blank `al_id`); `Invalid Oi`
+  on the modify and cancel writes of GTT and OCO is a definite failure; every other name
+  succeeds only on `Ok`. The GTT, OCO and iceberg writes have no rate group (the docs list none).
 - Rate group by name: `PlaceOrder`/`PlaceMultiOrder` → orders; `GetQuotes`/`GetQuotesMultiple`
   → quotes; `TPSeries` → tpseries. `PlaceMultiOrder` and `GetQuotesMultiple` exist but their
   schema is undocumented (open item F1): reachable only through `request()`.
@@ -336,7 +345,7 @@ it differs, the SDK logs one DEBUG line on the `tradesmart` logger,
 
 | Argument | Wire key | Values |
 |---|---|---|
-| `alert_type` | `ai_t` | `GttAlertType` (7.3): the 13 documented codes |
+| `alert_type` | `ai_t` | `GttAlertType` (7.3): the 13 documented codes; the two OCO codes `LMT_BOS_O` / `LMT_SOB_O` are known to the enum but refused by `place_gtt` / `modify_gtt` (2.9) |
 | `trigger_value` | `d` | a finite number (Decimal, int, float or numeric text; not a boolean); no sign or range rule (the docs give none: a % change can be negative). Not `trigger_price`, which stays the stop-loss trigger `trgprc` of the order |
 | `alert_validity` | `validity` | `GttValidity`: `GTT` (default on place; none on modify) or `DAY` |
 | `validity` | `ret` | `Validity` DAY (default on place; none on modify), EOS, IOC, as in `place_order` |
@@ -355,7 +364,7 @@ Validation (raises `RequestValidationError`, nothing is sent), on place and modi
 
 | Rule | Field |
 |---|---|
-| `alert_type` resolves through `GttAlertType` | `ai_t` |
+| `alert_type` resolves through `GttAlertType` and is not an OCO code (`LMT_BOS_O`, `LMT_SOB_O`: use `place_oco` / `modify_oco`, 2.9) | `ai_t` |
 | `alert_validity` is `DAY` or `GTT` | `validity` |
 | `exchange` is NSE, NFO, BSE, BFO or MCX (CDS and BCD refused: not documented for GTT) | `exch` |
 | `product` is CNC (`C`), NRML (`M`) or CO (`H`); MIS, BO and MTF refused (not documented for GTT). A CO GTT needs no `book_loss_price`: the GTT request has no `blprc` | `prd` |
@@ -371,6 +380,149 @@ signal is in 4.3. Models `Gtt` and `TriggeredGtt` are in `models.md`; their fiel
 key only (never by field name), so a row without `ret` leaves `validity` empty: the wire
 `validity` (DAY/GTT) is `alert_validity`. The `request_time` of `GetEnabledGTTs` has its own format
 (`DDMMYYYYHHMMSS`) and is not parsed.
+
+### 2.9 OCO orders
+
+Python reference: `endpoints/oco.py`, `models/oco.py`, `client.py`, `async_client.py`. Docs: the OCO
+page of the TradeSmart API docs (local copy of 2026-11-18, `04-oco-orders.md`); observations: F35.
+Names below are Python's; other languages use their own case style (2.1).
+
+An OCO (one cancels the other) is a **multi-day exit with a target and a stop-loss**: two orders
+wait on TradeSmart's server against one instrument, each behind its own trigger value; when the
+last price reaches one trigger, that order is sent to the exchange and the other is cancelled.
+Nothing reaches the exchange before then. It is held as an alert identified by `al_id`, like a GTT
+(2.8), and is listed by `pending_gtts()` / `triggered_gtts()`.
+
+- **A trigger that is already crossed when the OCO is placed may fire at once** (as a GTT, 2.8).
+  The SDK does not read the last price and does not check the triggers against the market.
+- `alert_validity` and `validity` as on a GTT (2.8): `GTT` keeps the OCO until one side triggers or
+  it is cancelled, `DAY` ends it with the trading day.
+- A `MARKET` leg may be refused by the exchange for API orders (F27); the SDK sends what it is given.
+
+| Method | Endpoint | Parameters (Python types, defaults) | Returns |
+|---|---|---|---|
+| `place_oco(*, exchange, tradingsymbol, transaction_type, quantity, product, stop_loss, target, tag=None, validity="DAY", alert_validity="GTT")` | `PlaceOCOOrder` | `stop_loss`, `target`: `OcoLeg` | `str` alert id (`al_id`) |
+| `modify_oco(alert_id, *, <the same keywords>, validity, alert_validity)` | `ModifyOCOOrder` | as `place_oco`; `validity` and `alert_validity` have **no defaults** (as `modify_gtt`: a default could silently turn a `DAY` OCO into a `GTT` one) | `str` alert id |
+| `cancel_oco(alert_id)` | `CancelOCOOrder` | `alert_id`: a non-blank string | `str` alert id |
+
+`modify_oco` sends the whole OCO again (the docs: every required field, both triggers and both
+legs). `modify_oco` and `cancel_oco` return the ack's `al_id` exactly as the server sent it (the
+GTT rule of 2.8, including the DEBUG line when it differs from the one sent).
+
+`stop_loss` and `target` are an `OcoLeg` each (Python: a frozen request model exported from
+`tradesmart`; other languages: a plain object type with the same fields):
+
+| `OcoLeg` field | Wire (inside the leg) | Rule |
+|---|---|---|
+| `trigger_value` | the leg's `oivariable` item, `d` | a finite number (Decimal, int, float or numeric text; not a boolean), **greater than 0**; sent as given (digits kept) |
+| `price` | `prc` | as `place_order` for the order type (2.4): required and > 0 for `LIMIT` / `SL-LMT`, `0` when omitted on `MARKET` / `SL-MKT` |
+| `order_type` | `prctyp` | `LIMIT` (default, as the web terminal), `MARKET`, `SL`, `SL_M` (7.3): `LMT`, `MKT`, `SL-LMT`, `SL-MKT` |
+| `trigger_price` | `trgprc` | as `place_order`: required for `SL-LMT` / `SL-MKT`, refused for the others. It is the stop-loss trigger of the **order** the leg places, not the OCO trigger value |
+
+Shared by both legs (one instrument, one side, one size: an OCO protects one position):
+
+| Argument | Wire key | Values |
+|---|---|---|
+| `exchange` | `exch` (top level and each leg) | NSE, NFO, BSE, BFO, MCX (as GTT) |
+| `tradingsymbol` | `tsym` (top level and each leg) | as `place_order` |
+| `transaction_type` | `ai_t` and each leg's `trantype` | BUY: `ai_t` `LMT_BOS_O`, `trantype` `B`; SELL: `LMT_SOB_O`, `S` |
+| `quantity` | each leg's `qty` | as `place_gtt` (2.8): trade units, a whole multiple of the lot size, MCX included; an integer > 0, not a boolean |
+| `product` | each leg's `prd` | CNC (`C`), NRML (`M`) or CO (`H`); MIS, BO and MTF refused (as GTT) |
+| `validity` | each leg's `ret` | `Validity` DAY, EOS, IOC |
+| `alert_validity` | top-level `validity` | `GttValidity`: `GTT` or `DAY` |
+| `tag` | each leg's `remarks`, when given | optional (the docs mark the leg `remarks` optional); a non-blank string when given; whether list rows return it is open (F35) |
+| `alert_id` | `al_id` | a non-blank string (modify, cancel; an integer is rejected, never converted) |
+
+**Slots (F35 a).** The stop-loss is always sent as `x` and `place_order_params`, the target as `y`
+and `place_order_params_leg2`, buy and sell, as TradeSmart's web terminal does. The docs' sell
+example puts the target in `x`; whether the server cares is a question to TradeSmart (F35). The
+SDK never swaps the slots.
+
+**Side check (before sending).** A BUY OCO closes a short: the stop-loss trigger must be **above**
+the target trigger. A SELL OCO closes a long: the stop-loss trigger must be **below** the target
+trigger. Equal triggers are refused. This is the web terminal's rule without the last price. It
+is checked only when both triggers are valid numbers; the refusal is `loc` `["oivariable"]`.
+
+**Wire bodies** (key order is part of the contract; every number is a string; optional keys only
+when given). `PlaceOCOOrder`:
+`uid, tsym, exch, validity, ai_t, oivariable, place_order_params, place_order_params_leg2`, where
+`oivariable` is the list `[{"var_name": "x", "d": <stop-loss trigger>}, {"var_name": "y", "d":
+<target trigger>}]` and each leg is `tsym, exch, trantype, prctyp, prd, ret, actid, uid, qty, prc,
+ordersource[, trgprc][, remarks]` with `actid` and `uid` both the client id and `ordersource`
+`API` (the docs list it for legs and their example sends it). `ModifyOCOOrder`: the same with
+`al_id` second, after `uid`. `CancelOCOOrder`: `uid, al_id`. There is no top-level `actid`,
+`remarks` or `dscqty`, no `algo_id`, no `exchsym`. The nested bodies are encoded as in 3.2.
+Vectors: `oco_requests.json` (exact payloads, key order significant, and every refusal with its
+`loc`).
+
+Validation (raises `RequestValidationError`, nothing is sent; `loc` is the wire path of the error):
+
+| Rule | `loc` |
+|---|---|
+| `exchange` is NSE, NFO, BSE, BFO or MCX | `exch` |
+| `product` is CNC, NRML or CO | `prd` |
+| `quantity` an integer > 0, not a boolean | `qty` |
+| `trigger_value` a finite number > 0, not a boolean | `oivariable`, 0 (stop-loss) or 1 (target), `d` |
+| `order_type` resolves through `OrderType` | `place_order_params` or `place_order_params_leg2`, `prctyp` |
+| `price` rules of the order type | the leg key, `prc` |
+| `trigger_price` required for `SL-*`, refused otherwise | the leg key, `trgprc` |
+| the side check above | `oivariable` |
+| `alert_id` a non-blank string (modify, cancel) | `al_id` |
+
+`place_gtt` and `modify_gtt` refuse `alert_type` `LMT_BOS_O` / `LMT_SOB_O` (`RequestValidationError`
+on `ai_t`, the message naming `place_oco` / `modify_oco`): the docs say an OCO is modified and
+cancelled only with the OCO endpoints. `GttAlertType` has the two codes (`OCO_BUY`, `OCO_SELL`, 7.3)
+so that list rows parse to them. `cancel_gtt` cannot tell an OCO alert id from a GTT's without a
+lookup: not checked.
+
+**Outcome (5.2, 4.2.1).** The three names are state-changing: sent exactly once, never retried,
+timeouts and ambiguous failures as 5.2, outcome lines with `al_id=` (5.6), the unknown-outcome
+warning points to `pending_gtts()`. Success words (letter case ignored, `al_id` non-blank, no
+non-blank `emsg`): `PlaceOCOOrder` `OI created`, `ModifyOCOOrder` `OI replaced`, `CancelOCOOrder`
+`OI deleted`. **`Invalid Oi`** (any letter case) on `ModifyOCOOrder` / `CancelOCOOrder` is a
+**definite failure**, `OrderRejectedError` with the message `Invalid Oi` (the test environment
+answers it, with an `al_id` and no `emsg`, for an alert that no longer exists, F35 b); on
+`PlaceOCOOrder` it is not documented, so it is `OrderStatusUnknownError`. The docs' rule "treat
+`al_id` and no `emsg` as success" is **not** followed: `Invalid Oi` shows why. Anything else
+(another word, `Ok`, a list, no `al_id`) is `OrderStatusUnknownError`. No rate group (the docs give
+none).
+
+**Reading back.** `pending_gtts()` lists OCO rows, `triggered_gtts()` lists a fired or cancelled
+one (a cancelled OCO has the row `stat` `CANCELLED`, as a cancelled GTT, F32 / F35 c). `Gtt` and
+`TriggeredGtt` (`models.md`) have these fields, `null` on a plain GTT row:
+
+- `oco_first` / `oco_second` (`OcoLegRow`): the legs `place_order_params` /
+  `place_order_params_leg2` (fields `transaction_type`, `order_type`, `quantity` a JSON number or
+  string kept as an int, `price`, `trigger_price` when present, `product`, `account_id`,
+  `ordersource`, `tag`; everything else, such as `s_prdt_ali`, `C` and `ipaddr`, stays an extra).
+  A leg carries **no trigger value**: the triggers are in `oco_triggers`.
+- `oco_triggers` (list of `OcoTrigger`, `var_name` and `trigger_value`): the `oivariable` items.
+  The trigger of a leg is the item whose `var_name` is `x` for the first leg and `y` for the
+  second, matched by `var_name`, never by position. List rows return the values with two decimals
+  (`"1400.00"`).
+- Read-only helpers: **`stop_loss` and `target`** each give an **`OcoSide`** (`models.md`: `leg`, an
+  `OcoLegRow`, and `trigger_value`) or `None`, chosen **by trigger value and side, not by slot**.
+  The side is decided by the row's `alert_type`: for `OCO_BUY` the leg with the **higher**
+  trigger is the stop-loss and the lower one the target; for `OCO_SELL` the leg with the **lower**
+  trigger is the stop-loss. The leg's own `trantype` is **not** used for the choice. So an OCO
+  placed by another front end, in either slot order (the docs' example has the target in `x`),
+  reads correctly. If `alert_type` is not an OCO code (a plain GTT row), the two triggers are
+  equal, or either trigger or leg is missing: both are `None`. `is_oco` is true when `alert_type`
+  is one of the two OCO codes.
+- The row's own top-level `d`, `trantype`, `prctyp`, `qty` and `prc` are leg 1's values copied by
+  the server and keep their GTT meaning; for an OCO read the leg fields.
+
+A nested record that fails to parse (a leg, or the trigger list) is `null` as a whole; the row itself
+still parses (vectors: `oco_rows.json`).
+
+**Offline broker (16).** It accepts the three endpoints, keeps OCOs with the GTTs, answers the
+observed words and `Invalid Oi` for an unknown or already cancelled alert, and lists a cancelled
+OCO as `CANCELLED`. It does **not** trigger an OCO: no fired OCO has been observed, so the fired
+row and order shapes would be invented; `trigger_gtt` on an OCO alert is an error that says so.
+
+Fixtures: `place_oco_success.json`, `modify_oco_success.json`, `cancel_oco_success.json`,
+`modify_oco_invalid.json`, and OCO rows in `pending_gtts_success.json` /
+`triggered_gtts_success.json`.
 
 ---
 
@@ -407,7 +559,9 @@ redirect target. (Many HTTP libraries follow redirects by default and re-send a 
 
 1. Serialise the payload as compact JSON (`","` and `":"` separators, no spaces) with the keys
    in the payload's own order (the wire key orders of 2.3 and 2.4; never sorted). Every value is
-   a string. Strings use exactly these escapes: `"` → `\"`, `\` → `\\`; U+0008, U+0009,
+   a string, or a nested object or list of such values (the OCO bodies, 2.9: `oivariable` is a
+   list of objects, each leg an object): keys and items keep their order and every string at
+   any depth follows the rules below. Strings use exactly these escapes: `"` → `\"`, `\` → `\\`; U+0008, U+0009,
    U+000A, U+000C, U+000D → `\b`, `\t`, `\n`, `\f`, `\r`; every other character below U+0020 →
    `\u00XX` with **lower-case** hex (`\u0001`, `\u001f`). Everything else is written as itself
    in UTF-8: non-ASCII characters (no `\uXXXX`, "ensure_ascii" off), DEL (U+007F) and U+2028 /
@@ -418,9 +572,10 @@ redirect target. (Many HTTP libraries follow redirects by default and re-send a 
    is escaped (the server URL-decodes the body; `M&M` must survive). `=`, space, `/`, `?`, `#`
    are sent as is.
 3. Body = `jData=` + that text, sent as UTF-8 bytes. The bytes are produced before anything is
-   sent (5.2): a key or value that cannot be encoded as UTF-8 (in Python a lone surrogate, for
-   example from a mis-decoded file name) raises `RequestValidationError` with one `errors` entry
-   per such key (`type` `string_unicode`, the key as field) and nothing is sent.
+   sent (5.2): a key or value, **at any depth**, that cannot be encoded as UTF-8 (in Python a
+   lone surrogate, for example from a mis-decoded file name) raises `RequestValidationError`
+   with one `errors` entry per top-level key that holds one (`type` `string_unicode`, that
+   top-level key as field: a nested value is named by its top-level key) and nothing is sent.
 
 Example: `{"uid":"TEST123","tsym":"M&M-EQ"}` → `jData={"uid":"TEST123","tsym":"M%26M-EQ"}`.
 Vectors (exact text and bytes): `jdata_encoding.json`.
@@ -556,28 +711,48 @@ unredacted body. SDKs whose parsers have no depth limit need no special case.
 
 #### 4.2.1 Per-endpoint success words
 
-Owner decisions (2026-11-12, amended 2026-11-13): only the documented word is a success. The
-three **GTT** words compare **ignoring letter case only** (Unicode case folding on both sides,
-Python `casefold()`; nothing trimmed, no whitespace or punctuation normalised): the test
-environment answers `OI created` for the documented `Oi created` (F32), and a case variant of
-the documented word carries no other meaning. Every other word, the iceberg `true` and `false`
-included, stays exact and case-sensitive.
+Owner decisions (2026-11-12, amended 2026-11-13 and 2026-11-18): only the documented or the
+observed word is a success. The six **GTT and OCO** words compare **ignoring letter case only**
+(Unicode case folding on both sides, Python `casefold()`; nothing trimmed, no whitespace or
+punctuation normalised): the test environment answers `OI created` for the documented
+`Oi created` (F32), and a case variant of a word carries no other meaning. Every other word, the
+iceberg `true` and `false` included, stays exact and case-sensitive. **The cancel word** of both
+`CancelGTTOrder` and `CancelOCOOrder` is **`OI deleted`**, the word the test environment answers
+(F32, F35 b); the documented `Oi delete success` is **no longer a success**: it is
+`OrderStatusUnknownError` (the caller confirms in `pending_gtts()`). Risk accepted by the owner
+(2026-11-18): if production answers the documented word, production cancels report unknown until
+the SDK is changed (open question to TradeSmart, F35).
 
 | Endpoint | Success `stat` | Also required for success | Definite failure |
 |---|---|---|---|
 | `PlaceGTTOrder` | `Oi created` | `al_id` a non-blank string; `emsg` missing, `null` or a blank string | `Not_Ok` (rows 11–16; row 10 needs an endpoint that allows empty, which these writes never do, so a `Not_Ok` "no data" goes by rows 11–16 too: `OrderRejectedError` at HTTP 200) |
-| `ModifyGTTOrder` | `Oi replaced` | same | `Not_Ok` |
-| `CancelGTTOrder` | `Oi delete success` | same | `Not_Ok` |
+| `ModifyGTTOrder` | `Oi replaced` | same | `Not_Ok`; `Invalid Oi` (below) |
+| `CancelGTTOrder` | `OI deleted` | same | `Not_Ok`; `Invalid Oi` (below) |
+| `PlaceOCOOrder` | `OI created` | same | `Not_Ok` |
+| `ModifyOCOOrder` | `OI replaced` | same | `Not_Ok`; `Invalid Oi` (below) |
+| `CancelOCOOrder` | `OI deleted` | same | `Not_Ok`; `Invalid Oi` (below) |
 | `PlaceIceBergOrder`, `ModifyIceBergOrder`, `CancelIceBergOrder` | `true` (the string) | — | `Not_Ok`, classified as in 4.2 (message from `emsg`); or `false` (these three names only): classified the same way, always definite (401/403 → `AuthenticationError`, 429 → `RateLimitError`, 404 → `NotFoundError`, else `OrderRejectedError`), the message from a non-blank `rejreason`, else `emsg` (`emsg` attribute = that text) |
 | every other endpoint | `Ok` | — | `Not_Ok` |
 
+**`Invalid Oi`.** A reply whose `stat` is `Invalid Oi` (letter case ignored by the same
+`casefold()` rule, nothing trimmed), decided by the `stat` alone, whatever `al_id` and `emsg` the body
+holds (missing, blank or not) and at any HTTP status, on **`ModifyGTTOrder`, `CancelGTTOrder`, `ModifyOCOOrder` or
+`CancelOCOOrder`**, is a **definite failure**: `OrderRejectedError` with the message exactly
+`Invalid Oi` (not the usual `<Endpoint> failed: ...` form) and `emsg` the `stat` text as received.
+The docs name it for a modify "when the OCO can't be modified"; the test environment answers it
+for a modify or cancel of an alert that no longer exists, with an `al_id` and **no** `emsg`
+(F35 b), so the docs' "an `al_id` and no `emsg` is success" is not followed. This check comes
+before the success check. On `PlaceOCOOrder`, `PlaceGTTOrder` and every other endpoint it is not a
+failure word: `OrderStatusUnknownError` on a state-changing call, `ResponseParseError` on a read.
+It is checked before row 17 and after the JSON checks (a non-JSON body is still row 1).
+
 Anything else on these state-changing endpoints is row 17, `OrderStatusUnknownError`: `Ok`,
-another endpoint's word, another word (`"OI deleted"`, which the test environment answers to
-`CancelGTTOrder`, F32), other spacing (`"Oi  created"`, `" Oi created"`, `"Oi created "`), an
+another endpoint's word, another word (the documented cancel word `"Oi delete success"`, F32 / F35 b),
+other spacing (`"Oi  created"`, `" Oi created"`, `"Oi created "`), an
 iceberg word in another case (`"True"`),
-a JSON boolean, a missing `stat`, the GTT word without a non-blank string `al_id` (a numeric
+a JSON boolean, a missing `stat`, a GTT or OCO word without a non-blank string `al_id` (a numeric
 `al_id` included) or with an `emsg` that is not missing, `null` or a blank string (a number, a
-boolean, a list or non-blank text). Any JSON **array** body on these six endpoints is
+boolean, a list or non-blank text). Any JSON **array** body on these nine endpoints is
 `OrderStatusUnknownError` too, whatever status or `expect` (including `request(...,
 expect="list")`): they acknowledge with an object. The `false` rule belongs to the three iceberg
 names; another endpoint whose success word is `true` would not inherit it. A false success is
@@ -630,7 +805,8 @@ Python reference: `_transport/retry.py`, `_transport/outcome.py`, `endpoints/ord
 ### 5.2 State-changing calls
 
 `PlaceOrder`, `PlaceMultiOrder`, `ModifyOrder`, `CancelOrder`, `ExitSNOOrder`, `GenAcsTok`,
-`PlaceGTTOrder`, `ModifyGTTOrder`, `CancelGTTOrder`, `PlaceIceBergOrder`, `ModifyIceBergOrder`,
+`PlaceGTTOrder`, `ModifyGTTOrder`, `CancelGTTOrder`, `PlaceOCOOrder`, `ModifyOCOOrder`,
+`CancelOCOOrder`, `PlaceIceBergOrder`, `ModifyIceBergOrder`,
 `CancelIceBergOrder`, and any `request(..., state_changing=True)`: sent **exactly once**, never
 retried.
 
@@ -668,8 +844,9 @@ Only then is the request marked as sent and handed to the HTTP library.
 Raised when the server may have executed the request: an ambiguous transport failure (5.2), a
 non-JSON / unexpected-shape / array body on a state-changing call (4.2 rows 1, 4, 17), an `Ok`
 object where a state-changing `request()` expects a list (row 9), or an `Ok` acknowledgement that
-cannot be parsed, or a reply to a GTT or iceberg write that is not its exact success word (4.2.1).
-Its message tells the caller to check `orders()` (`pending_gtts()` for the GTT writes) before
+cannot be parsed, or a reply to a GTT, OCO or iceberg write that is not its exact success word (4.2.1;
+`Invalid Oi` on a modify or cancel is a rejection, not unknown).
+Its message tells the caller to check `orders()` (`pending_gtts()` for the GTT and OCO writes) before
 retrying. Callers must never resend automatically.
 
 Examples and guides shipped with an SDK must show the safe pattern: every example order carries
@@ -715,13 +892,14 @@ CRUDEOIL `prcftr` 1. The SDK passes these fields through unchanged.
 ### 5.6 Order outcome log
 
 Logger `tradesmart.orders`, only for `PlaceOrder`, `PlaceMultiOrder`, `ModifyOrder`,
-`CancelOrder`, `ExitSNOOrder` and the GTT and iceberg writes (`PlaceGTTOrder`, `ModifyGTTOrder`,
-`CancelGTTOrder`, `PlaceIceBergOrder`, `ModifyIceBergOrder`, `CancelIceBergOrder`, also through
+`CancelOrder`, `ExitSNOOrder` and the GTT, OCO and iceberg writes (`PlaceGTTOrder`, `ModifyGTTOrder`,
+`CancelGTTOrder`, `PlaceOCOOrder`, `ModifyOCOOrder`, `CancelOCOOrder`, `PlaceIceBergOrder`,
+`ModifyIceBergOrder`, `CancelIceBergOrder`, also through
 `request()`; not `GenAcsTok`, not other `request()` calls):
 
 - One INFO line per call that reaches the logged block (exceptions below):
   `<Endpoint> <result> order_id=<id> in <ms> ms`.
-  `<id>` = the ack's order id, else the payload's `norenordno`, else `-`. For the GTT writes the
+  `<id>` = the ack's order id, else the payload's `norenordno`, else `-`. For the GTT and OCO writes the
   key is `al_id` instead of `order_id`: `<Endpoint> <result> al_id=<id> in <ms> ms`, `<id>` = the
   ack's `al_id`, else the payload's `al_id`, else `-` (e.g. `PlaceGTTOrder accepted
   al_id=26111200000010 in 41 ms`). The time includes any
@@ -739,12 +917,12 @@ Logger `tradesmart.orders`, only for `PlaceOrder`, `PlaceMultiOrder`, `ModifyOrd
   logged block, so **invalid parameters log no line**. A failure to build the request inside the
   logged block (5.2: a payload that is not valid UTF-8, an unsendable header) logs `not_sent`.
 - `OrderStatusUnknownError` adds one WARNING: `<Endpoint>: order status unknown; check orders() before acting`
-  (`check pending_gtts() before acting` for the GTT writes).
+  (`check pending_gtts() before acting` for the GTT and OCO writes).
   `not_sent` has no WARNING.
 - Interruptions (not SDK errors): an async cancellation or a sync `KeyboardInterrupt` /
   `SystemExit` (any non-`Exception` error, async included) **after** the request was handed to
   the HTTP library logs `unknown` plus the WARNING `<Endpoint>: outcome unknown - check orders()`
-  (`check pending_gtts()` for the GTT writes),
+  (`check pending_gtts()` for the GTT and OCO writes),
   then the interruption propagates unchanged. An interruption **before** that point (for example
   during a rate-limit wait) logs no line: nothing was sent. The async cancellation line measures
   the time from the start of the send (the rate-limit wait is not included); every other line
@@ -1048,7 +1226,7 @@ Python reference: `models/base.py`, `models/*.py`, `enums.py`.
 **Every response model and stream message, field by field** (name, wire key, type, required,
 lenient) and every enum with its wire values: `specifications/models.md`, generated from the
 Python models and kept in sync by a test. This section states the rules; `models.md` is the
-inventory.
+inventory. `models.json` is the machine-readable form of these tables.
 
 ### 7.1 Field types
 
@@ -1104,7 +1282,7 @@ sent. A string is never passed through unchanged.
 | `Validity` | DAY, IOC, EOS (same) | — |
 | `Product` | CNC `C`, MIS `I`, NRML `M`, CO `H`, BO `B`, MTF `F` | member names |
 | `OrderStatus` | PENDING, OPEN, TRIGGER_PENDING, COMPLETE, CANCELED, REJECTED (same) | — |
-| `GttAlertType` | LTP_ABOVE `LTP_A_O`, LTP_BELOW `LTP_B_O`, CHANGE_PERCENT_ABOVE `CH_PER_A_O`, CHANGE_PERCENT_BELOW `CH_PER_B_O`, ATP_ABOVE `ATP_A_O`, ATP_BELOW `ATP_B_O`, OI_ABOVE `OI_A_O`, OI_BELOW `OI_B_O`, TOI_ABOVE `TOI_A_O`, TOI_BELOW `TOI_B_O`, HIGH_52W_ABOVE `LTP_A_52HIGH_O`, HIGH_52W_BELOW `LTP_B_52HIGH_O`, VOLUME_ABOVE `VOLUME_A_O` | member names |
+| `GttAlertType` | LTP_ABOVE `LTP_A_O`, LTP_BELOW `LTP_B_O`, CHANGE_PERCENT_ABOVE `CH_PER_A_O`, CHANGE_PERCENT_BELOW `CH_PER_B_O`, ATP_ABOVE `ATP_A_O`, ATP_BELOW `ATP_B_O`, OI_ABOVE `OI_A_O`, OI_BELOW `OI_B_O`, TOI_ABOVE `TOI_A_O`, TOI_BELOW `TOI_B_O`, HIGH_52W_ABOVE `LTP_A_52HIGH_O`, HIGH_52W_BELOW `LTP_B_52HIGH_O`, VOLUME_ABOVE `VOLUME_A_O`, OCO_BUY `LMT_BOS_O`, OCO_SELL `LMT_SOB_O` (the two OCO codes, 2.9) | member names |
 | `GttValidity` | DAY, GTT (same) | — |
 | `StreamState` | DISCONNECTED, CONNECTING, AUTHENTICATING, CONNECTED, RECONNECTING, CLOSED | — |
 | `Buildup` | long_buildup, short_buildup, long_unwinding, short_covering, neutral | — |
@@ -1442,9 +1620,24 @@ itself: `forward = F` unchanged whatever `q`; a same-expiry future and a caller-
 `underlying_price` are used as the forward as is, whatever `q`. Vectors: `carry_forward.json`
 (`dividend_yield` is optional there; absent means 0).
 
-Known limit (open): `rate` and `dividend_yield` are only checked for being finite (10.7), so an
-absurd but finite rate (for example `1e6`) can overflow the carry factor; Python then raises its
-`OverflowError`. Another SDK should raise its `ValueError` equivalent instead.
+Rate and yield range: `rate` and `dividend_yield` are only checked for being finite (10.7), but an
+absurd finite value (for example `-1e6`, or `1e6` with a later future) can make an exponential
+factor too large for a float. Every such factor is checked where it is computed, and an overflow
+(a result that would be infinite) raises `ValueError` (never a language overflow error, never an
+infinite or NaN result):
+
+| Factor | Where | Message |
+|---|---|---|
+| `exp(−(r − q)(Tf − To))` | the carry above (`carry_adjusted_forward`, `option_greeks`) | `rate - dividend_yield is out of range: exp(-(rate - dividend_yield) * (future_years - option_years)) overflows a float (rate=<r>, dividend_yield=<q>, future_years=<Tf>, option_years=<To>)` |
+| `exp(−r·t)` | `black76`, `black_scholes`, `implied_volatility`, `greeks_from_price` | `rate is out of range: exp(-rate * years) overflows a float (rate=<r>, years=<t>)` |
+| `exp(−q·t)` | the same four, BSM only (Black-76 discounts the future at `rate`) | `dividend_yield is out of range: exp(-dividend_yield * years) overflows a float (dividend_yield=<q>, years=<t>)` |
+
+`t` is the floored time `max(years, 1 minute)` (10.2); values print in the language's shortest
+round-trip form. A factor is computed only when it is needed: an expired option (`years ≤ 0`) returns
+the `expired` result without one, so it never raises this error, and in `option_greeks` the carry
+check runs after the quotes (10.7 step 6). A factor that underflows to 0 is not an error (the result
+is then the model's limit, for example a forward of 0). Vectors: the `*overflowing*` cases in
+`carry_forward.json`, `greeks_prices.json`, `implied_volatility.json` and `greeks_edge_cases.json`.
 
 ### 10.4 Contract selection
 
@@ -1772,10 +1965,11 @@ Python reference: `_logging.py`, `_transport/codec.py`, `_token_store.py`.
 | F27 | `MARKET` (`MKT`) orders placed through the API | Refused: `stat Not_Ok`, "ALGO_CHK: MKT Order type not allowed for API order" (owner-confirmed for production; observed on the test environment). `SL-MKT` refused the same way on the test environment ("ALGO_CHK: SL-MKT Order type not allowed for API order", 2026-11-12); not yet confirmed on production | Not blocked client-side; documented; raises `OrderRejectedError` |
 | F28 | BFO script-master layout | Verified live 2026-11-12 (production): strike column `Strike`; options `BSXOPT`, futures `BSXFUT` (SENSEX) | 8.3; strike column and `OPT`→`FUT` future fallback (10.4) |
 | F29 | Order rate limit and algo ID | Docs: 30/s and 600/min. Owner: most clients are limited to 10 orders per second; a higher rate needs an exchange-approved strategy and its algo ID, checked by the TradeSmart backend. **Resolved 2026-11-12:** the docs (2026-11-12 copy) list `algo_id` (String, Optional) on `PlaceOrder` and `ModifyOrder`, "Required when placing more than 10 orders per second" | Default 10 per second, configurable 1 to 30 (3.4); `ClientConfig.algo_id` and per-call `algo_id` sent on `PlaceOrder` / `ModifyOrder` (2.4); above 10 per second requires `algo_id` (12) |
-| F30 | OCO (one-cancels-other) GTT | Pending: supported by the backend per the owner (2026-11-12); request fields and replies to be shared | Not implemented (no method; not reachable through the GTT methods) |
+| F30 | OCO (one-cancels-other) GTT | Documented 2026-11-18 (`04-oco-orders.md`); observed on the test environment and in the web terminal (F35) | Implemented: `place_oco`, `modify_oco`, `cancel_oco` and `OcoLeg` (2.9) |
 | F31 | Closing SELL at the last price on the test environment | Pending (test environment only; recorded, not an SDK issue): a LIMIT BUY at the last price fills within seconds, but the LIMIT SELL that closes it, at the last price or the best bid, stays `OPEN` (observed 2026-11-12, also for a SELL entered by hand); not seen on production | No SDK change; a live order suite on the test environment records it as a non-strict expected failure (Python known-issue key `closing-sell`) and keeps the position in the run's own position ledger, within a per-instrument ceiling, instead of failing with "CHECK THE ACCOUNT" |
-| F32 | GTT write `stat` words on the test environment | Observed 2026-11-13 (test environment): `PlaceGTTOrder` answered `{"stat": "OI created", "al_id": ...}` and `CancelGTTOrder` answered `{"stat": "OI deleted", "al_id": ...}`, while the docs say `Oi created` and `Oi delete success`. The words differ in letter case (`OI created`), and the cancel word is a different word (`OI deleted`). `GetTrgOi` (`triggered_gtts()`) also listed a **cancelled** GTT, its row `stat` `CANCELLED`. Pending: TradeSmart to confirm production's words | The GTT success words compare ignoring letter case only (4.2.1); `OI deleted` stays `OrderStatusUnknownError` (the caller checks `pending_gtts()`). A live GTT check treats a triggered row whose `stat` is `CANCELLED` (any case) as not fired |
+| F32 | GTT write `stat` words on the test environment | Observed 2026-11-13 (test environment): `PlaceGTTOrder` answered `{"stat": "OI created", "al_id": ...}` and `CancelGTTOrder` answered `{"stat": "OI deleted", "al_id": ...}`, while the docs say `Oi created` and `Oi delete success`. The words differ in letter case (`OI created`), and the cancel word is a different word (`OI deleted`). `GetTrgOi` (`triggered_gtts()`) also listed a **cancelled** GTT, its row `stat` `CANCELLED`. Pending: TradeSmart to confirm production's words | The GTT success words compare ignoring letter case only (4.2.1); Amended 2026-11-18 (owner, F35): `OI deleted` is the success word of `CancelGTTOrder` and `CancelOCOOrder`; the documented `Oi delete success` is `OrderStatusUnknownError` (the caller checks `pending_gtts()`); `Invalid Oi` on a GTT modify or cancel is a definite `OrderRejectedError`. A live GTT check treats a triggered row whose `stat` is `CANCELLED` (any case) as not fired |
 | F33 | Order rate per minute | Open. Docs: 600 per minute. Observed 2026-11-14 (production): an order was refused once 200 had been received in the current minute, with "Order Recieved 202 in a current minute exceeds Limit 200 for user". Ask TradeSmart whether the limit is 200 or 600 and whether ModifyOrder, CancelOrder and ExitSNOOrder count toward it | Default `order_rate_limit_per_minute` 200 (3.4, 12); with 200 orders in the rolling minute the SDK waits for a slot within `order_rate_limit_max_wait`, else raises `RateLimitError` before sending |
+| F35 | OCO behaviour against the docs (TradeSmart's web terminal, and the public API on the test environment) | Observed 2026-11-18. (a) **Slots:** the web terminal always sends the stop-loss as `x` (`place_order_params`) and the target as `y` (`place_order_params_leg2`), buy and sell; its form requires, for a buy, the stop-loss trigger above the last price and the target below (a sell mirrors it). The docs' sell example puts the target in `x`. (b) **Reply words (test environment, public API):** place `OI created`, modify `OI replaced`; cancel **`OI deleted`** (docs: `Oi delete success`; the same word as the GTT cancel, F32); a modify or cancel of an alert that was already cancelled answers **`Invalid Oi` with an `al_id` and no `emsg`**, so the docs' rule "`al_id` and no `emsg` is success" would read a failure as success. (c) **List rows:** an OCO row has a top-level `d` (= `x`'s) and `remarks`, leg 1's fields copied to the top level, legs without `tsym` / `exch` / `ret` / `trgprc`, `qty` a JSON number, only leg 1 with `s_prdt_ali`, legs with `ipaddr` (the placing IP address); a cancelled OCO is listed by `GetTrgOi` with `stat` `CANCELLED`. (d) The web terminal sends `LMT` legs only, no `trgprc`. (e) Nested request values (`oivariable`, the legs) need a nested body encoder. Ask TradeSmart: does the slot matter (is the direction derived from the last price, or fixed) and is the docs example right; production's cancel word (`OI deleted`?); is `Invalid Oi` always a definite failure; does a leg `remarks` come back in list rows | `place_oco` / `modify_oco` / `cancel_oco` (2.9): stop-loss in `x`, target in `y`, a side check before sending (BUY: stop-loss trigger above the target trigger; SELL: below; equal refused); words as in 4.2.1; **owner decision 2026-11-18 (amends F32):** `CancelOCOOrder` and `CancelGTTOrder` succeed only on `OI deleted` (the documented `Oi delete success` becomes `OrderStatusUnknownError`), and `Invalid Oi` is a definite `OrderRejectedError` on the OCO and GTT modify and cancel; nested bodies in `request()` and the typed calls (3.2); `stop_loss` / `target` of a list row chosen by trigger value and side, not by slot; no OCO triggering in the offline broker (16) |
 
 Test environment (2026-11-13): orders without `algo_id` were accepted with a server-assigned default algo id until mid-day; from the evening the test environment refuses them (`ORA: Algo id not set for an algo order from source API`); production behaviour unconfirmed. The SDK sends no `algo_id` unless set.
 
@@ -1827,7 +2021,8 @@ market hours. If it does, the lifecycle and drills below are the reference.
 | Test-driven transitions | accept (`PENDING` → working), fill (full or partial; partials accumulate; `COMPLETE` when filled), trigger (`TRIGGER_PENDING` → `OPEN`), cancel, reject |
 | Strategy calls | Modify / cancel / exit apply to the book; on a closed order an immediate `Not_Ok` "order is not open to modify" / "... to cancel" (live NSE first acknowledges such a cancel, then refuses it; F23). Exit (`ExitSNOOrder`) applies to cover and bracket orders only (product `H` / `B`): an unknown order → `Not_Ok` "Order not found to Exit"; another product → "order is not a cover or bracket order"; a closed order → "order is not open to exit"; otherwise the whole order becomes `CANCELED` and the reply is `{request_time, stat: "Ok", dmsg: "success"}` as documented (that an exit cancels the whole order is assumed) |
 | Every change | Order book row and order history row (newest first) updated, and an `om` on subscribed streams; a fill also adds a trade-book row, updates the position net quantity and average (no funds change) and pushes a `pm` |
-| GTT | Place, modify and cancel apply to a list of pending GTTs and answer the documented words (`Oi created`, `Oi replaced`, `Oi delete success`) with `request_time` and `al_id`; an unknown or already triggered alert id → `Not_Ok` "GTT not found to Modify" / "... to Cancel"; a modify that changes `ai_t` → `Not_Ok` "ai_t cannot be modified"; missing or non-numeric fields → `Not_Ok` "Invalid Input : ...". The pending and triggered lists answer the documented row shape (`qty` a JSON number), or `Not_Ok` "no data" when empty (assumed); the enabled alert types are the documented example (`ATP`, `LTP`). A GTT never fires by itself: the test fires one (`trigger_gtt`), which places its order as a new order would be (with `add_ord_id` = the alert id) and lists the GTT as triggered with `norentm` |
+| GTT | Place, modify and cancel apply to a list of pending GTTs and answer the words `Oi created`, `Oi replaced` and `OI deleted` (the cancel word of the test environment, F32 / F35 b) with `request_time` and `al_id`; an unknown or already triggered alert id → `Not_Ok` "GTT not found to Modify" / "... to Cancel"; a modify that changes `ai_t` → `Not_Ok` "ai_t cannot be modified"; missing or non-numeric fields → `Not_Ok` "Invalid Input : ...". The pending and triggered lists answer the documented row shape (`qty` a JSON number), or `Not_Ok` "no data" when empty (assumed); the enabled alert types are the documented example (`ATP`, `LTP`). A GTT never fires by itself: the test fires one (`trigger_gtt`), which places its order as a new order would be (with `add_ord_id` = the alert id) and lists the GTT as triggered with `norentm` |
+| OCO | `PlaceOCOOrder`, `ModifyOCOOrder` and `CancelOCOOrder` apply to the same list of pending alerts (an OCO has two legs and two trigger values, 2.9) and answer `OI created`, `OI replaced` and `OI deleted` with `request_time` and `al_id`; a modify or cancel of an unknown or already cancelled alert answers the observed `Invalid Oi` with an `al_id` and no `emsg`. The pending and triggered lists answer the observed OCO row shape; a cancelled OCO is listed as triggered with `stat` `CANCELLED`. An OCO is **never triggered by the offline broker**: no fired OCO has been observed, so the fired row and order shapes would be invented; `trigger_gtt` on an OCO alert is an error that says so |
 | Not modelled | `PlaceMultiOrder` (F1), `GetOrderMargin`, the iceberg endpoints and any other endpoint without a route: `Not_Ok` "… does not model <endpoint>; set a reply …" |
 | REST drills (once, on the next call of one endpoint) | `reject(message)` → `Not_Ok`; `timeout_after_send()` → the call takes effect, then a read timeout (`OrderStatusUnknownError` on an order); `connect_error()` → nothing sent or recorded (`NetworkError`); `rate_limit(retry_after)` → HTTP 429 with a JSON `Not_Ok` body (assumed shape); `server_error(status=503, json=False)` → by default a non-JSON HTML gateway page, like a real 5xx (an order gets `OrderStatusUnknownError`, a read `ServerError`), with `json=True` a JSON `Not_Ok` body instead (an order gets `OrderRejectedError`); `bad_body()` → non-JSON; `session_expired()` → `Not_Ok` "Session Expired" |
 | Stream drills | Drop every connection (the client reconnects and resubscribes); refuse the next login (ack `s="Not_Ok"`); stop / resume answering heartbeats (silence detection) |

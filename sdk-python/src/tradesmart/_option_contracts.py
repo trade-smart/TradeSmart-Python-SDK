@@ -10,7 +10,7 @@ from decimal import Decimal, InvalidOperation
 
 from tradesmart.analytics import BuildupReading, ChainRow, OptionChainSnapshot, classify_buildup
 from tradesmart.errors import APIError, NotFoundError, ResponseParseError
-from tradesmart.greeks import OptionGreeks, _num, _nums, greeks_from_price
+from tradesmart.greeks import OptionGreeks, _exp_or_value_error, _num, _nums, greeks_from_price
 from tradesmart.models.base import IST
 from tradesmart.models.market import Candle, OptionContract, Quote
 
@@ -302,7 +302,16 @@ def carry_adjusted_forward(
         option_years,
         dividend_yield,
     )
-    return future_price * math.exp(-(rate - dividend_yield) * (future_years - option_years))
+    factor = _exp_or_value_error(
+        -(rate - dividend_yield) * (future_years - option_years),
+        lambda: (
+            "rate - dividend_yield is out of range: "
+            "exp(-(rate - dividend_yield) * (future_years - option_years)) overflows a float "
+            f"(rate={rate!r}, dividend_yield={dividend_yield!r}, "
+            f"future_years={future_years!r}, option_years={option_years!r})"
+        ),
+    )
+    return future_price * factor
 
 
 def _now() -> datetime:

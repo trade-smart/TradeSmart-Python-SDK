@@ -9,8 +9,9 @@ use, and a ``MatrixRun`` whose waits and pacing run on a fake clock (no real sle
 from __future__ import annotations
 
 import dataclasses
+import functools
 import json
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
@@ -169,8 +170,12 @@ def family_rig(
     uat: bool = False,
     simulated_order_clock: bool = True,
     pace_per_minute: int = batch.ORDER_PLACES_PER_MINUTE,
+    sdk: Callable[[OfflineBroker, UatLikeMarket], Any] | None = None,
     **market_options: Any,
 ) -> Iterator[Rig]:
+    """``sdk``: builds the SDK under test from the broker and market (a driver process, say);
+    ``None`` is the Python SDK on the rig's client. A driver is bound to the session (its notes,
+    stops and raw bodies) and closed with the rig."""
     t = FakeTime()
     with OfflineBroker(ACCOUNT) as broker:
         market = market_type(broker, **market_options)
@@ -183,17 +188,27 @@ def family_rig(
             client._transport.use_time(t.clock, t.sleep)
         run_dir = tmp_path / run_id
         run_dir.mkdir(parents=True)
+        under_test = sdk(broker, market) if sdk is not None else None
+        code = under_test.code if under_test is not None else "p"
         session = gate.MatrixSession(
             client=client,
             run_id=run_id,
             trading_day=TODAY,
             run_dir=run_dir,
-            ledger=Ledger(run_dir / LEDGER_NAME, run_id, forbidden=[ACCOUNT]),
+            ledger=Ledger(run_dir / LEDGER_NAME, run_id, forbidden=[ACCOUNT], sdk_code=code),
             guard=Guard(tmp_path / "STOP", max_open=max_open, clock=t.clock),
             sleep=t.sleep,
             clock=t.clock,
             uat=uat,
+            sdk=under_test,
         )
+        bind = getattr(under_test, "bind", None)
+        if callable(bind):
+            bind(
+                note=session.ledger.note,
+                stop=functools.partial(gate.sdk_stopped, session, None),
+                responses=session.responses,
+            )
         run = batch.open_run(
             session,
             contracts=contracts_of(market),
@@ -205,3 +220,5 @@ def family_rig(
             yield Rig(broker, market, session, run, tmp_path)
         finally:
             client.close()
+            if under_test is not None:
+                under_test.close()

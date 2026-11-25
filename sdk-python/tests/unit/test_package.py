@@ -8,7 +8,7 @@ SDK_DIR = Path(__file__).resolve().parents[2]
 
 
 def test_version() -> None:
-    assert tradesmart.__version__ == "2.0.0"
+    assert tradesmart.__version__ == "2.1.0"
 
 
 def test_shipped_code_has_no_internal_references() -> None:
@@ -50,3 +50,15 @@ def test_sdist_includes_are_anchored_at_the_project_folder() -> None:
         "/NOTICE",
         "/pyproject.toml",
     ]
+
+
+def test_oco_leg_is_a_public_name() -> None:
+    assert "OcoLeg" in tradesmart.__all__
+    for name in ("OcoLegRow", "OcoTrigger", "OcoSide"):
+        assert name in tradesmart.__all__
+        assert getattr(tradesmart, name).__name__ == name
+    leg = tradesmart.OcoLeg(trigger_value="1430", price="1440")
+    assert leg.order_type == tradesmart.OrderType.LIMIT
+    for client in (tradesmart.TradeSmart, tradesmart.AsyncTradeSmart):
+        for method in ("place_oco", "modify_oco", "cancel_oco"):
+            assert callable(getattr(client, method))

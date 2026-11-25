@@ -13,13 +13,13 @@ from typing import Any
 
 from tradesmart._client_core import STATE_CHANGING_ENDPOINTS
 from tradesmart._logging import get_logger
-from tradesmart._transport.codec import GTT_WRITE_ENDPOINTS, check_hint
+from tradesmart._transport.codec import ALERT_WRITE_ENDPOINTS, check_hint
 from tradesmart.endpoints.base import Call
 from tradesmart.errors import OrderStatusUnknownError
 
 _log = get_logger("orders")
 # The order endpoints: PlaceOrder, PlaceMultiOrder, ModifyOrder, CancelOrder, ExitSNOOrder, the
-# GTT writes (PlaceGTTOrder, ModifyGTTOrder, CancelGTTOrder) and the iceberg writes.
+# GTT and OCO writes (Place, Modify and Cancel of each) and the iceberg writes.
 ORDER_ENDPOINTS = STATE_CHANGING_ENDPOINTS - {"GenAcsTok"}
 
 
@@ -33,12 +33,12 @@ def is_order_call(call: Call[Any]) -> bool:
 
 
 def _id_key(call: Call[Any]) -> str:
-    """``al_id`` (the GTT alert id) for the GTT writes, else ``order_id``."""
-    return "al_id" if call.spec.name in GTT_WRITE_ENDPOINTS else "order_id"
+    """``al_id`` (the alert id) for the GTT and OCO writes, else ``order_id``."""
+    return "al_id" if call.spec.name in ALERT_WRITE_ENDPOINTS else "order_id"
 
 
 def _order_id(call: Call[Any], result: Any) -> str:
-    if call.spec.name in GTT_WRITE_ENDPOINTS:
+    if call.spec.name in ALERT_WRITE_ENDPOINTS:
         # The ack's al_id (a str from a typed method, a dict from request()), else the payload's.
         ack_id = result if isinstance(result, str) else getattr(result, "al_id", None)
         if ack_id is None and isinstance(result, dict):
@@ -51,7 +51,8 @@ def _order_id(call: Call[Any], result: Any) -> str:
         payload_key = "norenordno"
     if isinstance(ack_id, str) and ack_id.strip():
         return ack_id.strip()
-    return call.payload.get(payload_key) or "-"
+    from_payload = call.payload.get(payload_key)
+    return from_payload if isinstance(from_payload, str) and from_payload else "-"
 
 
 class SendProgress:

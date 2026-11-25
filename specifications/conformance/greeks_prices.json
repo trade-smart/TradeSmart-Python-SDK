@@ -479,6 +479,37 @@
     },
     {
       "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "model": "black76",
+        "option_type": "CE",
+        "rate": -1000000.0,
+        "strike": 100,
+        "underlying": 100,
+        "volatility": 0.2,
+        "years": 0.25
+      },
+      "name": "black76_rate_overflowing_the_discount_factor_is_an_error"
+    },
+    {
+      "expected": {
+        "error": "ValueError"
+      },
+      "input": {
+        "dividend_yield": -1000000.0,
+        "model": "bsm",
+        "option_type": "PE",
+        "rate": 0.065,
+        "strike": 100,
+        "underlying": 100,
+        "volatility": 0.2,
+        "years": 0.25
+      },
+      "name": "bsm_dividend_yield_overflowing_the_discount_factor_is_an_error"
+    },
+    {
+      "expected": {
         "delta": 0.9986869863322352,
         "gamma": 9.834117749533336e-05,
         "iv": 0.2,

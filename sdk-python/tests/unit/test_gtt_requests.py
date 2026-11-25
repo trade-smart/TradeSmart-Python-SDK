@@ -175,7 +175,9 @@ def test_validity_eos_and_ioc_go_to_ret() -> None:
     assert place(validity=Validity.IOC)["ret"] == "IOC"
 
 
-@pytest.mark.parametrize("member", list(GttAlertType))
+@pytest.mark.parametrize(
+    "member", [m for m in GttAlertType if m not in (GttAlertType.OCO_BUY, GttAlertType.OCO_SELL)]
+)
 def test_every_alert_type_is_sent_as_its_wire_code(member: GttAlertType) -> None:
     assert place(alert_type=member)["ai_t"] == member.value
     assert place(alert_type=member.value.lower())["ai_t"] == member.value
@@ -336,7 +338,7 @@ def test_refusal_message_never_echoes_the_tag() -> None:
     [
         (PLACE_GTT_ORDER, "Oi created"),
         (MODIFY_GTT_ORDER, "Oi replaced"),
-        (CANCEL_GTT_ORDER, "Oi delete success"),
+        (CANCEL_GTT_ORDER, "OI deleted"),
     ],
 )
 def test_write_specs_are_order_calls_with_their_words(spec: Any, word: str) -> None:
@@ -378,7 +380,7 @@ def test_write_parsers_return_the_alert_id() -> None:
     body = {"request_time": "10:02:06 12-11-2026", "stat": "Oi created", "al_id": AL_ID}
     assert PLACE_GTT_ORDER.parse(body) == AL_ID
     assert MODIFY_GTT_ORDER.parse({**body, "stat": "Oi replaced"}) == AL_ID
-    assert CANCEL_GTT_ORDER.parse({**body, "stat": "Oi delete success"}) == AL_ID
+    assert CANCEL_GTT_ORDER.parse({**body, "stat": "OI deleted"}) == AL_ID
 
 
 @pytest.mark.parametrize(

@@ -40,6 +40,10 @@ async def _run_async(
 
 @pytest.fixture(scope="module")
 def results(request: pytest.FixtureRequest, matrix: gate.MatrixSession) -> Mapping[str, CaseResult]:
+    if matrix.sdk.name != "python":  # the async client and the streams are Python-only
+        pytest.skip(
+            f"family M9 (async client and streams) is Python-only; SDK is {matrix.sdk.name}"
+        )
     reason = family.hours_refusal(uat=matrix.uat, mock=matrix.mock)
     if reason is not None:
         pytest.skip(reason)

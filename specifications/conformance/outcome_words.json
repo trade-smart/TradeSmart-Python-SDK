@@ -708,7 +708,7 @@
         "rate_limit_mode": "wait",
         "replies": [
           {
-            "body": "{\"stat\":\"Oi delete success\",\"al_id\":\"26111200000099\"}"
+            "body": "{\"stat\":\"OI deleted\",\"al_id\":\"26111200000099\"}"
           }
         ],
         "token": "valid"
@@ -754,12 +754,12 @@
         "rate_limit_mode": "wait",
         "replies": [
           {
-            "body": "{\"stat\":\"OI deleted\",\"al_id\":\"26111200000099\"}"
+            "body": "{\"stat\":\"Oi delete success\",\"al_id\":\"26111200000099\"}"
           }
         ],
         "token": "valid"
       },
-      "name": "request_cancel_gtt_test_env_word_oi_deleted_is_unknown"
+      "name": "request_cancel_gtt_docs_word_oi_delete_success_is_unknown"
     },
     {
       "expected": {
@@ -1030,7 +1030,7 @@
         "rate_limit_mode": "wait",
         "replies": [
           {
-            "body": "{\"stat\":\"Oi delete success\",\"al_id\":\"26111200000010\"}"
+            "body": "{\"stat\":\"OI deleted\",\"al_id\":\"26111200000010\"}"
           }
         ],
         "token": "valid"
@@ -1076,15 +1076,475 @@
         "rate_limit_mode": "wait",
         "replies": [
           {
-            "body": "{\"stat\":\"OI deleted\",\"al_id\":\"26111200000010\"}"
+            "body": "{\"stat\":\"Oi delete success\",\"al_id\":\"26111200000010\"}"
           }
         ],
         "token": "valid"
       },
-      "name": "cancel_gtt_test_env_word_oi_deleted_is_unknown"
+      "name": "cancel_gtt_docs_word_oi_delete_success_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "ModifyGTTOrder rejected al_id=26111200000010",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "modify_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Invalid Oi\",\"al_id\":\"26111200000010\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "modify_gtt_invalid_oi_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "CancelGTTOrder rejected al_id=26111200000010",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "cancel_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Invalid Oi\",\"al_id\":\"26111200000010\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "cancel_gtt_invalid_oi_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "CancelGTTOrder rejected al_id=26111200000099",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "request_cancel_gtt",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"INVALID OI\",\"al_id\":\"26111200000099\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_cancel_gtt_invalid_oi_is_rejected"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "PlaceOCOOrder accepted al_id=26111800000001",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"OI created\",\"al_id\":\"26111800000001\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_oco_accepted_logs_the_al_id"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "PlaceOCOOrder accepted al_id=26111800000001",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"OI CREATED\",\"al_id\":\"26111800000001\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_oco_upper_case_word_is_accepted"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceOCOOrder unknown al_id=-",
+        "requests": 1,
+        "warning": "PlaceOCOOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "place_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Ok\",\"al_id\":\"26111800000001\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_oco_ok_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceOCOOrder unknown al_id=-",
+        "requests": 1,
+        "warning": "PlaceOCOOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "place_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Invalid Oi\",\"al_id\":\"26111800000001\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_oco_invalid_oi_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "PlaceOCOOrder rejected al_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Not_Ok\",\"emsg\":\"RMS:Blocked\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_oco_not_ok_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "PlaceOCOOrder unknown al_id=-",
+        "requests": 1,
+        "warning": "PlaceOCOOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "place_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "read_timeout"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_oco_read_timeout_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "NetworkError",
+        "info": "PlaceOCOOrder not_sent al_id=-",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "place_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "connect_error"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "place_oco_connect_error_is_not_sent"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "ModifyOCOOrder accepted al_id=26111800000001",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "modify_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"OI replaced\",\"al_id\":\"26111800000001\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "modify_oco_accepted_logs_the_al_id"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "ModifyOCOOrder rejected al_id=26111800000001",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "modify_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Invalid Oi\",\"al_id\":\"26111800000001\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "modify_oco_invalid_oi_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "ModifyOCOOrder rejected al_id=26111800000001",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "modify_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"INVALID OI\",\"al_id\":\"26111800000001\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "modify_oco_invalid_oi_upper_case_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "ModifyOCOOrder unknown al_id=26111800000001",
+        "requests": 1,
+        "warning": "ModifyOCOOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "modify_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "read_timeout"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "modify_oco_read_timeout_is_unknown"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "CancelOCOOrder accepted al_id=26111800000001",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "cancel_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"OI deleted\",\"al_id\":\"26111800000001\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "cancel_oco_accepted_logs_the_al_id"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "CancelOCOOrder rejected al_id=26111800000001",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "cancel_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Invalid Oi\",\"al_id\":\"26111800000001\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "cancel_oco_invalid_oi_is_rejected"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "CancelOCOOrder unknown al_id=26111800000001",
+        "requests": 1,
+        "warning": "CancelOCOOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "cancel_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Oi delete success\",\"al_id\":\"26111800000001\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "cancel_oco_docs_word_oi_delete_success_is_unknown"
+    },
+    {
+      "expected": {
+        "error": "OrderStatusUnknownError",
+        "info": "CancelOCOOrder unknown al_id=26111800000001",
+        "requests": 1,
+        "warning": "CancelOCOOrder: order status unknown; check pending_gtts() before acting"
+      },
+      "input": {
+        "call": "cancel_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "failure": "read_timeout"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "cancel_oco_read_timeout_is_unknown"
+    },
+    {
+      "expected": {
+        "error": null,
+        "info": "CancelOCOOrder accepted al_id=26111800000099",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "request_cancel_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"OI deleted\",\"al_id\":\"26111800000099\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_cancel_oco_accepted"
+    },
+    {
+      "expected": {
+        "error": "OrderRejectedError",
+        "info": "CancelOCOOrder rejected al_id=26111800000099",
+        "requests": 1,
+        "warning": null
+      },
+      "input": {
+        "call": "request_cancel_oco",
+        "closed": false,
+        "invalid_parameters": false,
+        "order_rate_limit_max_wait": 1.0,
+        "prior_orders": 0,
+        "rate_limit_mode": "wait",
+        "replies": [
+          {
+            "body": "{\"stat\":\"Invalid Oi\",\"al_id\":\"26111800000099\"}"
+          }
+        ],
+        "token": "valid"
+      },
+      "name": "request_cancel_oco_invalid_oi_is_rejected"
     }
   ],
-  "description": "The order outcome log (logger tradesmart.orders) of one call. input.call is an order method (place_order, modify_order, cancel_order, exit_order), a typed GTT write (place_gtt with the arguments of the order_validation.json gtt_ cases, modify_gtt the same with alert_id 26111200000010, cancel_gtt that alert_id), request_place_order (request('placeorder', ..., state_changing=True)), request_place_gtt (request('placegttorder', {exch: NSE})), request_cancel_gtt (request('CANCELGTTORDER', {al_id: '26111200000099'})), request_place_iceberg (request('placeicebergorder', {exch: NSE})), request_order_book_state_changing (not an order endpoint) or limits (a read). input.token is valid, none or expired (an AccessToken past its expiry); closed closes the client first; prior_orders accepted orders are placed first in the same instant (so an 11th order exceeds the 10 per second limit; their lines are not shown; order_rate_limit_max_wait is the configured wait cap); replies answer the call's requests in turn: {status, body} or {failure: kind} (kinds as in transport_failures.json). expected.info is the INFO line without its time ('<Endpoint> <word> order_id=<id>', id '-' when none; 'al_id=<id>' for the GTT writes, the ack's al_id else the payload's), expected.warning the WARNING line (it names pending_gtts() for the GTT writes, orders() otherwise), both null when not logged; expected.error is the error type raised (null when the call returned) and expected.requests how many requests reached the transport.",
+  "description": "The order outcome log (logger tradesmart.orders) of one call. input.call is an order method (place_order, modify_order, cancel_order, exit_order), a typed GTT write (place_gtt with the arguments of the order_validation.json gtt_ cases, modify_gtt the same with alert_id 26111200000010, cancel_gtt that alert_id), a typed OCO write (place_oco with the arguments of the oco_requests.json case place_buy_limit_limit, modify_oco the same with alert_id 26111800000001, cancel_oco that alert_id; the legs are OcoLeg values built from the case's dictionaries), request_place_order (request('placeorder', ..., state_changing=True)), request_place_gtt (request('placegttorder', {exch: NSE})), request_cancel_gtt (request('CANCELGTTORDER', {al_id: '26111200000099'})), request_cancel_oco (request('CANCELOCOORDER', {al_id: '26111800000099'})), request_place_iceberg (request('placeicebergorder', {exch: NSE})), request_order_book_state_changing (not an order endpoint) or limits (a read). input.token is valid, none or expired (an AccessToken past its expiry); closed closes the client first; prior_orders accepted orders are placed first in the same instant (so an 11th order exceeds the 10 per second limit; their lines are not shown; order_rate_limit_max_wait is the configured wait cap); replies answer the call's requests in turn: {status, body} or {failure: kind} (kinds as in transport_failures.json). expected.info is the INFO line without its time ('<Endpoint> <word> order_id=<id>', id '-' when none; 'al_id=<id>' for the GTT and OCO writes, the ack's al_id else the payload's; a reply with the stat Invalid Oi to a modify or cancel is a rejection, see success_words.json), expected.warning the WARNING line (it names pending_gtts() for the GTT and OCO writes, orders() otherwise), both null when not logged; expected.error is the error type raised (null when the call returned) and expected.requests how many requests reached the transport.",
   "source": "tradesmart._transport.outcome via tradesmart.TradeSmart (in-memory transport)",
   "tolerance": {}
 }
