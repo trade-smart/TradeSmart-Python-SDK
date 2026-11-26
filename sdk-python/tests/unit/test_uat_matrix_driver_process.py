@@ -12,6 +12,8 @@ import contextlib
 import json
 import os
 import re
+import signal
+import subprocess
 import sys
 import threading
 import time
@@ -135,19 +137,40 @@ def _script(*replies: dict[str, Any], **extra: Any) -> dict[str, Any]:
     return {"hello": HELLO, "replies": list(replies), **extra}
 
 
-def _gone(pid: int, wait: float = 5.0) -> bool:
-    """The process no longer runs (absent, or a zombie nobody reaped)."""
-    deadline = time.monotonic() + wait
-    while True:
+def _running(pid: int) -> bool:
+    """The process runs (a zombie nobody reaped does not count). Checked for real on every CI
+    platform: ``/proc`` on Linux, ``tasklist`` on Windows, signal 0 elsewhere (macOS)."""
+    if os.name == "nt":
+        listed = subprocess.run(  # noqa: S603
+            ["tasklist", "/FI", f"PID eq {pid}", "/NH", "/FO", "CSV"],  # noqa: S607
+            capture_output=True,
+            text=True,
+            check=False,
+        ).stdout
+        return f'"{pid}"' in listed
+    if Path("/proc").is_dir():
         try:
             stat = Path(f"/proc/{pid}/stat").read_text(encoding="utf-8")
         except OSError:
-            return True
-        if stat.rsplit(")", 1)[-1].split()[0] == "Z":
-            return True
+            return False
+        return stat.rsplit(")", 1)[-1].split()[0] != "Z"
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def _gone(pid: int, wait: float = 5.0) -> bool:
+    """The process no longer runs, within ``wait`` seconds."""
+    deadline = time.monotonic() + wait
+    while _running(pid):
         if time.monotonic() >= deadline:
             return False
         time.sleep(0.05)
+    return True
 
 
 PLACE_KWARGS: dict[str, Any] = {**PLAN, "tag": "sdkuat-1113abcd-j000-1"}
@@ -882,6 +905,24 @@ def test_close_ends_the_driver_and_its_process_tree(tmp_path: Path) -> None:
     with pytest.raises(RequestValidationError):
         sdk.cancel_order("1001")
     sdk.close()  # twice is harmless
+
+
+def test_close_never_waits_on_a_pipe_a_surviving_process_still_holds(tmp_path: Path) -> None:
+    # A process the tree kill cannot reach keeps the driver's stdout and stderr open, so the
+    # reader threads stay blocked in readline. Closing a stream under a blocked reader waits for
+    # it forever (the Windows CI hang: there, process.kill() reached the driver only).
+    fake = Fake(tmp_path, _script(escaped_child=True))
+    sdk = fake.start()
+    escaped = next(e["escaped_child"] for e in fake.entries() if "escaped_child" in e)
+    try:
+        closer = threading.Thread(target=sdk.close, daemon=True)
+        closer.start()
+        closer.join(30.0)
+        assert not closer.is_alive(), "close() hung on a pipe that another process holds open"
+        assert sdk.process.poll() is not None
+    finally:
+        with contextlib.suppress(OSError):
+            os.kill(escaped, signal.SIGTERM)
 
 
 def test_the_reply_timeout_is_stated_in_the_protocol_document() -> None:

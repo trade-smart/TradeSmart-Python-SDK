@@ -10,6 +10,9 @@ by ``FAKE_DRIVER_SCRIPT``:
 - ``refuse``: then write one more stderr line and exit 3 before any handshake;
 - ``child``: start a long-sleeping child process first (its pid goes to the log), so the tests
   can check that the harness kills the whole process tree;
+- ``escaped_child``: start a long-sleeping child outside the driver's process group that keeps
+  the driver's stdout and stderr open (its pid goes to the log), so the tests can check that
+  closing a driver never waits on a pipe something else still holds;
 - ``hello``: the handshake object (``{"hello": ...}`` is written), or a string written as the
   first stdout line verbatim, or ``null`` to write nothing and wait for end of file; the
   nonce echo ``run`` is filled from ``TRADESMART_LIVE_DRIVER_RUN`` unless the object sets it
@@ -90,6 +93,14 @@ def main() -> int:
     if script.get("child"):
         child = subprocess.Popen([sys.executable, "-c", f"import time; time.sleep({FOREVER})"])  # noqa: S603
         _log({"child": child.pid})
+    if script.get("escaped_child"):
+        # Holds the driver's stdout and stderr open but is outside its process group, so no
+        # tree kill reaches it (as any grandchild on Windows before a tree kill existed there).
+        escaped = subprocess.Popen(  # noqa: S603
+            [sys.executable, "-c", f"import time; time.sleep({FOREVER})"],
+            start_new_session=os.name == "posix",
+        )
+        _log({"escaped_child": escaped.pid})
     hello = script.get("hello", {})
     if hello is None:
         sys.stdin.read()  # nothing on stdout: wait for end of file

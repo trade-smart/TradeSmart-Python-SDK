@@ -529,21 +529,39 @@ class DriverSdk:
             return _TIMEOUT
 
     def _kill(self) -> None:
-        """Kill the driver's whole process tree (its own process group) and reap it."""
+        """Kill the driver's whole process tree and reap it: its own process group on POSIX,
+        ``taskkill /T`` on Windows (``process.kill()`` alone ends the driver but not what it
+        started, such as the runtime a launcher script runs)."""
         process = self.process
         if os.name == "posix":
             with contextlib.suppress(OSError):
                 os.killpg(process.pid, signal.SIGKILL)
+        elif os.name == "nt":
+            # Before process.kill(): taskkill finds the children through their parent.
+            with contextlib.suppress(OSError, subprocess.TimeoutExpired):
+                subprocess.run(  # noqa: S603 - fixed command, our own child's pid
+                    ["taskkill", "/F", "/T", "/PID", str(process.pid)],  # noqa: S607
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    timeout=KILL_WAIT,
+                    check=False,
+                )
         with contextlib.suppress(OSError):
             process.kill()
         with contextlib.suppress(subprocess.TimeoutExpired):
             process.wait(KILL_WAIT)
-        for stream in (process.stdin, process.stdout, process.stderr):
-            with contextlib.suppress(OSError, ValueError):
-                if stream is not None:
-                    stream.close()
-        for reader in self._readers:
+        with contextlib.suppress(OSError, ValueError):
+            if process.stdin is not None:
+                process.stdin.close()
+        # A reader still blocked in readline means something outside the tree kill holds the
+        # pipe open; closing that stream would wait on the reader forever, so it is left to the
+        # daemon thread. Readers: stdout first, then stderr (see __init__).
+        for reader, stream in zip(self._readers, (process.stdout, process.stderr), strict=True):
             reader.join(JOIN_WAIT)
+            if not reader.is_alive():
+                with contextlib.suppress(OSError, ValueError):
+                    if stream is not None:
+                        stream.close()
 
     def _report_stderr(self, event: str = "stderr") -> None:
         """The redacted stderr lines go to the ledger (``driver_stderr``) and the stderr log,

@@ -220,7 +220,8 @@ driver's output ends (the process exited): the harness
 
 - raises `OrderStatusUnknownError` for a state-changing call (the call may have been executed; the
   matrix then reads the order book, never resends) and `NetworkError` for a read;
-- kills the driver's whole process tree (it starts the driver in a process group of its own);
+- kills the driver's whole process tree (on POSIX it starts the driver in a process group of its
+  own; on Windows it uses `taskkill /T`), and never waits on a pipe a surviving process still holds;
 - stops that SDK's run: no further request reaches this driver (every later call is refused before
   anything is written), the matrix skips that SDK's remaining cases with the reason, and its ledger
   names the stop. A broken reply to a state-changing call is CHECK THE ACCOUNT, which also stops
