@@ -182,6 +182,52 @@ Note = Callable[..., None]
 Stop = Callable[[str, bool], None]
 
 
+def _kernel32() -> Any:
+    import ctypes
+    from ctypes import wintypes
+
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)  # type: ignore[attr-defined]
+    kernel32.CreateJobObjectW.argtypes = (ctypes.c_void_p, wintypes.LPCWSTR)
+    kernel32.CreateJobObjectW.restype = wintypes.HANDLE
+    kernel32.AssignProcessToJobObject.argtypes = (wintypes.HANDLE, wintypes.HANDLE)
+    kernel32.AssignProcessToJobObject.restype = wintypes.BOOL
+    kernel32.TerminateJobObject.argtypes = (wintypes.HANDLE, wintypes.UINT)
+    kernel32.TerminateJobObject.restype = wintypes.BOOL
+    kernel32.CloseHandle.argtypes = (wintypes.HANDLE,)
+    kernel32.CloseHandle.restype = wintypes.BOOL
+    return kernel32
+
+
+def _windows_job(process: subprocess.Popen[bytes]) -> Any:
+    """On Windows, a job object holding the driver: its children join it, and ending the job
+    ends the whole tree even after the driver itself exited (``taskkill /T`` finds children only
+    through a living parent). ``None`` elsewhere, or when the job cannot be made (the
+    ``taskkill /T`` backup in ``_kill`` then still runs)."""
+    if os.name != "nt":
+        return None
+    try:
+        kernel32 = _kernel32()
+        job = kernel32.CreateJobObjectW(None, None)
+        if not job:
+            return None
+        if not kernel32.AssignProcessToJobObject(job, int(process._handle)):  # type: ignore[attr-defined]
+            kernel32.CloseHandle(job)
+            return None
+    except (OSError, AttributeError):
+        return None
+    return job
+
+
+def _end_windows_job(job: Any) -> None:
+    """End every process in the driver's job and release it (no-op for ``None``)."""
+    if job is None:
+        return
+    with contextlib.suppress(OSError, AttributeError):
+        kernel32 = _kernel32()
+        kernel32.TerminateJobObject(job, 1)
+        kernel32.CloseHandle(job)
+
+
 def default_reply_timeout(config: ClientConfig | None = None) -> float:
     """The reply timeout of one SDK call: the driver's connect and read timeouts, its order
     rate limiter's longest wait, and ``REPLY_MARGIN`` (30 s with the SDK defaults)."""
@@ -420,6 +466,7 @@ class DriverSdk:
             raise Refusal(
                 f"the live-order driver could not be started ({type(exc).__name__}); refusing"
             ) from None
+        self._job = _windows_job(self.process)  # None off Windows (the process group serves)
         self._readers = [
             threading.Thread(target=self._read_stdout, name="driver-stdout", daemon=True),
             threading.Thread(target=self._read_stderr, name="driver-stderr", daemon=True),
@@ -537,7 +584,10 @@ class DriverSdk:
             with contextlib.suppress(OSError):
                 os.killpg(process.pid, signal.SIGKILL)
         elif os.name == "nt":
-            # Before process.kill(): taskkill finds the children through their parent.
+            # The job ends every process in the tree, even after the driver itself exited.
+            _end_windows_job(self._job)
+            self._job = None
+            # Backup, before process.kill(): taskkill finds the children through their parent.
             with contextlib.suppress(OSError, subprocess.TimeoutExpired):
                 subprocess.run(  # noqa: S603 - fixed command, our own child's pid
                     ["taskkill", "/F", "/T", "/PID", str(process.pid)],  # noqa: S607

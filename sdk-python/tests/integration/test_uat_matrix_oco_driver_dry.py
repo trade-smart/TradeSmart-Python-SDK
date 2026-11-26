@@ -13,6 +13,7 @@ a loopback socket and the broker is in memory.
 from __future__ import annotations
 
 import json
+import os
 import socket
 import sys
 import threading
@@ -174,6 +175,9 @@ def _driver(tmp_path: Path, made: list[Bridge]) -> Any:
             "TRADESMART_LIVE_ORDER_ACCOUNT": ACCOUNT,
             "FAKE_DRIVER_SCRIPT": str(script),
             "FAKE_DRIVER_LOG": str(folder / "driver.log"),
+            # Windows: without SYSTEMROOT the driver's Python cannot open its relay socket
+            # (WinError 10106). A real run passes the whole environment.
+            **{k: v for k, v in os.environ.items() if k.upper() == "SYSTEMROOT"},
         }
         return DriverSdk(
             [sys.executable, str(FAKE)],
