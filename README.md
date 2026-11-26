@@ -2,7 +2,7 @@
 
 The official Python SDK for the [TradeSmart API V2](https://apidocs.tradesmartonline.in/v2/), from
 TradeSmart Fintech Securities Limited. Log in, read your account, find instruments, place and manage
-orders, and stream live prices and order updates from your own Python code. Version **2.0.0**.
+orders, and stream live prices and order updates from your own Python code. Version **2.1.0**.
 
 ## Install
 

@@ -1132,7 +1132,8 @@ def test_published_docs_have_no_internal_notes(doc: Path) -> None:
 
 def test_root_readme_is_a_landing_page() -> None:
     text = (REPO_DIR / "README.md").read_text(encoding="utf-8")
-    for needle in ("sdk-python/docs/", "SECURITY.md", "CONTRIBUTING.md", "LICENSE", "2.0.0"):
+    version = f"Version **{tradesmart.__version__}**"  # the package's version, not a pinned one
+    for needle in ("sdk-python/docs/", "SECURITY.md", "CONTRIBUTING.md", "LICENSE", version):
         assert needle in text, f"root README lacks {needle!r}"
     assert not re.search(r"\d+ tests\b|\d+ ?% coverage", text), "root README quotes test counts"
 

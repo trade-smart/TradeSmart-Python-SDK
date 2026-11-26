@@ -4,7 +4,7 @@ All notable changes to the `tradesmart` Python SDK are documented here. The form
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
-## [2.1.0] — Unreleased
+## [2.1.0] — 2026-11-26
 
 Default `User-Agent`: `tradesmart-python/2.1.0`. A minor release: OCO orders, plus one behaviour
 change to the GTT cancel (see "Changed").
