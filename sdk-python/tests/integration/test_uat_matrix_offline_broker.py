@@ -620,6 +620,42 @@ def test_ctrl_c_mid_round_stops_placing_and_sends_nothing_more(rig: Rig, workers
     assert rig.requests("CancelOrder") == 0  # an interrupted run sends no more calls
 
 
+def test_ctrl_c_as_the_pool_starts_a_worker_still_waits_for_its_call(
+    rig: Rig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # ThreadPoolExecutor starts a worker thread and only then records it for shutdown(): a
+    # Ctrl-C between the two left that worker's call in flight after the interrupt went on
+    # (seen once on macOS CI: the place was recorded after run_batch had raised).
+    if threading.current_thread() is not threading.main_thread():
+        pytest.skip("SIGINT reaches the main thread only")
+    if not hasattr(signal, "pthread_kill"):
+        pytest.skip("no signal.pthread_kill on this OS (Windows): Ctrl+C cannot be simulated here")
+    if signal.getsignal(signal.SIGINT) is not signal.default_int_handler:
+        pytest.skip("SIGINT is handled elsewhere here: it would not raise KeyboardInterrupt")
+    in_call, finished = threading.Event(), threading.Event()
+    original_start = threading.Thread.start
+    fired: list[bool] = []
+
+    def start(self: threading.Thread) -> None:
+        original_start(self)
+        if not fired:  # the pool's first worker: Ctrl-C lands as start() returns
+            fired.append(True)
+            assert in_call.wait(5.0)
+            signal.pthread_kill(threading.main_thread().ident or 0, signal.SIGINT)
+
+    def call(_item: int) -> None:
+        in_call.set()
+        time.sleep(0.3)  # the call is in flight while the interrupt is taken
+        finished.set()
+
+    monkeypatch.setattr(threading.Thread, "start", start)
+    with pytest.raises(KeyboardInterrupt):
+        batch._in_pool(rig.run, call, [1, 2, 3])
+    monkeypatch.undo()
+    assert finished.is_set(), "the interrupt went on while a call was still in flight"
+    assert rig.session.interrupted
+
+
 # -- I1: worker exceptions -------------------------------------------------------------------------
 
 

@@ -70,6 +70,7 @@ count as any other and its writes still cannot burst.
 from __future__ import annotations
 
 import dataclasses
+import itertools
 import json
 import threading
 import time
@@ -738,17 +739,32 @@ def _interrupt(session: MatrixSession) -> None:
     session.guard.stop(INTERRUPTED_REASON)
 
 
+_POOL_IDS = itertools.count(1)
+
+
+def _join_pool_threads(prefix: str) -> None:
+    """Wait for every live thread of one pool, by its name prefix. ``ThreadPoolExecutor`` starts
+    a worker and only then records it for ``shutdown()``: a Ctrl-C between the two leaves a
+    worker (and its call in flight) that ``shutdown(wait=True)`` does not wait for."""
+    current = threading.current_thread()
+    for thread in threading.enumerate():
+        if thread is not current and thread.name.startswith(prefix + "_"):
+            thread.join()
+
+
 def _in_pool(run: MatrixRun, fn: Callable[[_T], _R], items: Sequence[_T]) -> list[_R]:
     """``fn`` over ``items`` on the run's threads. On Ctrl-C (it reaches the waiting main
     thread) the run is stopped first, then every queued item is dropped and only the calls in
-    flight finish; the interrupt is re-raised."""
-    pool = ThreadPoolExecutor(max_workers=max(1, run.workers))
+    flight finish, every one of them, before the interrupt is re-raised."""
+    prefix = f"matrix-pool-{next(_POOL_IDS)}"
+    pool = ThreadPoolExecutor(max_workers=max(1, run.workers), thread_name_prefix=prefix)
     try:
         futures = [pool.submit(fn, item) for item in items]
         return [future.result() for future in futures]
     except KeyboardInterrupt:
         _interrupt(run.session)
         pool.shutdown(wait=True, cancel_futures=True)  # only on Ctrl-C: drop what is queued
+        _join_pool_threads(prefix)  # a worker started but not yet recorded by the pool
         raise
     finally:
         pool.shutdown(wait=True)
